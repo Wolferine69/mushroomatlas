@@ -83,7 +83,7 @@ WSGI_APPLICATION = 'Mushroomatlas.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mushroomatlas',
+        'NAME': 'postgres',
         'USER': 'postgres.gqvpdffwubmpwphrixvk',
         'PASSWORD': '21mushroomatlas+',
         'HOST': 'aws-0-eu-central-1.pooler.supabase.com',
