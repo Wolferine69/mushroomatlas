@@ -1,10 +1,12 @@
-{% extends 'home.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 <p>Name: {{ mushroom.name_cz }}</p>
 <p>Description: {{ mushroom.description }}</p>
 <p>Edibility: {{ mushroom.edibility }}</p>
 <p>Habitat: {{ mushroom.habitat }}</p>
+    {% if mushroom.image %}
 <p>Image: <img src="{{ mushroom.image.url }}" alt="{{ mushroom.name_cz }}"></p>
+    {% endif %}
 <p>Family: <a href="{% url 'family_detail' mushroom.family.id %}">{{ mushroom.family.name }}</a></p>
 {% endblock %}
