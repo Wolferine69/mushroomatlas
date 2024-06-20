@@ -23,16 +23,16 @@ class Family(models.Model):
  class Mushroom(models.Model):
      """Model representing a mushroom family."""
      EDIBILITY_CHOICES = [
-         ('edible', 'Edible'),
-         ('inedible', 'Inedible'),
-         ('poisonous', 'Poisonous'),
+         ('jedla', 'Jedlá'),
+         ('nejedla', 'Nejedlá'),
+         ('jedovata', 'Jedovatá'),
      ]
      HABITAT_CHOICES = [
-         ('deciduous', 'Deciduous Forest'),
-         ('coniferous', 'Coniferous Forest'),
-         ('mixed', 'Mixed Forest'),
-         ('meadow', 'Meadow'),
-         ('other', 'Other'),
+         ('listnaty', 'Listnatý les'),
+         ('jehlicnaty', 'Jehličnatý les'),
+         ('smiseny', 'Smíšený les'),
+         ('louka', 'Louka'),
+         ('jine', 'Jiné'),
      ]
      name_cz = models.CharField(max_length=100)
      name_latin = models.CharField(max_length=100)
