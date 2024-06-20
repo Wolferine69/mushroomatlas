@@ -1,1 +1,2 @@
 dodelat accounts a do admin.py ho dat
+zmenit mnozne cisla modelu v adminu
