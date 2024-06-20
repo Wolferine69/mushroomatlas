@@ -1,0 +1,1 @@
+dodelat accounts a do admin.py ho dat
