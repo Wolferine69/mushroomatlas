@@ -1,14 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Uzivatelsky formular</title>
-</head>
-<body>
-<form method="POST">
-    {% csrf_token %}
-    <table>{{ form }}</table>
-    <input type="submit" value="Submit" class="btn btn-primary">
-</form>
-</body>
-</html>
+{% extends "form.html" %}
+{% block form_title %}
+    <h3>Prihlasovaci formular</h3>
+{% endblock %}
