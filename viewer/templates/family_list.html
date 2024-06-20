@@ -1,0 +1,9 @@
+{% extends 'home.html' %}
+
+{% block content %}
+<ul>
+    {% for family in families %}
+    <li><a href="{% url 'family_detail' family.id %}">{{ family.name }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

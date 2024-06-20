@@ -1,0 +1,9 @@
+{% extends 'home.html' %}
+
+{% block content %}
+<ul>
+    {% for mushroom in mushrooms %}
+    <li><a href="{% url 'mushroom_detail' mushroom.id %}">{{ mushroom.name_cz }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

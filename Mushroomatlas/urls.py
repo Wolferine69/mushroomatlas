@@ -20,7 +20,10 @@ from django.contrib import admin
 from django.urls import path, include
 
 from accounts.views import SubmittableLoginView, RegistrationView
-from viewer.views import home
+from viewer.views import (home,
+                          MushroomListView, MushroomDetailView,
+                          FamilyListView, FamilyDetailView
+                          )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,4 +31,10 @@ urlpatterns = [
     path('accounts/login/', SubmittableLoginView.as_view(), name='login'),
     path('accounts/registration/', RegistrationView.as_view(), name='registration'),
     path('accounts/', include('django.contrib.auth.urls')),
+
+    path('mushrooms/', MushroomListView.as_view(), name='mushroom_list'),
+    path('mushrooms/<int:pk>/', MushroomDetailView.as_view(), name='mushroom_detail'),
+    path('families/', FamilyListView.as_view(), name='family_list'),
+    path('families/<int:pk>/', FamilyDetailView.as_view(), name='family_detail'),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
