@@ -1,11 +1,44 @@
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView
+from django.db.transaction import atomic
+from django.forms import Textarea, CharField, ImageField
 from django.shortcuts import render
 from django.urls import reverse_lazy
+from django.views.generic import CreateView
+
+from accounts.models import Profile
 
 
 # Create your views here.
 class SubmittableLoginView(LoginView):
-    template_name = 'registration/login.html'
+    template_name = 'login.html'
 
     def get_success_url(self):
         return reverse_lazy('home')
+
+
+class RegistrationForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
+
+    profile_picture = ImageField(label='Nahrát profilový obrázek', required=False)
+    biography = CharField(label='Tady můžeš napsat něco o sobě', widget=Textarea, required=False)
+
+    @atomic
+    def save(self, commit=True):
+        self.instance.is_active = True
+        user = super().save(commit)
+        biography = self.cleaned_data['biography']
+        profile_picture = self.cleaned_data['profile_picture']
+        profile = Profile(user=user, biography=biography, profile_picture=profile_picture)
+        if commit:
+            profile.save()
+        return user
+
+
+class RegistrationView(CreateView):
+    template_name = 'registration.html'
+    form_class = RegistrationForm
+    success_url = reverse_lazy('home')
+
