@@ -14,6 +14,7 @@ class User(models.Model):
 
 class Family(models.Model):
     name = models.CharField(max_length=100)
+    name_latin = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
 
     def __str__(self):
