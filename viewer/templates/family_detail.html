@@ -1,0 +1,12 @@
+{% extends 'home.html' %}
+
+{% block content %}
+<h2>{{ family.name }}</h2>
+<p>Description: {{ family.description }}</p>
+<h3>Mushrooms in this Family:</h3>
+<ul>
+    {% for mushroom in family.mushrooms.all %}
+    <li><a href="{% url 'mushroom_detail' mushroom.id %}">{{ mushroom.name }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

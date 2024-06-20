@@ -18,11 +18,20 @@ from django.contrib import admin
 from django.urls import path, include
 
 from accounts.views import SubmittableLoginView
-from viewer.views import home
+from viewer.views import (home,
+                          MushroomListView, MushroomDetailView,
+                          FamilyListView, FamilyDetailView
+                          )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home, name='home'),
     path('accounts/login/', SubmittableLoginView.as_view(), name='login'),
     path('accounts/', include('django.contrib.auth.urls')),
+
+    path('mushrooms/', MushroomListView.as_view(), name='mushroom_list'),
+    path('mushrooms/<int:pk>/', MushroomDetailView.as_view(), name='mushroom_detail'),
+    path('families/', FamilyListView.as_view(), name='family_list'),
+    path('families/<int:pk>/', FamilyDetailView.as_view(), name='family_detail'),
+
 ]
