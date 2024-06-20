@@ -1,17 +1,8 @@
 from django.db import models
+from accounts.models import Profile
+
 
 # Create your models here.
-class User(models.Model):
-    """Model representing a user."""
-    username = models.CharField(max_length=150)
-    email = models.EmailField(max_length=255, unique=True)
-    password = models.CharField(max_length=128)
-    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
-
-    def __str__(self):
-        return self.username
-
-
 class Family(models.Model):
     name = models.CharField(max_length=100)
     name_latin = models.CharField(max_length=100)
@@ -48,7 +39,7 @@ class Family(models.Model):
 
  class Finding(models.Model):
     """Model representing a finding of a mushroom."""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='findings')
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='findings')
     mushroom = models.ForeignKey(Mushroom, on_delete=models.CASCADE, related_name='findings')
     description = models.TextField(null=True, blank=True)
     date_found = models.DateField()
@@ -60,7 +51,7 @@ class Family(models.Model):
 
 class Recipe(models.Model):
     """Model representing a mushroom recipe."""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipes')
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='recipes')
     title = models.CharField(max_length=100)
     ingredients = models.TextField()
     instructions = models.TextField()
@@ -72,7 +63,7 @@ class Recipe(models.Model):
 
 class Comment(models.Model):
     """Model representing a comment on a finding."""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='comments')
     finding = models.ForeignKey(Finding, on_delete=models.CASCADE, related_name='comments')
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
