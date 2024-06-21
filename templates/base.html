@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html {% if LANGUAGE_CODE %} lang="{{ LANGUAGE_CODE }}" {% else %} lang="en" {% endif %}>
 <head>
     <meta charset="UTF-8">
@@ -34,6 +35,7 @@
         {% endblock %}
     </main>
     <footer role="contentinfo" class="bg-light text-center py-3">
+        <img src="{% static "houby.png" %}" alt="picture of mushrooms" >
         <p>&copy; 2024 Mushroomatlas. All rights reserved.</p>
     </footer>
     <!-- Bootstrap JS and dependencies -->
