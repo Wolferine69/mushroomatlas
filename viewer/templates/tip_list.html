@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Tipy a triky</h1>
+<ul>
+    {% for tip in tips %}
+    <li>
+        <a href="{% url 'tip_detail' pk=tip.pk %}">{{ tip.title }}</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

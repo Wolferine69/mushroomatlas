@@ -22,7 +22,7 @@ from django.urls import path, include
 from accounts.views import SubmittableLoginView, RegistrationView
 from viewer.views import (home,
                           MushroomListView, MushroomDetailView,
-                          FamilyListView, FamilyDetailView, RecipeListView, RecipeDetailView
+                          FamilyListView, FamilyDetailView, RecipeListView, RecipeDetailView, TipListView, TipDetailView
                           )
 
 urlpatterns = [
@@ -39,5 +39,8 @@ urlpatterns = [
 
     path('recipes/', RecipeListView.as_view(), name='recipes_list'),
     path('recipes/<int:pk>/', RecipeDetailView.as_view(), name='recipe_detail'),
+
+    path('tip/', TipListView.as_view(), name='tip_list'),
+    path('tip/<int:pk>/', TipDetailView.as_view(), name='tip_detail'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

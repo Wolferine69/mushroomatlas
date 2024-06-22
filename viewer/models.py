@@ -65,6 +65,16 @@ class Recipe(models.Model):
         return self.title
 
 
+class Tip(models.Model):
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='tip', null=True, blank=True)
+    title = models.CharField(max_length=500)
+    content = models.TextField()
+    image = models.ImageField(upload_to='recipe_images/', null=True, blank=True)
+
+    def __str__(self):
+        return self.title
+
+
 class Comment(models.Model):
     """Model representing a comment on a finding."""
     user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='comments')
