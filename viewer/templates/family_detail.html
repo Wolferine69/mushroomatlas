@@ -6,7 +6,7 @@
 <h3>Mushrooms in this Family:</h3>
 <ul>
     {% for mushroom in family.mushrooms.all %}
-    <li><a href="{% url 'mushroom_detail' mushroom.id %}">{{ mushroom.name }}</a></li>
+    <li><a href="{% url 'mushroom_detail' mushroom.id %}">{{ mushroom.name_cz }} ({{ mushroom.name_latin }})</a></li>
     {% endfor %}
 </ul>
 {% endblock %}
