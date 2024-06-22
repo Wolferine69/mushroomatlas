@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<p>Name: {{ mushroom.name_cz }}</p>
-<p>Description: {{ mushroom.description }}</p>
-<p>Edibility: {{ mushroom.edibility }}</p>
-<p>Habitat: {{ mushroom.habitat }}</p>
+<h2><strong>{{ mushroom.name_cz }}</strong></h2>
+<p><strong> Popis:</strong>  {{ mushroom.description }}</p>
+<p><strong> Jedlost:</strong>  {{ mushroom.get_edibility_display }}</p>
+<p><strong> Místo výskytu:</strong>  {{ mushroom.get_habitat_display }}</p>
     {% if mushroom.image %}
-<p>Image: <img src="{{ mushroom.image.url }}" alt="{{ mushroom.name_cz }}"></p>
+<p><strong> Obrázek:</strong>  <img src="{{ mushroom.image.url }}" alt="{{ mushroom.name_cz }}"></p>
     {% endif %}
-<p>Family: <a href="{% url 'family_detail' mushroom.family.id %}">{{ mushroom.family.name }}</a></p>
+<p><strong> Řád:</strong>  <a href="{% url 'family_detail' mushroom.family.id %}">{{ mushroom.family.name }}</a></p>
 {% endblock %}
