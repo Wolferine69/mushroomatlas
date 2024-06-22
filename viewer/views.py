@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView
-from .models import  Mushroom,Family
+from .models import Mushroom, Family, Recipe
+
 
 # Create your views here.
 def home(request):
@@ -27,3 +28,20 @@ class FamilyDetailView(DetailView):
     model = Family
     template_name = 'family_detail.html'
     context_object_name = 'family'
+
+class RecipeListView(ListView):
+    model = Recipe
+    template_name = 'recipes_list.html'
+    context_object_name = 'recipes'
+
+class RecipeDetailView(DetailView):
+    model = Recipe
+    template_name = 'recipes_detail.html'
+    context_object_name = 'recipe'
+
+class MushroomDetailView(DetailView):
+    model = Mushroom
+    template_name = 'mushroom_detail.html'
+    context_object_name = 'mushroom'
+
+
