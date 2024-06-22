@@ -47,7 +47,7 @@ class MushroomDetailView(DetailView):
 class TipListView(ListView):
     model = Tip
     template_name = 'tip_list.html'
-    context_object_name = 'tip'
+    context_object_name = 'tips'
 
 class TipDetailView(DetailView):
     model = Tip
