@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p>Name: {{ recipe.title }}</p>
+<p>Ingredients: {{ recipe.ingredients }}</p>
+<p>Instructions: {{ recipe.instructions }}</p>
+    {% if recipe.image %}
+<p>Image: <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}"></p>
+    {% endif %}
+<p>Main mushroom: <a href="{% url 'mushroom_detail' pk=recipe.main_mushroom.pk %}">{{ recipe.main_mushroom.name_cz }}</a></p>
+{% endblock %}

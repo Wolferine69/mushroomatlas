@@ -36,7 +36,7 @@ class RecipeListView(ListView):
 
 class RecipeDetailView(DetailView):
     model = Recipe
-    template_name = 'recipes_detail.html'
+    template_name = 'recipe_detail.html'
     context_object_name = 'recipe'
 
 class MushroomDetailView(DetailView):

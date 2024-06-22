@@ -9,4 +9,5 @@
 <p>Image: <img src="{{ mushroom.image.url }}" alt="{{ mushroom.name_cz }}"></p>
     {% endif %}
 <p>Family: <a href="{% url 'family_detail' mushroom.family.id %}">{{ mushroom.family.name }}</a></p>
+<p>Recipes: <a href="{{recipes_list }}" alt="{{recipe.title }}"></p>
 {% endblock %}

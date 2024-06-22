@@ -55,7 +55,7 @@ class Finding(models.Model):
 class Recipe(models.Model):
     """Model representing a mushroom recipe."""
     user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='recipes')
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=120)
     ingredients = models.TextField()
     instructions = models.TextField()
     image = models.ImageField(upload_to='recipe_images/', null=True, blank=True)
