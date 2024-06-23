@@ -1,8 +1,7 @@
-from django.shortcuts import render
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView
 from .models import Mushroom, Family, Recipe, Tip
-
+from .forms import MushroomForm
 
 # Create your views here.
 def home(request):
@@ -55,3 +54,14 @@ class TipDetailView(DetailView):
     model = Tip
     template_name = 'tip_detail.html'
     context_object_name = 'tip'
+
+def add_mushroom(request):
+    if request.method == 'POST':
+        form = MushroomForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('mushroom_list')
+
+    else:
+        form = MushroomForm()
+    return render(request, 'mushroom_create.html', {'form': form})

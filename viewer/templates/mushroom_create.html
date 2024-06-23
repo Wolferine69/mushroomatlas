@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Add New Mushroom{% endblock %}
+
+{% block content %}
+    <h2>Přidat novou houbu</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="{{ form.name_cz.id_for_label }}"><strong>Název cz:</strong></label>
+            {{ form.name_cz }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.name_latin.id_for_label }}"><strong>Název latinsky:</strong></label>
+            {{ form.name_latin }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.description.id_for_label }}"><strong>Popis:</strong></label>
+            {{ form.description }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.edibility.id_for_label }}"><strong>Jedlost:</strong></label>
+            {{ form.edibility }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.habitat.id_for_label }}"><strong>Stanoviště:</strong></label>
+            {{ form.habitat }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.image.id_for_label }}"><strong>Obrázek:</strong></label>
+            {{ form.image }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.family.id_for_label }}"><strong>Rodina:</strong></label>
+            {{ form.family }}
+        </div>
+        <button type="submit" class="btn btn-primary">Přidat</button>
+    </form>
+{% endblock %}
