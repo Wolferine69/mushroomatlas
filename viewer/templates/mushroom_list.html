@@ -1,9 +1,39 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load form_tags %}
 
 {% block content %}
-<ul>
-    {% for mushroom in mushrooms %}
-    <li><a href="{% url 'mushroom_detail' mushroom.id %}">{{ mushroom.name_cz }}</a></li>
-    {% endfor %}
-</ul>
+<div class="container mt-4">
+    <form method="get" class="form-inline mb-4">
+        <div class="form-group mr-2">
+            <label for="id_edibility" class="mr-2">Jedlost:</label>
+            {{ form.edibility|add_class:"form-control" }}
+        </div>
+        <div class="form-group mr-2">
+            <label for="id_habitat" class="mr-2">Biotop:</label>
+            {{ form.habitat|add_class:"form-control" }}
+        </div>
+        <button type="submit" class="btn btn-primary">Filtrovat</button>
+    </form>
+
+    <div class="row">
+        {% for mushroom in mushrooms %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                {% if mushroom.image %}
+                <img src="{{ mushroom.image.url }}" class="card-img-top img-fluid img-fixed" alt="{{ mushroom.name_cz }}">
+                {% else %}
+                <img src="{% static 'path/to/default/image.jpg' %}" class="card-img-top img-fluid img-fixed" alt="{{ mushroom.name_cz }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ mushroom.name_cz }} ({{ mushroom.name_latin }})</h5>
+                    <p class="card-text">{{ mushroom.description|truncatewords:20 }}</p>
+                    <p class="card-text"><strong>Jedlost:</strong> {{ mushroom.get_edibility_display }}</p>
+                    <a href="{% url 'mushroom_detail' mushroom.id %}" class="btn btn-primary">Více informací</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
