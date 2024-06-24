@@ -63,14 +63,14 @@ class MushroomFormTest(TestCase):
                 'description': 'Popis',
                 'edibility': 'jedla',
                 'image': 'Obrázek',
-                # Missing 'family' and 'habitats' fields which are required
+
             }
         )
         print(f"\ntest_mushroom_form_is_invalid: {form.data}")
         print('----------------------------------------')
         if not form.is_valid():
             print("test_mushroom_form_is_invalid: PASSED")
-            print(form.errors)  # Print form errors if the form is invalid
+            print(form.errors)
         else:
             print("test_mushroom_form_is_invalid: FAILED")
 
