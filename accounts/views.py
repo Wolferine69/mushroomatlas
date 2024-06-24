@@ -1,6 +1,6 @@
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.db.transaction import atomic
 from django.forms import Textarea, CharField, ImageField
 from django.shortcuts import render
@@ -42,3 +42,7 @@ class RegistrationView(CreateView):
     form_class = RegistrationForm
     success_url = reverse_lazy('home')
 
+
+class SubmittablePasswordChangeView(PasswordChangeView):
+    template_name = 'password.html'
+    success_url = reverse_lazy('home')
