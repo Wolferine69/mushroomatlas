@@ -19,7 +19,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-from accounts.views import SubmittableLoginView, RegistrationView, SubmittablePasswordChangeView
+from accounts.views import SubmittableLoginView, RegistrationView, SubmittablePasswordChangeView, AccountsListView, \
+    AccountDetailView
 from viewer.views import (home,
                           MushroomListView, MushroomDetailView,
                           FamilyListView, FamilyDetailView, RecipeListView, RecipeDetailView, TipListView,
@@ -32,6 +33,8 @@ urlpatterns = [
     path('accounts/login/', SubmittableLoginView.as_view(), name='login'),
     path('accounts/registration/', RegistrationView.as_view(), name='registration'),
     path('accounts/password_change/', SubmittablePasswordChangeView.as_view(), name='password_change'),
+    path('accounts/profiles', AccountsListView.as_view(), name='accounts_list'),
+    path('accounts/profiles/<int:pk>/', AccountDetailView.as_view(), name='account_detail'),
     path('accounts/', include('django.contrib.auth.urls')),
 
     path('mushrooms/', MushroomListView.as_view(), name='mushroom_list'),

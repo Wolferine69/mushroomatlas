@@ -5,7 +5,7 @@ from django.db.transaction import atomic
 from django.forms import Textarea, CharField, ImageField
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.views.generic import CreateView, ListView, DetailView
 
 from accounts.models import Profile
 
@@ -43,3 +43,15 @@ class RegistrationView(CreateView):
 class SubmittablePasswordChangeView(PasswordChangeView):
     template_name = 'password.html'
     success_url = reverse_lazy('home')
+
+
+class AccountsListView(ListView):
+    model = Profile
+    template_name = 'accounts_list.html'
+    context_object_name = 'accounts'
+
+
+class AccountDetailView(DetailView):
+    model = Profile
+    template_name = 'account_detail.html'
+    context_object_name = 'account'
