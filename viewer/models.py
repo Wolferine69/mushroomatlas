@@ -9,6 +9,9 @@ class Family(models.Model):
     name_latin = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
 
+    class Meta:
+        ordering = ['name']
+
     def __str__(self):
         return self.name
 
@@ -34,6 +37,9 @@ class Mushroom(models.Model):
     habitat = models.CharField(max_length=10, choices=HABITAT_CHOICES, default='mixed', )
     image = models.ImageField(upload_to='mushroom_images/', null=True, blank=True)
     family = models.ForeignKey(Family, on_delete=models.CASCADE, related_name='mushrooms', null=True, blank=True)
+
+    class Meta:
+        ordering = ['name_cz']
 
     def __str__(self):
         return f"{self.name_cz} ({self.name_latin}) - {self.get_edibility_display()} - Habitat: {self.get_habitat_display()}"
@@ -61,6 +67,9 @@ class Recipe(models.Model):
     image = models.ImageField(upload_to='recipe_images/', null=True, blank=True)
     main_mushroom = models.ForeignKey(Mushroom, on_delete=models.CASCADE, related_name='recipes', null=True, blank=True)
 
+    class Meta:
+        ordering = ['title']
+
     def __str__(self):
         return self.title
 
@@ -70,6 +79,9 @@ class Tip(models.Model):
     title = models.CharField(max_length=500)
     content = models.TextField()
     image = models.ImageField(upload_to='recipe_images/', null=True, blank=True)
+
+    class Meta:
+        ordering = ['title']
 
     def __str__(self):
         return self.title

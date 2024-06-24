@@ -4,5 +4,5 @@ zmenit mnozne cisla modelu v adminu
 upravit aby bylo možné mít 2 habitaty u Lišák zlatý (Hydnum repandum),
 Žampion polní (Agaricus campestris) 3 moznosti, Holubinka nazelenalá
 
-přidat defaultní třídění modelů (hlavně account)
+
 

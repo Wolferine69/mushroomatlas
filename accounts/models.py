@@ -9,5 +9,8 @@ class Profile(models.Model):
     biography = models.TextField(null=True, blank=True)
     profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
 
+    class Meta:
+        ordering = ['user__username']
+
     def __str__(self):
         return self.user.username
