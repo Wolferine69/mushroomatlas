@@ -1,5 +1,6 @@
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.db.transaction import atomic
 from django.forms import Textarea, CharField, ImageField
@@ -45,13 +46,13 @@ class SubmittablePasswordChangeView(PasswordChangeView):
     success_url = reverse_lazy('home')
 
 
-class AccountsListView(ListView):
+class AccountsListView(LoginRequiredMixin, ListView):
     model = Profile
     template_name = 'accounts_list.html'
     context_object_name = 'accounts'
 
 
-class AccountDetailView(DetailView):
+class AccountDetailView(LoginRequiredMixin, DetailView):
     model = Profile
     template_name = 'account_detail.html'
     context_object_name = 'account'
