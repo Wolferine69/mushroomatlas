@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView
 from .models import Mushroom, Family, Recipe, Tip
@@ -55,6 +56,7 @@ class TipDetailView(DetailView):
     template_name = 'tip_detail.html'
     context_object_name = 'tip'
 
+@login_required
 def add_mushroom(request):
     if request.method == 'POST':
         form = MushroomForm(request.POST, request.FILES)

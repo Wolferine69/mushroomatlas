@@ -5,6 +5,7 @@ from accounts.models import Profile
 
 # Create your models here.
 class Family(models.Model):
+    """Model representing a mushroom family."""
     name = models.CharField(max_length=100)
     name_latin = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
@@ -24,7 +25,7 @@ class Habitat(models.Model):
 
 
 class Mushroom(models.Model):
-    """Model representing a mushroom family."""
+    """Model representing a mushroom."""
     EDIBILITY_CHOICES = [
         ('jedla', 'Jedlá'),
         ('nejedla', 'Nejedlá'),
@@ -40,6 +41,7 @@ class Mushroom(models.Model):
 
     class Meta:
         ordering = ['name_cz']
+
 
     def __str__(self):
         return f"{self.name_cz} ({self.name_latin}) - {self.get_edibility_display()}"
