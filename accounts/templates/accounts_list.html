@@ -3,7 +3,7 @@
 {% block content %}
 <ul>
     {% for account in accounts %}
-    <li><a href="{% url 'account_detail' account.id %}">{{ account.name }}</a></li>
+    <li><a href="{% url 'account_detail' account.id %}">{{ account.user.username }}</a></li>
     {% endfor %}
 </ul>
 {% endblock %}

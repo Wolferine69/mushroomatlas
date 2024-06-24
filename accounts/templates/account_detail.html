@@ -1,12 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{#<h2><strong> {{ family.name }}</strong> </h2>#}
-{#<p><strong> Popis:</strong>  {{ family.description }}</p>#}
-{#<h3><strong> Mushrooms in this Family:</strong></h3>#}
-{#<ul>#}
-{#    {% for mushroom in family.mushrooms.all %}#}
-{#    <li><a href="{% url 'mushroom_detail' mushroom.id %}">{{ mushroom.name_cz }} ({{ mushroom.name_latin }})</a></li>#}
-{#    {% endfor %}#}
-{#</ul>#}
+<h2><strong>{{ account.user.username }}</strong></h2>
+    {% if account.profile_picture %}
+<p><img src="{{ account.profile_picture.url }}" alt="{{ account.user.username }}"
+        class="img-fluid" style="max-width: 300px; max-height: 300px;"></p>
+    {% endif %}
+<p><strong>{{ account.user.first_name }} {{ account.user.last_name }}</strong></p>
+    <p>{{ account.biography }}</p>
 {% endblock %}
