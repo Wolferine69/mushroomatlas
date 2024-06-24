@@ -4,7 +4,15 @@
 <h2><strong>{{ mushroom.name_cz }}</strong></h2>
 <p><strong> Popis:</strong>  {{ mushroom.description }}</p>
 <p><strong> Jedlost:</strong>  {{ mushroom.get_edibility_display }}</p>
-<p><strong> Místo výskytu:</strong>  {{ mushroom.get_habitat_display }}</p>
+<p><strong> Místo výskytu:</strong>
+{% if mushroom.habitats.exists %}
+    {% for habitat in mushroom.habitats.all %}
+        {{ habitat.name }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+{% else %}
+    <span>Nejsou k dispozici žádná data o místech výskytu.</span>
+{% endif %}
+</p>
     {% if mushroom.image %}
 <p><strong> Obrázek:</strong>  <img src="{{ mushroom.image.url }}" alt="{{ mushroom.name_cz }}"></p>
     {% endif %}
