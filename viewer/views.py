@@ -3,6 +3,7 @@ from django.views.generic import ListView, DetailView
 from .models import Mushroom, Family, Recipe, Tip
 from .forms import MushroomForm
 
+
 # Create your views here.
 def home(request):
     return render(request, "home.html")
@@ -54,6 +55,7 @@ class TipDetailView(DetailView):
     model = Tip
     template_name = 'tip_detail.html'
     context_object_name = 'tip'
+
 
 def add_mushroom(request):
     if request.method == 'POST':

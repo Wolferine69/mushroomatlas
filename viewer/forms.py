@@ -8,6 +8,7 @@ class MushroomForm(forms.ModelForm):
     class Meta:
         model = Mushroom
         fields = ['name_cz', 'name_latin', 'description', 'edibility', 'habitats', 'image', 'family']
+        widgets = {'habitats': forms.CheckboxSelectMultiple(),}
         labels = {
             'name_cz': 'Název cz',
             'name_latin': 'Název latinsky',
