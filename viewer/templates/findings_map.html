@@ -41,8 +41,27 @@
             <p><strong>Popis:</strong> ${finding.description}</p>
             <p><strong>Datum nálezu:</strong> ${finding.date_found}</p>
         `;
+        if (finding.image) {
+            detailsContent += `<p><img src="${finding.image}" alt="obrázek nálezu" style="max-width: 100%; height: auto;"></p>`;
+        }
         document.getElementById('details-content').innerHTML = detailsContent;
     }
+
+    // Přidání markerů pro každý nález
+    {% for finding in findings %}
+    var marker = L.marker([{{ finding.latitude }}, {{ finding.longitude }}]);
+    marker.mushroomId = "{{ finding.mushroom.id }}";
+    marker.on('click', function() {
+        showDetails({
+            mushroom: { name_cz: "{{ finding.mushroom.name_cz }}" },
+            description: "{{ finding.description }}",
+            date_found: "{{ finding.date_found }}",
+            image: "{% if finding.image %}{{ finding.image.url }}{% endif %}"
+        });
+    });
+    markers.push(marker);
+    marker.addTo(map);
+    {% endfor %}
 
     // Funkce pro filtrování markerů
     function filterMarkers() {
@@ -56,20 +75,6 @@
         });
     }
 
-    // Přidání markerů pro každý nález
-    {% for finding in findings %}
-    var marker = L.marker([{{ finding.latitude }}, {{ finding.longitude }}]);
-    marker.mushroomId = "{{ finding.mushroom.id }}";
-    marker.on('click', function() {
-        showDetails({
-            mushroom: { name_cz: "{{ finding.mushroom.name_cz }}" },
-            description: "{{ finding.description }}",
-            date_found: "{{ finding.date_found }}"
-        });
-    });
-    markers.push(marker);
-    marker.addTo(map);
-    {% endfor %}
 
     // Přidání event listeneru pro změnu filtru
     document.getElementById('mushroom-filter').addEventListener('change', filterMarkers);

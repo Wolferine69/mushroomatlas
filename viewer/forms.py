@@ -36,7 +36,7 @@ class MushroomFilterForm(forms.Form):
 class FindingForm(forms.ModelForm):
     class Meta:
         model = Finding
-        fields = ['mushroom', 'description', 'date_found', 'latitude', 'longitude']
+        fields = ['mushroom', 'description', 'date_found', 'image', 'latitude', 'longitude']
         widgets = {
             'latitude': forms.HiddenInput(),
             'longitude': forms.HiddenInput(),
