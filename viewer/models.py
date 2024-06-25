@@ -59,7 +59,7 @@ class Finding(models.Model):
     image = models.ImageField(upload_to='finding_images/', null=True, blank=True)
 
     def __str__(self):
-        return f"Finding of {self.mushroom.name_cz} by {self.user.username}"
+        return f"Finding of {self.mushroom.name_cz} by {self.user.user.username}"
 
 
 class Recipe(models.Model):
@@ -100,4 +100,4 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Comment by {self.user.username} on {self.finding}"
+        return f"Comment by {self.user.user.username} on {self.finding}"

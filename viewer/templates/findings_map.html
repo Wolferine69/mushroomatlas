@@ -46,6 +46,14 @@
         if (finding.image) {
             detailsContent += `<p><img src="${finding.image}" alt="obrázek nálezu" style="max-width: 100%; height: auto;"></p>`;
         }
+        detailsContent += `<h4>Komentáře:</h4>`;
+        if (finding.comments.length > 0) {
+            finding.comments.forEach(comment => {
+                detailsContent += `<p><strong>${comment.user}:</strong> ${comment.text} <br><em>${comment.created_at}</em></p>`;
+            });
+        } else {
+            detailsContent += `<p>Žádné komentáře.</p>`;
+        }
         document.getElementById('details-content').innerHTML = detailsContent;
     }
 
@@ -58,7 +66,16 @@
             mushroom: { name_cz: "{{ finding.mushroom.name_cz }}" },
             description: "{{ finding.description }}",
             date_found: "{{ finding.date_found }}",
-            image: "{% if finding.image %}{{ finding.image.url }}{% endif %}"
+            image: "{% if finding.image %}{{ finding.image.url }}{% endif %}",
+            comments: [
+                {% for comment in finding.comments.all %}
+                {
+                    user: "{{ comment.user.user.username }}",
+                    text: "{{ comment.text }}",
+                    created_at: "{{ comment.created_at }}"
+                }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ]
         });
     });
     markers.push(marker);

@@ -5,7 +5,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 
 from accounts.models import Profile
-from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding
+from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding, Comment
 from .forms import MushroomForm, MushroomFilterForm, FindingForm
 
 
@@ -112,6 +112,7 @@ class FindingsMapView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['mushrooms'] = Mushroom.objects.all()
+        context['comments'] = Comment.objects.all()
         return context
 
 
