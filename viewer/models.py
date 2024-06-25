@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from django.db import models
 
 from accounts.models import Profile
@@ -64,7 +63,7 @@ class Finding(models.Model):
 
 class Recipe(models.Model):
     """Model representing a mushroom recipe."""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipes')
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='recipes')
     title = models.CharField(max_length=120)
     ingredients = models.TextField()
     instructions = models.TextField()
