@@ -20,7 +20,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from accounts.views import SubmittableLoginView, RegistrationView, SubmittablePasswordChangeView, AccountsListView, \
-    AccountDetailView
+    AccountDetailView, ProfileUpdateView
 from viewer.views import (home,
                           MushroomListView, MushroomDetailView,
                           FamilyListView, FamilyDetailView, RecipeListView, RecipeDetailView, TipListView,
@@ -36,6 +36,7 @@ urlpatterns = [
     path('accounts/profiles', AccountsListView.as_view(), name='accounts_list'),
     path('accounts/profiles/<int:pk>/', AccountDetailView.as_view(), name='account_detail'),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/profile/update/', ProfileUpdateView.as_view(), name='profile_update'),
 
     path('mushrooms/', MushroomListView.as_view(), name='mushroom_list'),
     path('mushrooms/<int:pk>/', MushroomDetailView.as_view(), name='mushroom_detail'),
@@ -52,5 +53,6 @@ urlpatterns = [
 
     path('findings_map/', FindingsMapView.as_view(), name='findings_map'),
     path('add_finding/', AddFindingView.as_view(), name='add_finding'),
+
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
