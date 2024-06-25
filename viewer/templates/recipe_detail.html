@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<p>Name: {{ recipe.title }}</p>
-<p>Ingredients: {{ recipe.ingredients }}</p>
-<p>Instructions: {{ recipe.instructions }}</p>
-    {% if recipe.image %}
-<p>Image: <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}"></p>
-    {% endif %}
-<p>Main mushroom: <a href="{% url 'mushroom_detail' pk=recipe.main_mushroom.pk %}">{{ recipe.main_mushroom.name_cz }}</a></p>
+<h2><strong>{{ recipe.title }}</strong></h2>
+<p><strong>Ingredience: </strong> {{ recipe.ingredients }}</p>
+<p><strong>Instrukce: </strong> {{ recipe.instructions }}</p>
+{% if recipe.image %}
+    <p><strong>Obrázek: </strong> <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}"></p>
+{% endif %}
+<p><strong>Hlavní houba: </strong> <a href="{% url 'mushroom_detail' pk=recipe.main_mushroom.pk %}">{{ recipe.main_mushroom.name_cz }}</a></p>
+<p><strong>Přidal uživatel: </strong> {{ recipe.user.username }}</p>
 {% endblock %}

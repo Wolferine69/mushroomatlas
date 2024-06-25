@@ -58,17 +58,29 @@ class RecipeListView(ListView):
     template_name = 'recipes_list.html'
     context_object_name = 'recipes'
 
+    def recipes_list(request):
+        recipes = Recipe.objects.all().select_related('user')
+        return render(request, 'recipes_list.html', {'recipes': recipes})
+
 
 class RecipeDetailView(DetailView):
     model = Recipe
     template_name = 'recipe_detail.html'
     context_object_name = 'recipe'
 
+    def recipe_detail(request, pk):
+        recipe = Recipe.objects.select_related('user', 'main_mushroom').get(pk=pk)
+        return render(request, 'recipe_detail.html', {'recipe': recipe})
+
 
 class TipListView(ListView):
     model = Tip
     template_name = 'tip_list.html'
     context_object_name = 'tips'
+
+    def tips_list(request):
+        tips = Tip.objects.all().select_related('user')
+        return render(request, 'your_template.html', {'tips': tips})
 
 
 class TipDetailView(DetailView):
