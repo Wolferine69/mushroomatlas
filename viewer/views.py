@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
@@ -114,7 +115,7 @@ class FindingsMapView(ListView):
         return context
 
 
-class AddFindingView(CreateView):
+class AddFindingView(LoginRequiredMixin, CreateView):
     model = Finding
     form_class = FindingForm
     template_name = 'finding_create.html'
