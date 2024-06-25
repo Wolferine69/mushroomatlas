@@ -39,9 +39,10 @@
     // Funkce pro zobrazení detailů nálezu
     function showDetails(finding) {
         var detailsContent = `
-            <p><strong>Název:</strong> ${finding.mushroom.name_cz}</p>
-            <p><strong>Popis:</strong> ${finding.description}</p>
-            <p><strong>Datum nálezu:</strong> ${finding.date_found}</p>
+            <p><strong>Název:</strong> ${finding.mushroom.name_cz}<br>
+            <strong>Uživatel:</strong> ${finding.user.username}<br>
+            <strong>Popis:</strong> ${finding.description}<br>
+            <strong>Datum nálezu:</strong> ${finding.date_found}</p>
         `;
         if (finding.image) {
             detailsContent += `<p><img src="${finding.image}" alt="obrázek nálezu" style="max-width: 100%; height: auto;"></p>`;
@@ -64,6 +65,7 @@
     marker.on('click', function() {
         showDetails({
             mushroom: { name_cz: "{{ finding.mushroom.name_cz }}" },
+            user: { username: "{{ finding.user.user.username }}" },
             description: "{{ finding.description }}",
             date_found: "{{ finding.date_found }}",
             image: "{% if finding.image %}{{ finding.image.url }}{% endif %}",

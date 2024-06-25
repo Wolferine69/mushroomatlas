@@ -1,9 +1,4 @@
-dodelat accounts a do admin.py ho dat
 zmenit mnozne cisla modelu v adminu
-
-upravit aby bylo možné mít 2 habitaty u Lišák zlatý (Hydnum repandum),
-Žampion polní (Agaricus campestris) 3 moznosti, Holubinka nazelenalá
-
 
 registrovaní uživatelé:
 username:                       password:
@@ -13,3 +8,5 @@ ForestExplorer                  W1ldF0r3st@
 ShroomMaster                    FungiL0v3r$
 MycoFanatic                     M1c0Fan@t1c
 FungiFreak                      FunGuy123!
+
+zmenit format data/casu na cesky
