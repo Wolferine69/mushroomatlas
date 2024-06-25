@@ -12,8 +12,6 @@ class Family(models.Model):
 
     class Meta:
         ordering = ['name']
-
-    class Meta:
         verbose_name_plural = "Families"
 
     def __str__(self):
