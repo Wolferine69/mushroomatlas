@@ -2,6 +2,9 @@
 
 {% block content %}
 <h2>Nálezy hub</h2>
+{% if user.is_authenticated %}
+    <a class="nav-link" href="{% url 'add_finding' %}">Přidej nález</a>
+{% endif %}
 <div id="map"></div>
 
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>

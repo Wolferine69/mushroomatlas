@@ -45,6 +45,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'tip_list' %}">Tipy a triky</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'findings_map' %}">Mapa nálezů</a>
+                        </li>
                         {% if user.is_authenticated %}
                             <li class="nav-item">
                             <a class="nav-link" href="{% url 'add_mushroom' %}">Přidej houbu</a>
