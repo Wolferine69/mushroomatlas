@@ -1,5 +1,5 @@
 from django import forms
-from.models import Habitat
+from .models import Habitat, Finding
 
 from viewer.models import Mushroom
 
@@ -20,6 +20,7 @@ class MushroomForm(forms.ModelForm):
             'family': 'Rodina',
         }
 
+
 class MushroomFilterForm(forms.Form):
     EDIBILITY_CHOICES = [
         ('', 'Jakékoliv'),
@@ -30,3 +31,14 @@ class MushroomFilterForm(forms.Form):
 
     edibility = forms.ChoiceField(choices=EDIBILITY_CHOICES, required=False, label='Jedlost')
     habitat = forms.ModelChoiceField(queryset=Habitat.objects.all(), required=False, label='Biotop')
+
+
+class FindingForm(forms.ModelForm):
+    class Meta:
+        model = Finding
+        fields = ['mushroom', 'description', 'date_found', 'latitude', 'longitude']
+        widgets = {
+            'latitude': forms.HiddenInput(),
+            'longitude': forms.HiddenInput(),
+            'date_found': forms.DateInput(attrs={'type': 'date'}),
+        }

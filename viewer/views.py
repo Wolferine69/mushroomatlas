@@ -1,8 +1,11 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, redirect
-from django.views.generic import ListView, DetailView
-from .models import Mushroom, Family, Recipe, Tip, Habitat
-from .forms import MushroomForm, MushroomFilterForm
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, CreateView
+
+from accounts.models import Profile
+from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding
+from .forms import MushroomForm, MushroomFilterForm, FindingForm
 
 
 # Create your views here.
@@ -30,6 +33,7 @@ class MushroomListView(ListView):
         context['mushrooms'] = mushrooms
         context['habitats'] = Habitat.objects.all()
         return context
+
 
 class MushroomDetailView(DetailView):
     model = Mushroom
@@ -84,3 +88,21 @@ def add_mushroom(request):
     else:
         form = MushroomForm()
     return render(request, 'mushroom_create.html', {'form': form})
+
+
+class FindingsMapView(ListView):
+    model = Finding
+    template_name = 'findings_map.html'
+    context_object_name = 'findings'
+
+
+class AddFindingView(CreateView):
+    model = Finding
+    form_class = FindingForm
+    template_name = 'finding_create.html'
+    success_url = reverse_lazy('findings_map')
+
+    def form_valid(self, form):
+        form.instance.user = Profile.objects.get(user=self.request.user)
+        return super().form_valid(form)
+

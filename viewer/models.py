@@ -53,7 +53,8 @@ class Finding(models.Model):
     mushroom = models.ForeignKey(Mushroom, on_delete=models.CASCADE, related_name='findings')
     description = models.TextField(null=True, blank=True)
     date_found = models.DateField()
-    location = models.CharField(max_length=200, null=True, blank=True)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
     image = models.ImageField(upload_to='finding_images/', null=True, blank=True)
 
     def __str__(self):
