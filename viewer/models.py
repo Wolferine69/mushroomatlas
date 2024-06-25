@@ -70,6 +70,7 @@ class Recipe(models.Model):
     instructions = models.TextField()
     image = models.ImageField(upload_to='recipe_images/', null=True, blank=True)
     main_mushroom = models.ForeignKey(Mushroom, on_delete=models.CASCADE, related_name='recipes', null=True, blank=True)
+    source = models.CharField(max_length=200, null=True, blank=True)
 
     class Meta:
         ordering = ['title']

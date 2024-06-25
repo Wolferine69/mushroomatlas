@@ -13,9 +13,15 @@
     <span>Nejsou k dispozici žádná data o místech výskytu.</span>
 {% endif %}
 </p>
-    {% if mushroom.image %}
-<p><strong> Obrázek:</strong>  <img src="{{ mushroom.image.url }}" alt="{{ mushroom.name_cz }}"></p>
-    {% endif %}
+{% if mushroom.image %}
+<p><img src="{{ mushroom.image.url }}" alt="{{ mushroom.name_cz }}"></p>
+{% endif %}
 <p><strong> Řád:</strong>  <a href="{% url 'family_detail' mushroom.family.id %}">{{ mushroom.family.name }}</a></p>
-<p><strong>Recepty:</strong> <a href="{{recipes_list }}" alt="{{recipe.title }}"></p>
+<p><strong>Recepty:</strong>
+<ul>
+    {% for recipe in mushroom.recipes.all %}
+        <li><a href="{% url 'recipe_detail' pk=recipe.pk %}">{{ recipe.title }}</a></li>
+    {% endfor %}
+</ul>
 {% endblock %}
+
