@@ -10,7 +10,7 @@
     <p><span style="font-size: small; font-style: italic;">Zdroj obrázku: </span> {{ recipe.source }}</p>
 {% endif %}
 <p><strong>Hlavní houba: </strong> <a href="{% url 'mushroom_detail' pk=recipe.main_mushroom.pk %}">{{ recipe.main_mushroom.name_cz }}</a></p>
-<p><strong>Přidal uživatel: </strong> <a href="{% url 'account_detail' pk=recipe.user.pk %}">{{ recipe.user.username }}</a></p>
+<p><strong>Přidal uživatel: </strong> <a href="{% url 'account_detail' pk=recipe.user.pk %}">{{ recipe.user.user.username }}</a></p>
 
 <a href="{% url 'recipes_list' %}" class="btn btn-secondary">Zpět na seznam receptů</a>
 {% endblock %}
