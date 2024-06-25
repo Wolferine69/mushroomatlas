@@ -5,7 +5,7 @@
 <ul>
     {% for tip in tips %}
     <li>
-        <a href="{% url 'tip_detail' pk=tip.pk %}">{{ tip.title }}</a> - Přidal: {{ tip.user.username }}
+        <a href="{% url 'tip_detail' pk=tip.pk %}">{{ tip.title }}</a> - Přidal: {{ tip.user.user.username }}
     </li>
     {% endfor %}
 </ul>
