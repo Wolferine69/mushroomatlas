@@ -1,4 +1,5 @@
 from django import forms
+from.models import Habitat
 
 from viewer.models import Mushroom
 
@@ -18,3 +19,14 @@ class MushroomForm(forms.ModelForm):
             'image': 'Obrázek',
             'family': 'Rodina',
         }
+
+class MushroomFilterForm(forms.Form):
+    EDIBILITY_CHOICES = [
+        ('', 'Jakékoliv'),
+        ('jedla', 'Jedlá'),
+        ('nejedla', 'Nejedlá'),
+        ('jedovata', 'Jedovatá'),
+    ]
+
+    edibility = forms.ChoiceField(choices=EDIBILITY_CHOICES, required=False, label='Jedlost')
+    habitat = forms.ModelChoiceField(queryset=Habitat.objects.all(), required=False, label='Biotop')

@@ -5,4 +5,11 @@ upravit aby bylo možné mít 2 habitaty u Lišák zlatý (Hydnum repandum),
 Žampion polní (Agaricus campestris) 3 moznosti, Holubinka nazelenalá
 
 
-
+registrovaní uživatelé:
+username:                       password:
+MushroomHunter                  P4s$w0rd1!
+NatureLover22                   Gr33nThum8&
+ForestExplorer                  W1ldF0r3st@
+ShroomMaster                    FungiL0v3r$
+MycoFanatic                     M1c0Fan@t1c
+FungiFreak                      FunGuy123!
