@@ -46,3 +46,30 @@ class GuiTestWithSelenium(TestCase):
 
         # assert 'Welcome to our Hollymovie' in selenium_webdriver.page_source
         assert 'A user with that username already exists.' in selenium_webdriver.page_source
+
+    def test_login(self):
+        selenium_webdriver = webdriver.Firefox()
+        selenium_webdriver.get('http://127.0.0.1:8000/accounts/login/')
+        time.sleep(0.3)
+        username_field = selenium_webdriver.find_element(By.ID, 'id_username')
+        username_field.send_keys('TestUser1')
+        time.sleep(0.3)
+        password_field = selenium_webdriver.find_element(By.ID, 'id_password')
+        password_field.send_keys('SDdskj45!dfa@')
+        time.sleep(0.3)
+        submit_button = selenium_webdriver.find_element(By.ID, 'id_submit')
+        submit_button.send_keys(Keys.RETURN)
+        time.sleep(3)
+        assert 'Vítej v našem houbovém světě!' in selenium_webdriver.page_source
+
+    def test_mushroom(self):
+        selenium_webdriver = webdriver.Firefox()
+        selenium_webdriver.get('http://127.0.0.1:8000/mushrooms/1/')
+        time.sleep(3)
+        assert 'Hřib smrkový' in selenium_webdriver.page_source
+
+    # def test_finding(self): #TODO: findings does't response
+    #     selenium_webdriver = webdriver.Firefox()
+    #     selenium_webdriver.get('http://127.0.0.1:8000/findings/1/')
+    #     time.sleep(3)
+    #     assert 'Hřib smrkový' in selenium_webdriver.page_source

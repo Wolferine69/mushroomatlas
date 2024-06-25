@@ -98,4 +98,5 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Comment by {self.user.username} on {self.finding}"
+        return f"Comment by {self.user.username} on {self.finding}" #TODO: AttributeError: 'Profile' object has no attribute 'username'
+                                                                    #TODO: This model relationship should be corrected

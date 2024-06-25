@@ -12,5 +12,7 @@ class Profile(models.Model):
     class Meta:
         ordering = ['user__username']
 
-    def __str__(self):
+    def __str__(self): #TODO: AttributeError: 'Profile' object has no attribute 'username'
+                        #TODO: This model relationship should be corrected
+
         return self.user.username
