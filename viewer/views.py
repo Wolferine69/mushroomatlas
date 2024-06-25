@@ -108,6 +108,12 @@ class FindingsMapView(ListView):
     context_object_name = 'findings'
 
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['mushrooms'] = Mushroom.objects.all()
+        return context
+
+
 class AddFindingView(CreateView):
     model = Finding
     form_class = FindingForm

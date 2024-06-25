@@ -22,8 +22,6 @@
             <div class="card">
                 {% if mushroom.image %}
                 <img src="{{ mushroom.image.url }}" class="card-img-top img-fluid img-fixed" alt="{{ mushroom.name_cz }}">
-                {% else %}
-                <img src="{% static 'path/to/default/image.jpg' %}" class="card-img-top img-fluid img-fixed" alt="{{ mushroom.name_cz }}">
                 {% endif %}
                 <div class="card-body">
                     <h5 class="card-title">{{ mushroom.name_cz }} ({{ mushroom.name_latin }})</h5>

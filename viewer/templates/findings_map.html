@@ -2,23 +2,77 @@
 
 {% block content %}
 <h2>Nálezy hub</h2>
-{% if user.is_authenticated %}
-    <a class="nav-link" href="{% url 'add_finding' %}">Přidej nález</a>
-{% endif %}
-<div id="map"></div>
+<div style="display: flex;">
+    <div style="width: 70%;">
+        <form id="filter-form">
+            <label for="mushroom-filter">Filtr podle druhu houby:</label>
+            <select id="mushroom-filter" name="mushroom">
+                <option value="">Všechny</option>
+                {% for mushroom in mushrooms %}
+                    <option value="{{ mushroom.id }}">{{ mushroom.name_cz }}</option>
+                {% endfor %}
+            </select>
+        </form>
+        <a href="{% url 'add_finding' %}" class="btn btn-primary">Přidej nález</a>
+        <div id="map"></div>
+    </div>
+    <div id="details" style="width: 30%; padding-left: 20px;">
+        <h3>Detaily nálezu</h3>
+        <div id="details-content">
+            Klikněte na marker na mapě pro zobrazení detailů.
+        </div>
+    </div>
+</div>
 
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script>
-    var map = L.map('map').setView([49.5, 15.5], 7); // Nastavení počátečního zobrazení (např. Praha)
+    var map = L.map('map').setView([49.5, 15.5], 7); // Nastavení počátečního zobrazení
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
     }).addTo(map);
 
+    var markers = [];
+
+    // Funkce pro zobrazení detailů nálezu
+    function showDetails(finding) {
+        var detailsContent = `
+            <p><strong>Název:</strong> ${finding.mushroom.name_cz}</p>
+            <p><strong>Popis:</strong> ${finding.description}</p>
+            <p><strong>Datum nálezu:</strong> ${finding.date_found}</p>
+        `;
+        document.getElementById('details-content').innerHTML = detailsContent;
+    }
+
+    // Funkce pro filtrování markerů
+    function filterMarkers() {
+        var selectedMushroomId = document.getElementById('mushroom-filter').value;
+        markers.forEach(marker => {
+            if (selectedMushroomId === "" || marker.mushroomId === selectedMushroomId) {
+                marker.addTo(map);
+            } else {
+                map.removeLayer(marker);
+            }
+        });
+    }
+
     // Přidání markerů pro každý nález
     {% for finding in findings %}
-    var marker = L.marker([{{ finding.latitude }}, {{ finding.longitude }}]).addTo(map)
-        .bindPopup("<b>{{ finding.mushroom.name_cz }}</b><br />{{ finding.description }}");
+    var marker = L.marker([{{ finding.latitude }}, {{ finding.longitude }}]);
+    marker.mushroomId = "{{ finding.mushroom.id }}";
+    marker.on('click', function() {
+        showDetails({
+            mushroom: { name_cz: "{{ finding.mushroom.name_cz }}" },
+            description: "{{ finding.description }}",
+            date_found: "{{ finding.date_found }}"
+        });
+    });
+    markers.push(marker);
+    marker.addTo(map);
     {% endfor %}
+
+    // Přidání event listeneru pro změnu filtru
+    document.getElementById('mushroom-filter').addEventListener('change', filterMarkers);
 </script>
 {% endblock %}
+
