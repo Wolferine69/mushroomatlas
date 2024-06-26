@@ -13,6 +13,8 @@ class UserProfileUpdateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['username'].disabled = True
+        self.fields['username'].help_text = ''
         if self.instance:
             profile = self.instance.profile
             self.fields['biography'].initial = profile.biography
