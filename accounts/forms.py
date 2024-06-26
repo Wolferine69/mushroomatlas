@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from .models import Profile
 
+
 class UserProfileUpdateForm(forms.ModelForm):
     biography = forms.CharField(label='Tady můžeš napsat něco o sobě', widget=forms.Textarea, required=False)
     profile_picture = forms.ImageField(label='Nahrát profilový obrázek', required=False)
