@@ -1,5 +1,5 @@
 from django import forms
-from .models import Habitat, Finding
+from .models import Habitat, Finding, Comment
 
 from viewer.models import Mushroom
 
@@ -41,4 +41,13 @@ class FindingForm(forms.ModelForm):
             'latitude': forms.HiddenInput(),
             'longitude': forms.HiddenInput(),
             'date_found': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']
+        widgets = {
+            'text': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Napište komentář...'}),
         }

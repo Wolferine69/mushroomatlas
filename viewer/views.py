@@ -1,12 +1,12 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 
 from accounts.models import Profile
 from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding, Comment
-from .forms import MushroomForm, MushroomFilterForm, FindingForm
+from .forms import MushroomForm, MushroomFilterForm, FindingForm, CommentForm
 
 
 # Create your views here.
@@ -108,11 +108,15 @@ class FindingsMapView(ListView):
     template_name = 'findings_map.html'
     context_object_name = 'findings'
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['mushrooms'] = Mushroom.objects.all()
         context['comments'] = Comment.objects.all()
+        findings = Finding.objects.all()
+        for finding in findings:
+            finding.latitude = str(finding.latitude).replace(',', '.')
+            finding.longitude = str(finding.longitude).replace(',', '.')
+        context['findings'] = findings
         return context
 
 
@@ -126,3 +130,17 @@ class AddFindingView(LoginRequiredMixin, CreateView):
         form.instance.user = Profile.objects.get(user=self.request.user)
         return super().form_valid(form)
 
+
+class AddCommentView(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'add_comment.html'
+
+    def form_valid(self, form):
+        finding = get_object_or_404(Finding, id=self.kwargs['pk'])
+        form.instance.user = Profile.objects.get(user=self.request.user)
+        form.instance.finding = finding
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('findings_map')

@@ -55,6 +55,7 @@
         } else {
             detailsContent += `<p>Žádné komentáře.</p>`;
         }
+        detailsContent += `<a href="/add_comment/${finding.id}/" class="btn btn-primary">Přidat komentář</a>`;
         document.getElementById('details-content').innerHTML = detailsContent;
     }
 
@@ -64,6 +65,7 @@
     marker.mushroomId = "{{ finding.mushroom.id }}";
     marker.on('click', function() {
         showDetails({
+            id: "{{ finding.id }}",
             mushroom: { name_cz: "{{ finding.mushroom.name_cz }}" },
             user: { username: "{{ finding.user.user.username }}" },
             description: "{{ finding.description }}",

@@ -24,7 +24,7 @@ from accounts.views import SubmittableLoginView, RegistrationView, SubmittablePa
 from viewer.views import (home,
                           MushroomListView, MushroomDetailView,
                           FamilyListView, FamilyDetailView, RecipeListView, RecipeDetailView, TipListView,
-                          TipDetailView, add_mushroom, FindingsMapView, AddFindingView
+                          TipDetailView, add_mushroom, FindingsMapView, AddFindingView, AddCommentView
                           )
 
 urlpatterns = [
@@ -53,6 +53,7 @@ urlpatterns = [
 
     path('findings_map/', FindingsMapView.as_view(), name='findings_map'),
     path('add_finding/', AddFindingView.as_view(), name='add_finding'),
+    path('add_comment/<int:pk>/', AddCommentView.as_view(), name='add_comment'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
