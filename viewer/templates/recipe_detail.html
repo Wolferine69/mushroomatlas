@@ -2,12 +2,32 @@
 
 {% block content %}
 
+<style>
+    .recipe-images {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .recipe-image {
+        max-width: 300px;
+        height: auto;
+        margin-bottom: 10px;
+    }
+</style>
+
 <h2><strong>{{ recipe.title }}</strong></h2>
 <p><strong>Ingredience: </strong> {{ recipe.ingredients }}</p>
 <p><strong>Instrukce: </strong> {{ recipe.instructions }}</p>
 {% if recipe.image %}
-    <p><img src="{{ recipe.image.url }}" alt="{{ recipe.title }}"></p>
-    <p><span style="font-size: small; font-style: italic;">Zdroj obrázku: </span> {{ recipe.source }}</p>
+    <div class="recipe-images">
+        <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="recipe-image">
+        <!-- Přidejte další obrázky zde, pokud existují -->
+        {% for additional_image in recipe.additional_images.all %}
+            <img src="{{ additional_image.url }}" alt="{{ recipe.title }}" class="recipe-image">
+        {% endfor %}
+    </div>
+    <p><span style="font-size: small; font-style: italic;">Zdroj obrázků: </span> {{ recipe.source }}</p>
 {% endif %}
 <p><strong>Hlavní houba: </strong> <a href="{% url 'mushroom_detail' pk=recipe.main_mushroom.pk %}">{{ recipe.main_mushroom.name_cz }}</a></p>
 <p><strong>Přidal uživatel: </strong> <a href="{% url 'account_detail' pk=recipe.user.pk %}">{{ recipe.user.user.username }}</a></p>
