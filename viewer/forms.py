@@ -1,5 +1,5 @@
 from django import forms
-from .models import Habitat, Finding, Comment
+from .models import Habitat, Finding, Comment, Recipe
 
 from viewer.models import Mushroom
 
@@ -50,4 +50,20 @@ class CommentForm(forms.ModelForm):
         fields = ['text']
         widgets = {
             'text': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Napište komentář...'}),
+        }
+
+
+class RecipeForm(forms.ModelForm):
+
+    class Meta:
+        model = Recipe
+        fields = ['title', 'ingredients', 'instructions', 'image', 'main_mushroom', 'user', 'source']
+        labels = {
+            'title': 'Název receptu',
+            'ingredients': 'Ingredience',
+            'instructions': 'Instrukce',
+            'image': 'Obrázek',
+            'source': 'Zdroj',
+            'main_mushroom': 'Hlavní houba',
+            'user': 'Přidal',
         }

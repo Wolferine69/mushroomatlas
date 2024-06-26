@@ -6,7 +6,7 @@ from django.views.generic import ListView, DetailView, CreateView
 
 from accounts.models import Profile
 from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding, Comment
-from .forms import MushroomForm, MushroomFilterForm, FindingForm, CommentForm
+from .forms import MushroomForm, MushroomFilterForm, FindingForm, CommentForm, RecipeForm
 
 
 # Create your views here.
@@ -101,6 +101,18 @@ def add_mushroom(request):
     else:
         form = MushroomForm()
     return render(request, 'mushroom_create.html', {'form': form})
+
+@login_required
+def add_recipe(request):
+    if request.method == 'POST':
+        form = RecipeForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('recipes_list')
+
+    else:
+        form = RecipeForm()
+    return render(request, 'recipe_create.html', {'form': form})
 
 
 class FindingsMapView(ListView):
