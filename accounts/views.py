@@ -1,13 +1,16 @@
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, PasswordChangeView
+from django.contrib.messages.views import SuccessMessageMixin
 from django.db.transaction import atomic
 from django.forms import Textarea, CharField, ImageField
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, DetailView
+from django.views.generic import CreateView, ListView, DetailView, UpdateView
 
+from accounts.forms import UserProfileUpdateForm
 from accounts.models import Profile
 
 
@@ -56,3 +59,17 @@ class AccountDetailView(LoginRequiredMixin, DetailView):
     model = Profile
     template_name = 'account_detail.html'
     context_object_name = 'account'
+
+class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = User
+    form_class = UserProfileUpdateForm
+    template_name = 'profile_update.html'
+    success_url = reverse_lazy('profile_update')
+    success_message = "Váš profil byl úspěšně aktualizován!"
+
+    def get_object(self):
+        return get_object_or_404(User, pk=self.request.user.pk)
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
