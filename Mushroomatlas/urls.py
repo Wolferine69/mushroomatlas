@@ -24,7 +24,7 @@ from accounts.views import SubmittableLoginView, RegistrationView, SubmittablePa
 from viewer.views import (home,
                           MushroomListView, MushroomDetailView,
                           FamilyListView, FamilyDetailView, RecipeListView, RecipeDetailView, TipListView,
-                          TipDetailView, add_mushroom, FindingsMapView, AddFindingView, AddCommentView
+                          TipDetailView, add_mushroom, FindingsMapView, AddFindingView, AddCommentView, add_recipe
                           )
 
 urlpatterns = [
@@ -47,6 +47,7 @@ urlpatterns = [
 
     path('recipes/', RecipeListView.as_view(), name='recipes_list'),
     path('recipes/<int:pk>/', RecipeDetailView.as_view(), name='recipe_detail'),
+    path('add_recipe/', add_recipe, name='add_recipe'),
 
     path('tip/', TipListView.as_view(), name='tip_list'),
     path('tip/<int:pk>/', TipDetailView.as_view(), name='tip_detail'),

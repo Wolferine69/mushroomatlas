@@ -13,7 +13,9 @@
         </div>
         <button type="submit" class="btn btn-primary">Filtrovat</button>
     </form>
-
+    {% if user.is_authenticated %}
+        <a class="nav-link" href="{% url 'add_recipe' %}">Přidej recept</a>
+    {% endif %}
     <div class="row">
         {% for recipe in recipes %}
         <div class="col-md-4 mb-4">
