@@ -6,12 +6,29 @@
 <div style="display: flex;">
     <div style="width: 70%;">
         <form id="filter-form">
-            <label for="mushroom-filter">Filtr podle druhu houby:</label>
+            <label for="mushroom-filter">Druh houby:</label>
             <select id="mushroom-filter" name="mushroom">
                 <option value="">Všechny</option>
                 {% for mushroom in mushrooms %}
                     <option value="{{ mushroom.id }}">{{ mushroom.name_cz }}</option>
                 {% endfor %}
+            </select>
+            <br>
+            <label for="time-filter">Jedlost:</label>
+            <select id="time-filter" name="time">
+                <option value="">Kdykoliv</option>
+                <option value="week">Max týden</option>
+                <option value="month">Max měsíc</option>
+                <option value="halfyear">Max půlrok</option>
+                <option value="year">Max rok</option>
+            </select>
+            <br>
+            <label for="edibility-filter">Jedlost:</label>
+            <select id="edibility-filter" name="edibility">
+                <option value="">Všechna</option>
+                <option value="jedla">Jedlá</option>
+                <option value="nejedla">Nejedlá</option>
+                <option value="jedovata">Jedovatá</option>
             </select>
         </form>
         {% if user.is_authenticated %}
@@ -103,6 +120,7 @@
     var iconType = "{% if finding.mushroom.edibility == 'jedla' %}jedla{% elif finding.mushroom.edibility == 'nejedla' %}nejedla{% else %}jedovata{% endif %}";
     var marker = L.marker([{{ finding.latitude }}, {{ finding.longitude }}], {icon: icons[iconType]});
     marker.mushroomId = "{{ finding.mushroom.id }}";
+    marker.edibility = "{{ finding.mushroom.edibility }}";
     marker.on('click', function() {
         showDetails({
             id: "{{ finding.id }}",
@@ -129,8 +147,10 @@
     // Funkce pro filtrování markerů
     function filterMarkers() {
         var selectedMushroomId = document.getElementById('mushroom-filter').value;
+        var selectedEdibility = document.getElementById('edibility-filter').value;
         markers.forEach(marker => {
-            if (selectedMushroomId === "" || marker.mushroomId === selectedMushroomId) {
+            if ((selectedMushroomId === "" || marker.mushroomId === selectedMushroomId) &&
+                (selectedEdibility === "" || marker.edibility === selectedEdibility)) {
                 marker.addTo(map);
             } else {
                 map.removeLayer(marker);
@@ -141,6 +161,7 @@
 
     // Přidání event listeneru pro změnu filtru
     document.getElementById('mushroom-filter').addEventListener('change', filterMarkers);
+    document.getElementById('edibility-filter').addEventListener('change', filterMarkers);
 </script>
 {% endblock %}
 
