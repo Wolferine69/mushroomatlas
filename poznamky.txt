@@ -15,5 +15,3 @@ ForestExplorer                  W1ldF0r3st@
 ShroomMaster                    FungiL0v3r$
 MycoFanatic                     M1c0Fan@t1c
 FungiFreak                      FunGuy123!
-
-zmenit format data/casu na cesky
