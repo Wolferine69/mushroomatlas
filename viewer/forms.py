@@ -63,7 +63,7 @@ class RecipeForm(forms.ModelForm):
             'ingredients': 'Ingredience',
             'instructions': 'Instrukce',
             'image': 'Obrázek',
-            'source': 'Zdroj',
+            'source': 'Zdroj obrázku',
             'main_mushroom': 'Hlavní houba',
             'user': 'Přidal',
         }
