@@ -4,7 +4,7 @@ from django.test import TestCase
 
 from viewer.forms import MushroomForm
 from viewer.models import *
-from viewer.views import MushroomListView
+
 
 
 
