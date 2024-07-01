@@ -1,8 +1,8 @@
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, TemplateView
 
 from accounts.models import Profile
 from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding, Comment
@@ -11,7 +11,8 @@ from .forms import MushroomForm, MushroomFilterForm, FindingForm, CommentForm, R
 
 # Create your views here.
 def home(request):
-    return render(request, "home.html")
+    can_add_mushroom = request.user.is_authenticated and request.user.has_perm('viewer.add_mushroom')
+    return render(request, "home.html", {'can_add_mushroom': can_add_mushroom})
 
 
 class MushroomListView(ListView):
@@ -33,6 +34,8 @@ class MushroomListView(ListView):
 
         context['mushrooms'] = mushrooms
         context['habitats'] = Habitat.objects.all()
+        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
+            'viewer.add_mushroom')
         return context
 
 
@@ -41,17 +44,35 @@ class MushroomDetailView(DetailView):
     template_name = 'mushroom_detail.html'
     context_object_name = 'mushroom'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
+            'viewer.add_mushroom')
+        return context
+
 
 class FamilyListView(ListView):
     model = Family
     template_name = 'family_list.html'
     context_object_name = 'families'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
+            'viewer.add_mushroom')
+        return context
+
 
 class FamilyDetailView(DetailView):
     model = Family
     template_name = 'family_detail.html'
     context_object_name = 'family'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
+            'viewer.add_mushroom')
+        return context
 
 
 class RecipeListView(ListView):
@@ -63,6 +84,12 @@ class RecipeListView(ListView):
         recipes = Recipe.objects.all().select_related('user')
         return render(request, 'recipes_list.html', {'recipes': recipes})
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
+            'viewer.add_mushroom')
+        return context
+
 
 class RecipeDetailView(DetailView):
     model = Recipe
@@ -72,6 +99,12 @@ class RecipeDetailView(DetailView):
     def recipe_detail(request, pk):
         recipe = Recipe.objects.select_related('user', 'main_mushroom').get(pk=pk)
         return render(request, 'recipe_detail.html', {'recipe': recipe})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
+            'viewer.add_mushroom')
+        return context
 
 
 class TipListView(ListView):
@@ -83,11 +116,23 @@ class TipListView(ListView):
         tips = Tip.objects.all().select_related('user')
         return render(request, 'your_template.html', {'tips': tips})
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
+            'viewer.add_mushroom')
+        return context
+
 
 class TipDetailView(DetailView):
     model = Tip
     template_name = 'tip_detail.html'
     context_object_name = 'tip'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
+            'viewer.add_mushroom')
+        return context
 
 
 @login_required
@@ -101,6 +146,7 @@ def add_mushroom(request):
     else:
         form = MushroomForm()
     return render(request, 'mushroom_create.html', {'form': form})
+
 
 @login_required
 def add_recipe(request):
@@ -129,6 +175,8 @@ class FindingsMapView(ListView):
             finding.latitude = str(finding.latitude).replace(',', '.')
             finding.longitude = str(finding.longitude).replace(',', '.')
         context['findings'] = findings
+        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
+            'viewer.add_mushroom')
         return context
 
 
@@ -156,3 +204,17 @@ class AddCommentView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse_lazy('findings_map')
+
+
+class MushroomAddPermissionRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_authenticated and self.request.user.has_perm('viewer.add_mushroom')
+
+
+class HomePageView(MushroomAddPermissionRequiredMixin, TemplateView):
+    template_name = 'base.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['can_add_mushroom'] = self.request.user.has_perm('viewer.add_mushroom')
+        return context

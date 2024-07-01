@@ -48,7 +48,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'findings_map' %}">Mapa nálezů</a>
                         </li>
-                        {% if user.is_authenticated %}
+                        {% if user.is_authenticated and can_add_mushroom %}
                             <li class="nav-item">
                             <a class="nav-link" href="{% url 'add_mushroom' %}">Přidej houbu</a>
                             </li>

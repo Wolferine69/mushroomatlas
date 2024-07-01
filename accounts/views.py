@@ -1,14 +1,15 @@
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.transaction import atomic
 from django.forms import Textarea, CharField, ImageField
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, DetailView, UpdateView
+from django.views.generic import CreateView, ListView, DetailView, UpdateView, TemplateView
 
 from accounts.forms import UserProfileUpdateForm
 from accounts.models import Profile
@@ -54,6 +55,11 @@ class AccountsListView(LoginRequiredMixin, ListView):
     template_name = 'accounts_list.html'
     context_object_name = 'accounts'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
+                'viewer.add_mushroom')
+        return context
 
 class AccountDetailView(LoginRequiredMixin, DetailView):
     model = Profile
@@ -70,6 +76,8 @@ class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     def get_object(self):
         return get_object_or_404(User, pk=self.request.user.pk)
 
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm('viewer.add_mushroom')
+        return context
+

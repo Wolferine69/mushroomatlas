@@ -19,12 +19,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
+from accounts import views
 from accounts.views import SubmittableLoginView, RegistrationView, SubmittablePasswordChangeView, AccountsListView, \
     AccountDetailView, ProfileUpdateView
 from viewer.views import (home,
                           MushroomListView, MushroomDetailView,
                           FamilyListView, FamilyDetailView, RecipeListView, RecipeDetailView, TipListView,
-                          TipDetailView, add_mushroom, FindingsMapView, AddFindingView, AddCommentView, add_recipe
+                          TipDetailView, add_mushroom, FindingsMapView, AddFindingView, AddCommentView, add_recipe,
                           )
 
 urlpatterns = [
