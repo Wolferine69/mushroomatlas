@@ -22,6 +22,7 @@ from django.urls import path, include
 from accounts import views
 from accounts.views import SubmittableLoginView, RegistrationView, SubmittablePasswordChangeView, AccountsListView, \
     AccountDetailView, ProfileUpdateView
+from api.views import Mushrooms, Families, Recipes, Findings
 from viewer.views import (home,
                           MushroomListView, MushroomDetailView,
                           FamilyListView, FamilyDetailView, RecipeListView, RecipeDetailView, TipListView,
@@ -57,5 +58,10 @@ urlpatterns = [
     path('add_finding/', AddFindingView.as_view(), name='add_finding'),
     path('add_comment/<int:pk>/', AddCommentView.as_view(), name='add_comment'),
 
+    path('admin/', admin.site.urls),
+    path('api/mushrooms/', Mushrooms.as_view(), name='mushroom-list-create'),
+    path('api/families/', Families.as_view(), name='family-list-create'),
+    path('api/recipes/', Recipes.as_view(), name='recipe-list-create'),
+    path('api/findings/', Findings.as_view(), name='recipe-list-create'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

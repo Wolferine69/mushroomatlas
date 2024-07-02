@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'viewer',
     'accounts',
     'viewer.templatetags',
+    'rest_framework',
+    "api.apps.ApiConfig"
 ]
 
 MIDDLEWARE = [
