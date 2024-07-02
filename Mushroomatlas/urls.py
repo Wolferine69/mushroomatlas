@@ -63,5 +63,6 @@ urlpatterns = [
     path('api/families/', Families.as_view(), name='family-list-create'),
     path('api/recipes/', Recipes.as_view(), name='recipe-list-create'),
     path('api/findings/', Findings.as_view(), name='recipe-list-create'),
+    path('api-auth/', include('rest_framework.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
