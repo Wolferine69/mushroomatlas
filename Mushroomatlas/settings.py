@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'accounts',
     'viewer.templatetags',
     'rest_framework',
-    "api.apps.ApiConfig"
+    'rest_framework.authtoken',
+    "api.apps.ApiConfig",
 ]
 
 MIDDLEWARE = [
@@ -157,8 +158,11 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
+
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']

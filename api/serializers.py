@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from viewer.models import Mushroom, Family, Recipe, Finding
+from viewer.models import Mushroom, Family, Recipe, Finding, Habitat
 
 
 class MushroomSerializer(serializers.ModelSerializer):
@@ -25,3 +25,7 @@ class FindingSerializer(serializers.ModelSerializer):
         model = Finding
         fields = '__all__'
 
+class HabitatSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Habitat
+        fields = '__all__'
