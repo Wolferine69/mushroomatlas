@@ -1,4 +1,4 @@
-# Create your views here.
+# views.py
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import mixins, generics
 from rest_framework.authtoken.models import Token
@@ -6,7 +6,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from viewer.models import Mushroom, Family, Recipe, Finding, Habitat
-from .serializers import MushroomSerializer, FamilySerializer, RecipeSerializer, FindingSerializer, HabitatSerializer
+from accounts.models import Profile
+from .serializers import MushroomSerializer, FamilySerializer, RecipeSerializer, FindingSerializer, HabitatSerializer, ProfileSerializer
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 class Mushrooms(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
@@ -63,6 +64,14 @@ class Habitats(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericA
 
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
+
+class Profiles(mixins.ListModelMixin, generics.GenericAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
 @csrf_exempt
 @api_view(['POST'])
