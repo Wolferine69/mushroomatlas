@@ -91,6 +91,7 @@
 
 
     var markers = [];
+    var selectedFindingId = new URLSearchParams(window.location.search).get('finding');
 
     // Funkce pro zobrazení detailů nálezu
     function showDetails(finding) {
@@ -123,6 +124,7 @@
     marker.mushroomId = "{{ finding.mushroom.id }}";
     marker.edibility = "{{ finding.mushroom.edibility }}";
     marker.dateFound = dateFound;
+    marker.findingId = "{{ finding.id }}";
     marker.on('click', function() {
         showDetails({
             id: "{{ finding.id }}",
@@ -144,6 +146,29 @@
     });
     markers.push(marker);
     marker.addTo(map);
+    console.log(marker.findingId,"mid")
+    console.log(selectedFindingId,"cid")
+    if (marker.findingId === selectedFindingId) {
+        map.setView(marker.getLatLng(), 13);
+        showDetails({
+            id: "{{ finding.id }}",
+            mushroom: { name_cz: "{{ finding.mushroom.name_cz }}" },
+            user: { username: "{{ finding.user.user.username }}" },
+            description: "{{ finding.description }}",
+            date_found: "{{ finding.date_found }}",
+            image: "{% if finding.image %}{{ finding.image.url }}{% endif %}",
+            comments: [
+                {% for comment in finding.comments.all %}
+                {
+                    user: "{{ comment.user.user.username }}",
+                    text: "{{ comment.text }}",
+                    created_at: "{{ comment.created_at }}"
+                }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ]
+        });
+    }
+
     {% endfor %}
 
     // Funkce pro filtrování markerů

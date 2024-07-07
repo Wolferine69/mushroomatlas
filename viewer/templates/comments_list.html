@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<a>
+    {% for comment in comments %}
+        <a href="{% url 'findings_map' %}?finding={{ comment.finding.id }}">
+        <li>{{ comment.user }} | {{ comment.finding.mushroom.name_cz }} | {{ comment.text }} | {{ comment.created_at }}</li>
+        </a>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -218,3 +218,19 @@ class HomePageView(MushroomAddPermissionRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['can_add_mushroom'] = self.request.user.has_perm('viewer.add_mushroom')
         return context
+
+
+class CommentsListView(LoginRequiredMixin, ListView):
+    model = Comment
+    template_name = 'comments_list.html'
+    context_object_name = 'comments'
+
+    def get_queryset(self):
+        user_profile = self.request.user.profile
+        return Comment.objects.filter(finding__user=user_profile)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
+            'viewer.add_mushroom')
+        return context
