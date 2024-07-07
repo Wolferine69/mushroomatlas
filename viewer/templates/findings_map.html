@@ -14,7 +14,7 @@
                 {% endfor %}
             </select>
             <br>
-            <label for="time-filter">Jedlost:</label>
+            <label for="time-filter">Aktuálnost:</label>
             <select id="time-filter" name="time">
                 <option value="">Kdykoliv</option>
                 <option value="week">Max týden</option>
@@ -118,9 +118,11 @@
     // Přidání markerů pro každý nález
     {% for finding in findings %}
     var iconType = "{% if finding.mushroom.edibility == 'jedla' %}jedla{% elif finding.mushroom.edibility == 'nejedla' %}nejedla{% else %}jedovata{% endif %}";
+    var dateFound = new Date("{{ finding.date_found|date:'Y-m-d' }}");
     var marker = L.marker([{{ finding.latitude }}, {{ finding.longitude }}], {icon: icons[iconType]});
     marker.mushroomId = "{{ finding.mushroom.id }}";
     marker.edibility = "{{ finding.mushroom.edibility }}";
+    marker.dateFound = dateFound;
     marker.on('click', function() {
         showDetails({
             id: "{{ finding.id }}",
@@ -148,9 +150,31 @@
     function filterMarkers() {
         var selectedMushroomId = document.getElementById('mushroom-filter').value;
         var selectedEdibility = document.getElementById('edibility-filter').value;
+        var selectedTime = document.getElementById('time-filter').value;
+        var now = new Date();
         markers.forEach(marker => {
+            var timeCondition = true;
+            if (selectedTime === "week") {
+                var weekAgo = new Date(now);
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                timeCondition = marker.dateFound >= weekAgo;
+            } else if (selectedTime === "month") {
+                var monthAgo = new Date(now);
+                monthAgo.setMonth(monthAgo.getMonth() - 1);
+                timeCondition = marker.dateFound >= monthAgo;
+            } else if (selectedTime === "halfyear") {
+                var halfYearAgo = new Date(now);
+                halfYearAgo.setMonth(halfYearAgo.getMonth() - 6);
+                timeCondition = marker.dateFound >= halfYearAgo;
+            } else if (selectedTime === "year") {
+                var yearAgo = new Date(now);
+                yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+                timeCondition = marker.dateFound >= yearAgo;
+            }
+
             if ((selectedMushroomId === "" || marker.mushroomId === selectedMushroomId) &&
-                (selectedEdibility === "" || marker.edibility === selectedEdibility)) {
+                (selectedEdibility === "" || marker.edibility === selectedEdibility) &&
+                timeCondition) {
                 marker.addTo(map);
             } else {
                 map.removeLayer(marker);
@@ -158,10 +182,10 @@
         });
     }
 
-
     // Přidání event listeneru pro změnu filtru
     document.getElementById('mushroom-filter').addEventListener('change', filterMarkers);
     document.getElementById('edibility-filter').addEventListener('change', filterMarkers);
+    document.getElementById('time-filter').addEventListener('change', filterMarkers);
 </script>
 {% endblock %}
 
