@@ -6,8 +6,6 @@ from viewer.forms import MushroomForm
 from viewer.models import *
 
 
-
-
 class MushroomFormTest(TestCase):
 
     @classmethod
