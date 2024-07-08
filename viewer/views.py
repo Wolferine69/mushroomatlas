@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, TemplateView
 
+from accounts.forms import RatingForm
 from accounts.models import Profile
 from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding, Comment
 from .forms import MushroomForm, MushroomFilterForm, FindingForm, CommentForm, RecipeForm
@@ -96,14 +97,24 @@ class RecipeDetailView(DetailView):
     template_name = 'recipe_detail.html'
     context_object_name = 'recipe'
 
-    def recipe_detail(request, pk):
-        recipe = Recipe.objects.select_related('user', 'main_mushroom').get(pk=pk)
-        return render(request, 'recipe_detail.html', {'recipe': recipe})
+    def post(self, request, *args, **kwargs):
+        recipe = self.get_object()
+        form = RatingForm(request.POST)
+
+        if form.is_valid():
+            rating = form.save(commit=False)
+            rating.recipe = recipe
+            rating.user = request.user.profile  # Přiřadíme instanci Profile přihlášeného uživatele
+            rating.save()
+            return redirect('recipe_detail', pk=recipe.pk)
+
+        context = self.get_context_data(**kwargs)
+        context['form'] = form
+        return render(request, self.template_name, context)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
-            'viewer.add_mushroom')
+        context['form'] = RatingForm()
         return context
 
 
