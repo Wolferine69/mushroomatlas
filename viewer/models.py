@@ -44,7 +44,6 @@ class Mushroom(models.Model):
     class Meta:
         ordering = ['name_cz']
 
-
     def __str__(self):
         return f"{self.name_cz} ({self.name_latin}) - {self.get_edibility_display()}"
 
@@ -72,6 +71,8 @@ class Recipe(models.Model):
     image = models.ImageField(upload_to='recipe_images/', null=True, blank=True)
     main_mushroom = models.ForeignKey(Mushroom, on_delete=models.CASCADE, related_name='recipes', null=True, blank=True)
     source = models.CharField(max_length=200, null=True, blank=True)
+    rating = models.IntegerField(default=0)
+
 
     class Meta:
         ordering = ['title']
@@ -99,11 +100,10 @@ class Comment(models.Model):
     finding = models.ForeignKey(Finding, on_delete=models.CASCADE, related_name='comments')
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    new = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-created_at']
 
     def __str__(self):
         return f"Comment by {self.user.user.username} on {self.finding}"
-
-

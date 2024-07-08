@@ -1,6 +1,7 @@
 import unittest
 import requests
 
+
 class TestAPI(unittest.TestCase):
 
     def setUp(self):
@@ -145,6 +146,7 @@ class TestAPI(unittest.TestCase):
         response = self.client.post(f"{self.base_url}/api/habitats/", headers=self.headers, json=payload)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json()["name"], "Testovací habitat")
+
 
 if __name__ == '__main__':
     unittest.main()
