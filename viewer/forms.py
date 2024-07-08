@@ -1,5 +1,5 @@
 from django import forms
-from .models import Habitat, Finding, Comment, Recipe
+from .models import Habitat, Finding, Comment, Recipe, Family
 
 from viewer.models import Mushroom
 
@@ -31,6 +31,7 @@ class MushroomFilterForm(forms.Form):
 
     edibility = forms.ChoiceField(choices=EDIBILITY_CHOICES, required=False, label='Jedlost')
     habitat = forms.ModelChoiceField(queryset=Habitat.objects.all(), required=False, label='Biotop')
+    family = forms.ModelChoiceField(queryset=Family.objects.all(), required=False, label='Řád')
 
 
 class FindingForm(forms.ModelForm):

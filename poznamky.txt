@@ -16,4 +16,9 @@ ShroomMaster                    FungiL0v3r$
 MycoFanatic                     M1c0Fan@t1c
 FungiFreak                      FunGuy123!
 
-zdenek upravit pridani houby jen pro ty co maj prava
+
+Záloha (po upravě v databázi, zalohu přidat do gitu):
+python manage.py backup
+
+Obnovení:
+python manage.py loaddata název_zalohy.json
