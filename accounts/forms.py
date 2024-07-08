@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 
-from viewer.models import Recipe
+from viewer.models import Rating
 from .models import Profile
 
 
@@ -34,8 +34,19 @@ class UserProfileUpdateForm(forms.ModelForm):
 
 class RatingForm(forms.ModelForm):
     class Meta:
-        model = Recipe
+        model = Rating
         fields = ['rating']
         widgets = {
             'rating': forms.NumberInput(attrs={'min': 1, 'max': 5, 'step': 1}),
         }
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.user = self.user
+        if commit:
+            instance.save()
+        return instance

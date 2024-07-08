@@ -73,12 +73,26 @@ class Recipe(models.Model):
     source = models.CharField(max_length=200, null=True, blank=True)
     rating = models.IntegerField(default=0)
 
-
     class Meta:
         ordering = ['title']
 
     def __str__(self):
         return self.title
+
+    def update_average_rating(self):
+        ratings = self.ratings.all()
+        if ratings.count() > 0:
+            total_rating = sum(rating.rating for rating in ratings)
+            self.rating = total_rating / ratings.count()
+        else:
+            self.rating = 0
+        self.save()
+
+
+class Rating(models.Model):
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='ratings')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.IntegerField(default=1, choices=((1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')))
 
 
 class Tip(models.Model):
@@ -107,3 +121,4 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.user.user.username} on {self.finding}"
+

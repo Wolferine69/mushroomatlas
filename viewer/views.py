@@ -93,30 +93,32 @@ class RecipeListView(ListView):
 
 
 class RecipeDetailView(DetailView):
-    model = Recipe
-    template_name = 'recipe_detail.html'
-    context_object_name = 'recipe'
+    def get(self, request, pk):
+        recipe = get_object_or_404(Recipe, pk=pk)
+        form = RatingForm()
+        context = {
+            'recipe': recipe,
+            'form': form,
+        }
+        return render(request, 'recipe_detail.html', context)
 
-    def post(self, request, *args, **kwargs):
-        recipe = self.get_object()
-        form = RatingForm(request.POST)
-
+    def post(self, request, pk):
+        recipe = get_object_or_404(Recipe, pk=pk)
+        form = RatingForm(request.POST, user=request.user)
         if form.is_valid():
-            rating = form.save(commit=False)
-            rating.recipe = recipe
-            rating.user = request.user.profile  # Přiřadíme instanci Profile přihlášeného uživatele
-            rating.save()
-            return redirect('recipe_detail', pk=recipe.pk)
+            form.instance.recipe = recipe
+            form.instance.user = request.user
+            form.save()
 
-        context = self.get_context_data(**kwargs)
-        context['form'] = form
-        return render(request, self.template_name, context)
+            # Aktualizace průměrného hodnocení receptu
+            recipe.update_average_rating()
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['form'] = RatingForm()
-        return context
-
+            return redirect('recipe_detail', pk=pk)
+        context = {
+            'recipe': recipe,
+            'form': form,
+        }
+        return render(request, 'recipe_detail.html', context)
 
 class TipListView(ListView):
     model = Tip

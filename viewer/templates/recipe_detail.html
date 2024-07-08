@@ -32,7 +32,7 @@
 <p><strong>Přidal uživatel: </strong> <a href="{% url 'account_detail' pk=recipe.user.pk %}">{{ recipe.user.user.username }}</a></p>
 
 <!-- Zobrazit aktuální hodnocení -->
-<p><strong>Hodnocení: </strong> {{ recipe.rating }}</p>
+<p><strong>Celkové hodnocení: </strong> {{ recipe.rating }}</p>
 
 <!-- Formulář pro přidání hodnocení -->
 <form method="post">
