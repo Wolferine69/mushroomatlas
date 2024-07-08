@@ -50,6 +50,7 @@ class CommentForm(forms.ModelForm):
         fields = ['text']
         widgets = {
             'text': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Napište komentář...'}),
+            'new': forms.HiddenInput(),
         }
 
 

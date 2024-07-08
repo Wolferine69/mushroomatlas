@@ -200,6 +200,7 @@ class AddCommentView(LoginRequiredMixin, CreateView):
         finding = get_object_or_404(Finding, id=self.kwargs['pk'])
         form.instance.user = Profile.objects.get(user=self.request.user)
         form.instance.finding = finding
+        form.instance.new = True
         return super().form_valid(form)
 
     def get_success_url(self):
