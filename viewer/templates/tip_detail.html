@@ -3,5 +3,6 @@
 {% block content %}
 <h1>{{ tip.title }}</h1>
 <p>{{ tip.content }}</p>
+    <p><img src="{{ tip.image.url }}" alt="tip image"></p>
 <p><a href="{% url 'tip_list' %}">Zpět na seznam tipů</a></p>
 {% endblock %}
