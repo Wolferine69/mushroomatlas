@@ -60,7 +60,6 @@
                         {% endif %}
                         {% if user.is_authenticated %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'comments' %}">Komentáře k mým nálezům</a>
                             </li>
                         {% endif %}
                     </ul>
@@ -83,6 +82,7 @@
                                 </form>
                                 <a class="dropdown-item text-right" href="{% url 'password_change' %}">Změna hesla</a>
                                 <a class="dropdown-item text-right" href="{% url 'profile_update' %}">Profil</a>
+                                <a class="dropdown-item text-right" href="{% url 'comments' %}">Komentáře k nálezům</a>
                             </div>
                         {% else %}
                             <a class="nav-link active dropdown-toggle" href="#" data-toggle="dropdown">
