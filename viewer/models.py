@@ -44,7 +44,6 @@ class Mushroom(models.Model):
     class Meta:
         ordering = ['name_cz']
 
-
     def __str__(self):
         return f"{self.name_cz} ({self.name_latin}) - {self.get_edibility_display()}"
 
@@ -105,5 +104,3 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.user.user.username} on {self.finding}"
-
-
