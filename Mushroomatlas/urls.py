@@ -68,5 +68,6 @@ urlpatterns = [
     path('api/habitats/', Habitats.as_view(), name='habitat-list-create'),
     path('api/profiles/', Profiles.as_view(), name='profile-list'),
     path('api-auth/', include('rest_framework.urls')),
+    path("__reload__/", include("django_browser_reload.urls")),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
