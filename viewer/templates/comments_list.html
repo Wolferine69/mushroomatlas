@@ -1,11 +1,17 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<a>
+<ul>
     {% for comment in comments %}
-        <a href="{% url 'findings_map' %}?finding={{ comment.finding.id }}">
-        <li>{{ comment.user }} | {{ comment.finding.mushroom.name_cz }} | {{ comment.text }} | {{ comment.created_at }}</li>
-        </a>
+        <li>
+            <a href="{% url 'findings_map' %}?finding={{ comment.finding.id }}">
+                {% if comment.new %}
+                    <mark><strong>{{ comment.user }} | {{ comment.finding.mushroom.name_cz }} | {{ comment.text }} | {{ comment.created_at }}</strong></mark>
+                {% else %}
+                    {{ comment.user }} | {{ comment.finding.mushroom.name_cz }} | {{ comment.text }} | {{ comment.created_at }}
+                {% endif %}
+            </a>
+        </li>
     {% endfor %}
 </ul>
 {% endblock %}
