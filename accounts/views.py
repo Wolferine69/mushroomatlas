@@ -10,7 +10,7 @@ from django.forms import Textarea, CharField, ImageField
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, TemplateView
-
+from messaging.models import Message
 from accounts.forms import UserProfileUpdateForm
 from accounts.models import Profile
 
@@ -65,6 +65,12 @@ class AccountDetailView(LoginRequiredMixin, DetailView):
     model = Profile
     template_name = 'account_detail.html'
     context_object_name = 'account'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.get_object().user  # Assuming Profile has a one-to-one relationship with User
+        context['sent_messages'] = Message.objects.filter(sender=user).order_by('-timestamp')
+        return context
 
 class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = User

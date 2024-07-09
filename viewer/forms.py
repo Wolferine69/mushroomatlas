@@ -1,7 +1,7 @@
 from django import forms
 from .models import Habitat, Finding, Comment, Recipe, Family
 
-from viewer.models import Mushroom
+from viewer.models import Mushroom, Message
 
 
 class MushroomForm(forms.ModelForm):
@@ -69,3 +69,8 @@ class RecipeForm(forms.ModelForm):
             'main_mushroom': 'Hlavní houba',
             'user': 'Přidal',
         }
+
+class MessageForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = ['receiver', 'content']

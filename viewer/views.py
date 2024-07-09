@@ -6,8 +6,8 @@ from django.views.generic import ListView, DetailView, CreateView, TemplateView
 
 from accounts.forms import RatingForm
 from accounts.models import Profile
-from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding, Comment
-from .forms import MushroomForm, MushroomFilterForm, FindingForm, CommentForm, RecipeForm
+from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding, Comment, Message
+from .forms import MushroomForm, MushroomFilterForm, FindingForm, CommentForm, RecipeForm, MessageForm
 
 
 # Create your views here.
@@ -248,3 +248,22 @@ class CommentsListView(LoginRequiredMixin, ListView):
         context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
             'viewer.add_mushroom')
         return context
+
+
+@login_required
+def send_message(request):
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.sender = request.user
+            message.save()
+            return redirect('inbox')
+    else:
+        form = MessageForm()
+    return render(request, 'send_message.html', {'form': form})
+
+@login_required
+def inbox(request):
+    messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
+    return render(request, 'inbox.html', {'messages': messages})

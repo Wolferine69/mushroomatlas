@@ -8,4 +8,17 @@
     {% endif %}
 <p><strong>{{ account.user.first_name }} {{ account.user.last_name }}</strong></p>
     <p>{{ account.biography }}</p>
+
+<h3>Sent Messages</h3>
+<ul>
+    {% for message in sent_messages %}
+        <li>
+            <strong>To:</strong> {{ message.receiver.username }}<br>
+            <strong>Sent at:</strong> {{ message.timestamp }}<br>
+            <p>{{ message.content }}</p>
+        </li>
+    {% empty %}
+        <li>No messages sent.</li>
+    {% endfor %}
+</ul>
 {% endblock %}
