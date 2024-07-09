@@ -6,23 +6,23 @@
 
 {% block content %}
 <section class="container">
-    <form method="get" class="flex sm:flex-row">
-        <div class="form-group mr-2">
-            <label for="id_edibility" class="mr-2">Jedlost:</label>
+    <form method="get" class="flex-row md:flex sm:block">
+        <div class="block mr-2">
+            <label for="id_edibility" class="block">Jedlost:</label>
             {{ form.edibility|add_class:"form-control" }}
         </div>
-        <div class=" ">
-            <label for="id_habitat" class="mr-2">Biotop:</label>
+        <div class="flex-col mr-2 ">
+            <label for="id_habitat" class="block">Biotop:</label>
             {{ form.habitat|add_class:"form-control" }}
         </div>
-        <div class="form-group mr-2">
-            <label for="id_family" class="mr-2">Řád:</label>
+        <div class="text-left mr-2">
+            <label for="id_family" class="block">Řád:</label>
             {{ form.family|add_class:"form-control" }}
         </div>
-        <button type="submit" class="btn btn-primary">Filtrovat</button>
+        <button type="submit" class="block">Filtrovat</button>
     </form>
 
-    <section class="grid grid-cols-3 gap-6 mt-4">
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 lg:grid-cols-3">
         {% for mushroom in mushrooms %}
         <div class="bg-emerald-900 p-4 rounded-md border-green-900 hover:bg-emerald-800">
             <div class="">
