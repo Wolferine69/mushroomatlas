@@ -261,9 +261,9 @@ def send_message(request):
             return redirect('inbox')
     else:
         form = MessageForm()
-    return render(request, 'send_message.html', {'form': form})
+    return render(request, 'messaging/send_message.html', {'form': form})
 
 @login_required
 def inbox(request):
     messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
-    return render(request, 'inbox.html', {'messages': messages})
+    return render(request, 'messaging/inbox.html', {'messages': messages})
