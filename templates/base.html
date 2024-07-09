@@ -83,6 +83,9 @@
                                 <a class="dropdown-item text-right" href="{% url 'password_change' %}">Změna hesla</a>
                                 <a class="dropdown-item text-right" href="{% url 'profile_update' %}">Profil</a>
                                 <a class="dropdown-item text-right" href="{% url 'comments' %}">Komentáře k nálezům</a>
+                                <a class="dropdown-item text-right" href="{% url 'send_message' %}">Poslat zprávu</a>
+                                <a class="dropdown-item text-right" href="{% url 'view_inbox' %}">Přijaté zprávy</a>
+                                <a class="dropdown-item text-right" href="{% url 'view_outbox' %}">Odeslané zprávy</a>
                             </div>
                         {% else %}
                             <a class="nav-link active dropdown-toggle" href="#" data-toggle="dropdown">
