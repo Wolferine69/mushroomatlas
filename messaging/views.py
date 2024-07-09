@@ -1,19 +1,31 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from .forms import MessageForm
 from .models import Message
 
 @login_required
-def send_message(request):
+def send_message(request, receiver_username=None, replied_to_id=None):
+    receiver = None
+    replied_to = None
+    if receiver_username:
+        receiver = get_object_or_404(User, username=receiver_username)
+    if replied_to_id:
+        replied_to = get_object_or_404(Message, id=replied_to_id)
+
     if request.method == 'POST':
         form = MessageForm(request.POST)
         if form.is_valid():
             message = form.save(commit=False)
             message.sender = request.user
+            if receiver:
+                message.receiver = receiver
+            if replied_to:
+                message.replied_to = replied_to
             message.save()
             return redirect('view_inbox')
     else:
-        form = MessageForm()
+        form = MessageForm(initial={'receiver': receiver, 'replied_to': replied_to})
     return render(request, 'messaging/send_message.html', {'form': form})
 
 @login_required

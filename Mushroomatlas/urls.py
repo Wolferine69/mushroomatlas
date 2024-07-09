@@ -20,6 +20,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.authtoken.views import obtain_auth_token
 
+
 from accounts.views import SubmittableLoginView, RegistrationView, SubmittablePasswordChangeView, AccountsListView, \
     AccountDetailView, ProfileUpdateView
 from api.views import Mushrooms, Families, Recipes, Findings, Habitats, Profiles
@@ -29,6 +30,7 @@ from viewer.views import (home,
                           TipDetailView, add_mushroom, FindingsMapView, AddFindingView, AddCommentView, add_recipe,
                           CommentsListView,
                           )
+from messaging import views as messaging_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -68,5 +70,11 @@ urlpatterns = [
     path('api/habitats/', Habitats.as_view(), name='habitat-list-create'),
     path('api/profiles/', Profiles.as_view(), name='profile-list'),
     path('api-auth/', include('rest_framework.urls')),
+
+    path('send/', messaging_views.send_message, name='send_message'),
+    path('send/<str:receiver_username>/', messaging_views.send_message, name='send_message'),
+    path('send/<str:receiver_username>/<int:replied_to_id>/', messaging_views.send_message, name='send_message'),
+    path('inbox/', messaging_views.view_inbox, name='view_inbox'),
+    path('outbox/', messaging_views.view_outbox, name='view_outbox'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -16,6 +16,7 @@
             <strong>To:</strong> {{ message.receiver.username }}<br>
             <strong>Sent at:</strong> {{ message.timestamp }}<br>
             <p>{{ message.content }}</p>
+            <a href="{% url 'send_message' receiver_username=message.receiver.username replied_to_id=message.id %}">Reply</a>
         </li>
     {% empty %}
         <li>No messages sent.</li>
