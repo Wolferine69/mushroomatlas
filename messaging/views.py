@@ -8,10 +8,12 @@ from .models import Message
 def send_message(request, receiver_username=None, replied_to_id=None):
     receiver = None
     replied_to = None
+    initial_subject = ""
     if receiver_username:
         receiver = get_object_or_404(User, username=receiver_username)
     if replied_to_id:
         replied_to = get_object_or_404(Message, id=replied_to_id)
+        initial_subject = f"RE: {replied_to.subject}"
 
     if request.method == 'POST':
         form = MessageForm(request.POST)
@@ -25,7 +27,7 @@ def send_message(request, receiver_username=None, replied_to_id=None):
             message.save()
             return redirect('view_inbox')
     else:
-        form = MessageForm(initial={'receiver': receiver, 'replied_to': replied_to})
+        form = MessageForm(initial={'receiver': receiver, 'replied_to': replied_to, 'subject': initial_subject})
     return render(request, 'messaging/send_message.html', {'form': form})
 
 @login_required
