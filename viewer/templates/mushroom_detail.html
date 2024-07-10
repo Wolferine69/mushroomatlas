@@ -3,7 +3,16 @@
 {% block content %}
 <h2><strong>{{ mushroom.name_cz }}</strong></h2>
 <p><strong> Popis:</strong>  {{ mushroom.description }}</p>
-<p><strong> Jedlost:</strong>  {{ mushroom.get_edibility_display }}</p>
+    <p><strong> Jedlost:</strong>
+        {% if mushroom.get_edibility_display == 'Jedovatá' %}
+            <span class="text-red-600"> {{ mushroom.get_edibility_display }}</span>
+        {% elif mushroom.get_edibility_display == 'Nejedlá' %}
+            <span class="text-orange-500"> {{ mushroom.get_edibility_display }}</span>
+        {% else %}
+            <span class="text-green-600"> {{ mushroom.get_edibility_display }}</span>
+        {% endif %}
+    </p>
+
 <p><strong> Místo výskytu:</strong>
 {% if mushroom.habitats.exists %}
     {% for habitat in mushroom.habitats.all %}

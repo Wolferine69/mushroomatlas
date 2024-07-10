@@ -8,9 +8,34 @@
 		<meta http-equiv="X-UA-Compatible" content="ie=edge">
 		{% tailwind_css %}
         <link href="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.css" rel="stylesheet" />
-	</head>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
 
-	<body class="min-h-screen bg-slate-50 dark:bg-black bg-gradient-to-r from-emerald-950 to-dark-blue-500 dark:text-white">
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+	</head>
+    <style>
+{#problem with external CDN stylesheet, needed for input fields to be rendered properly#}
+[type='text'],input:where(:not([type])),[type='email'],[type='url'],[type='password'],[type='number'],
+[type='date'],[type='datetime-local'],[type='month'],[type='search'],[type='tel'],[type='time'],[type='week'],
+[multiple],textarea,select {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  background-color: #3f503f;
+  border-color: #40a37a;
+  border-width: 2px;
+  border-radius: 0px;
+  padding-top: 0.5rem;
+  padding-right: 0.75rem;
+  padding-bottom: 0.5rem;
+  padding-left: 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  --tw-shadow: 0 0 #0000;
+}
+              </style>
+
+	<body class="min-h-screen bg-slate-50 dark:bg-black bg-gradient-to-b from-emerald-950 to-black dark:text-white">
             <header class="bg-teal-700 text-white sticky top-0 z-10">
         <section class="max-w-4xl mx-auto p-4 flex justify-between items-center">
             <h1 class="text-3xl font-medium">
@@ -26,17 +51,18 @@
                     <a href="{%  url 'tip_list' %}" class="hover:opacity-90">Tips</a>
                     <a href="{%  url 'findings_map' %}" class="hover:opacity-90">Findings</a>
                     {% if user.is_authenticated %}
-                        <a href="{%  url 'add_mushroom' %}" class="hover:opacity-90">Add Mushroom</a>
+                        <a href="{%  url 'add_mushroom' %}" class="hover:opacity-90 mt-2">Add Mushroom</a>
                     {% endif %}
                     {% if user.is_authenticated %}
-                        <a href="{%  url 'accounts_list' %}" class="hover:opacity-90">Users</a>
+                        <a href="{%  url 'accounts_list' %}" class="hover:opacity-90 mt-2">Users</a>
                     {% endif %}
                 </nav>
-            <div class="relative">
+            <div class="hidden lg:block ">
                 <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="fixed right-6 top-3 text-white bg-emerald-600 hover:bg-emerald-400 focus:ring-4 focus:outline-none focus:ring-emerald-300
-                 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center
-                  dark:bg-emerald-600 dark:hover:bg-emerald-400 dark:focus:ring-emerald-300"
-                        type="button">{% if user.is_authenticated %} Welcome {{ user.first_name }} {% else %} <span class="animate-pulse">You are not logged in.</span> {% endif %} <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex text-center items-center
+                  dark:bg-teal-700 dark:hover:bg-emerald-400 dark:focus:ring-emerald-300"
+                        type="button">{% if user.is_authenticated %}
+                            {% if user.first_name %} Vítej, {{ user.first_name }}! {% else %} Vítej, {{ user.username }}! {% endif %} {% else %} <span class="animate-pulse">Nejste prihlašeni.</span> {% endif %} <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
                                 </svg>
                                     </button>
@@ -69,7 +95,9 @@
         {% block content %}
         {% endblock %}
     </main>
-
+     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.js"></script>
     </body>
 </html>

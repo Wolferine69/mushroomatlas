@@ -1,6 +1,8 @@
 {% extends "form.html" %}
 
 {% block content %}
+
+
     <div class="container p-4 bg-emerald-950 rounded-lg drop-shadow-xl">
     {% block form_title %}Registrace{% endblock %}
     <form method="POST" enctype="multipart/form-data">
@@ -9,4 +11,5 @@
         <input id="id_submit" type="submit" value="Potvrdit">
     </form>
     </div>
+
 {% endblock %}
