@@ -32,6 +32,8 @@ class MushroomListView(ListView):
                 mushrooms = mushrooms.filter(edibility=form.cleaned_data['edibility'])
             if form.cleaned_data['habitat']:
                 mushrooms = mushrooms.filter(habitats=form.cleaned_data['habitat'])
+            if form.cleaned_data['family']:
+                mushrooms = mushrooms.filter(family=form.cleaned_data['family'])
 
         context['mushrooms'] = mushrooms
         context['habitats'] = Habitat.objects.all()
