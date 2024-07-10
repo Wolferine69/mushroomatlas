@@ -11,3 +11,13 @@ def new_comments_count(request):
     return {
         'new_comments_count': 0
     }
+
+
+def can_add_mushroom(request):
+    if request.user.is_authenticated:
+        return {
+            'can_add_mushroom': request.user.has_perm('viewer.add_mushroom')
+        }
+    return {
+        'can_add_mushroom': False
+    }
