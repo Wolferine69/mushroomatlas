@@ -28,7 +28,7 @@ from viewer.views import (home,
                           MushroomListView, MushroomDetailView,
                           FamilyListView, FamilyDetailView, RecipeListView, RecipeDetailView, TipListView,
                           TipDetailView, add_mushroom, FindingsMapView, AddFindingView, AddCommentView, add_recipe,
-                          CommentsListView,
+                          CommentsListView, mark_comment_read,
                           )
 from messaging import views as messaging_views
 
@@ -58,9 +58,11 @@ urlpatterns = [
     path('tip/<int:pk>/', TipDetailView.as_view(), name='tip_detail'),
 
     path('findings_map/', FindingsMapView.as_view(), name='findings_map'),
+    path('findings_map/<int:pk>/', FindingsMapView.as_view(), name='findings_map_with_pk'),
     path('add_finding/', AddFindingView.as_view(), name='add_finding'),
     path('add_comment/<int:pk>/', AddCommentView.as_view(), name='add_comment'),
     path('comments/', CommentsListView.as_view(), name='comments'),
+    path('mark_comment_read/<int:comment_id>/', mark_comment_read, name='mark_comment_read'),
 
     path('api/token/', obtain_auth_token, name='api_token_auth'),
     path('api/mushrooms/', Mushrooms.as_view(), name='mushroom-list-create'),

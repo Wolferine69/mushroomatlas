@@ -91,7 +91,7 @@
 
 
     var markers = [];
-    var selectedFindingId = new URLSearchParams(window.location.search).get('finding');
+    var selectedFindingId = "{{ selected_finding.id }}" || null;
 
     // Funkce pro zobrazení detailů nálezu
     function showDetails(finding) {
@@ -146,9 +146,7 @@
     });
     markers.push(marker);
     marker.addTo(map);
-    console.log(marker.findingId,"mid")
-    console.log(selectedFindingId,"cid")
-    if (marker.findingId === selectedFindingId) {
+    if (selectedFindingId && selectedFindingId == "{{ finding.id }}") {
         map.setView(marker.getLatLng(), 13);
         showDetails({
             id: "{{ finding.id }}",

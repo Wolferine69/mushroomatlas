@@ -190,6 +190,12 @@ class FindingsMapView(ListView):
         context['findings'] = findings
         context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
             'viewer.add_mushroom')
+
+        # Přidání vybraného nálezu do kontextu, pokud je pk v URL
+        pk = self.kwargs.get('pk')
+        if pk:
+            context['selected_finding'] = get_object_or_404(Finding, id=pk)
+
         return context
 
 
@@ -267,3 +273,10 @@ def send_message(request):
 def inbox(request):
     messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
     return render(request, 'messaging/inbox.html', {'messages': messages})
+
+
+def mark_comment_read(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    comment.new = False
+    comment.save()
+    return redirect('findings_map_with_pk', pk=comment.finding.id)
