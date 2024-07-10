@@ -71,6 +71,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'viewer.context_processors.new_comments_count',
+                'viewer.context_processors.new_messages_count',
                 'viewer.context_processors.can_add_mushroom',
             ],
         },

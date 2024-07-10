@@ -8,6 +8,7 @@ class Message(models.Model):
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     replied_to = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
+    is_read = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Message from {self.sender} to {self.receiver} at {self.timestamp}"

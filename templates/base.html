@@ -88,6 +88,9 @@
                                 {% endif %}
                                 <a class="dropdown-item text-right" href="{% url 'send_message' %}">Poslat zprávu</a>
                                 <a class="dropdown-item text-right" href="{% url 'view_inbox' %}">Přijaté zprávy</a>
+                                {% if new_messages_count > 0 %}
+                                        <span class="badge badge-pill badge-primary">{{ new_messages_count }} nových</span>
+                                {% endif %}
                                 <a class="dropdown-item text-right" href="{% url 'view_outbox' %}">Odeslané zprávy</a>
                             </div>
                         {% else %}

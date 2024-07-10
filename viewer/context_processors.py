@@ -1,5 +1,5 @@
 from .models import Comment, Finding
-
+from messaging.models import Message
 
 def new_comments_count(request):
     if request.user.is_authenticated:
@@ -10,6 +10,16 @@ def new_comments_count(request):
         }
     return {
         'new_comments_count': 0
+    }
+
+def new_messages_count(request):
+    if request.user.is_authenticated:
+        new_messages = Message.objects.filter(receiver=request.user, is_read=False).count()
+        return {
+            'new_messages_count': new_messages
+        }
+    return {
+        'new_messages_count': 0
     }
 
 
