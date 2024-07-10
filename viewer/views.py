@@ -6,7 +6,7 @@ from django.views.generic import ListView, DetailView, CreateView, TemplateView
 
 from accounts.forms import RatingForm
 from accounts.models import Profile
-from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding, Comment, Message
+from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding, Comment, Message, Rating
 from .forms import MushroomForm, MushroomFilterForm, FindingForm, CommentForm, RecipeForm, MessageForm
 
 
@@ -95,28 +95,47 @@ class RecipeListView(ListView):
 class RecipeDetailView(DetailView):
     def get(self, request, pk):
         recipe = get_object_or_404(Recipe, pk=pk)
-        form = RatingForm()
+        user = request.user
+        form = RatingForm(user=user, recipe=recipe)
+
+        # Check if the current user has already rated this recipe
+        if user.is_authenticated:
+            has_rated = Rating.objects.filter(recipe=recipe, user=user).exists()
+        else:
+            has_rated = False
+
         context = {
             'recipe': recipe,
             'form': form,
+            'has_rated': has_rated,
         }
         return render(request, 'recipe_detail.html', context)
 
     def post(self, request, pk):
         recipe = get_object_or_404(Recipe, pk=pk)
-        form = RatingForm(request.POST, user=request.user)
-        if form.is_valid():
-            form.instance.recipe = recipe
-            form.instance.user = request.user
-            form.save()
+        user = request.user
+        form = RatingForm(request.POST, user=user, recipe=recipe)
 
-            # Aktualizace průměrného hodnocení receptu
-            recipe.update_average_rating()
+        if user.is_authenticated:
+            if form.is_valid():
 
-            return redirect('recipe_detail', pk=pk)
+                has_rated = Rating.objects.filter(recipe=recipe, user=user).exists()
+
+                if not has_rated:
+                    form.save()
+
+                has_rated = Rating.objects.filter(recipe=recipe, user=user).exists()
+
+                recipe.update_average_rating()
+
+                return redirect('recipe_detail', pk=pk)
+        else:
+            has_rated = False
+
         context = {
             'recipe': recipe,
             'form': form,
+            'has_rated': has_rated,
         }
         return render(request, 'recipe_detail.html', context)
 

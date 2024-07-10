@@ -80,19 +80,24 @@ class Recipe(models.Model):
         return self.title
 
     def update_average_rating(self):
-        ratings = self.ratings.all()
-        if ratings.count() > 0:
-            total_rating = sum(rating.rating for rating in ratings)
+        ratings = Rating.objects.filter(recipe=self)
+        if ratings.exists():
+            total_rating = sum(rating.hodnoceni for rating in ratings)
             self.rating = total_rating / ratings.count()
         else:
             self.rating = 0
         self.save()
 
+    def num_ratings(self):
+        return Rating.objects.filter(recipe=self).count()
 
 class Rating(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='ratings')
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='hodnoceni')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    rating = models.IntegerField(default=1, choices=((1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')))
+    hodnoceni = models.IntegerField(default=1, choices=((1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')))
+
+    def __str__(self):
+        return f"{self.recipe.title} - {self.user.username}"
 
 
 class Tip(models.Model):
