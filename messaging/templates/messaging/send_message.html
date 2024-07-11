@@ -2,9 +2,73 @@
 
 {% block content %}
 <h1>Send a Message</h1>
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
+    <h2>Attachments</h2>
+    <div id="attachments">
+        {{ attachment_formset.management_form }}
+        {% for form in attachment_formset %}
+            <div class="attachment-form">
+                {{ form.as_p }}
+            </div>
+        {% endfor %}
+    </div>
     <button type="submit">Send</button>
 </form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var attachmentsDiv = document.getElementById('attachments');
+    var totalForms = document.getElementById('id_form-TOTAL_FORMS');
+    var currentCount = parseInt(totalForms.value);
+
+    // Hide additional attachment fields initially
+    for (var i = 1; i < currentCount; i++) {
+        attachmentsDiv.children[i].style.display = 'none';
+    }
+
+    function showNextAttachmentField() {
+        for (var i = 0; i < currentCount; i++) {
+            var inputField = document.querySelector('#attachments .attachment-form:nth-child(' + (i + 1) + ') input[type="file"]');
+            if (inputField && inputField.files.length > 0) {
+                if (i + 1 < currentCount) {
+                    attachmentsDiv.children[i + 1].style.display = 'block';
+                } else {
+                    addNewAttachmentField();
+                }
+            }
+        }
+    }
+
+    function addNewAttachmentField() {
+        var newForm = attachmentsDiv.children[0].cloneNode(true);
+        var newFormHtml = newForm.innerHTML.replace(/form-\d+-/g, 'form-' + currentCount + '-');
+        newForm.innerHTML = newFormHtml;
+        newForm.style.display = 'none';
+        attachmentsDiv.appendChild(newForm);
+        currentCount++;
+        totalForms.value = currentCount;
+
+        // Attach event listener to the new input field
+        var newInputField = newForm.querySelector('input[type="file"]');
+        if (newInputField) {
+            newInputField.addEventListener('change', showNextAttachmentField);
+        }
+    }
+
+    // Attach event listeners to the existing input fields
+    for (var i = 0; i < currentCount; i++) {
+        var inputField = document.querySelector('#attachments .attachment-form:nth-child(' + (i + 1) + ') input[type="file"]');
+        if (inputField) {
+            inputField.addEventListener('change', showNextAttachmentField);
+        }
+    }
+
+    // Show the first attachment field
+    if (currentCount > 0) {
+        attachmentsDiv.children[0].style.display = 'block';
+    }
+});
+</script>
 {% endblock %}

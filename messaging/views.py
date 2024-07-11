@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .forms import MessageForm
+from .forms import MessageForm, AttachmentFormSet
 from .models import Message
 
 @login_required
@@ -17,6 +17,7 @@ def send_message(request, receiver_username=None, replied_to_id=None):
 
     if request.method == 'POST':
         form = MessageForm(request.POST)
+        attachment_formset = AttachmentFormSet(request.POST, request.FILES)
         if form.is_valid():
             message = form.save(commit=False)
             message.sender = request.user
@@ -25,10 +26,21 @@ def send_message(request, receiver_username=None, replied_to_id=None):
             if replied_to:
                 message.replied_to = replied_to
             message.save()
+
+            attachments = attachment_formset.save(commit=False)
+            for attachment in attachments:
+                attachment.message = message
+                attachment.save()
+
             return redirect('view_inbox')
     else:
         form = MessageForm(initial={'receiver': receiver, 'replied_to': replied_to, 'subject': initial_subject})
-    return render(request, 'messaging/send_message.html', {'form': form})
+        attachment_formset = AttachmentFormSet()
+
+    return render(request, 'messaging/send_message.html', {
+        'form': form,
+        'attachment_formset': attachment_formset
+    })
 
 @login_required
 def view_inbox(request):
