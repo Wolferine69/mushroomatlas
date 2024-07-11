@@ -9,6 +9,23 @@
     {% for form in attachment_formset %}
         {{ form.as_p }}
     {% endfor %}
+
+    <hr style="margin: 20px 0; border: 1px solid #ccc;">
+
+    <h2>Původní přílohy</h2>
+    {% if original_message.attachments.exists %}
+    <ul>
+        {% for attachment in original_message.attachments.all %}
+            <li><strong>Příloha:</strong> <a href="{{ attachment.file.url }}">{{ attachment.file.name }}</a></li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Žádné přílohy.</p>
+    {% endif %}
+
+    <hr style="margin: 20px 0; border: 1px solid #ccc;">
+
     <button type="submit" class="btn btn-primary">Přeposlat</button>
 </form>
 {% endblock %}
+

@@ -110,8 +110,17 @@ def forward_message(request, message_id):
 
             return redirect('view_outbox')
     else:
-        form = MessageForm(initial={'subject': f"Fwd: {original_message.subject}", 'content': original_message.content},
-                           user=request.user)
+        form = MessageForm(
+            initial={
+                'subject': f"Fwd: {original_message.subject}",
+                'content': f"\n\n------ Původní zpráva ------\n"
+                           f"Datum: {original_message.timestamp}\n"
+                           f"Od: {original_message.sender.username}\n"
+                           f"Text:\n{original_message.content}\n"
+                           f"------ Konec původní zprávy ------\n"
+            },
+            user=request.user
+        )
         attachment_formset = AttachmentFormSet()
 
     return render(request, 'messaging/forward_message.html', {
