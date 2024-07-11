@@ -8,16 +8,16 @@ test - adding unit tests as part of the functionality
 
 
 registrovaní uživatelé:
-username:                       password:
+username:                       password:               Jméno:
 MushroomHunter                  P4s$w0rd1!
 NatureLover22                   Gr33nThum8&
-ForestExplorer                  W1ldF0r3st@
+ForestExplorer                  W1ldF0r3st@             Jan
 ShroomMaster                    FungiL0v3r$
-MycoFanatic                     M1c0Fan@t1c
+MycoFanatic                     M1c0Fan@t1c             Kateřina
 FungiFreak                      FunGuy123!
-FungiEnthusiast                 Z6y#L9p@T1w
-FungiFanatic                    N8tur3L0v3r!
-MushroomQueen                   H4rVesT!ng
+FungiEnthusiast                 Z6y#L9p@T1w             Václav
+FungiFanatic                    N8tur3L0v3r!            Tomáš
+MushroomQueen                   H4rVesT!ng              Petra
 NatureWalker                    G3n@L8mush
 
 

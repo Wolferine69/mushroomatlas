@@ -14,6 +14,7 @@ class UserProfileUpdateForm(forms.ModelForm):
         fields = ['username', 'first_name', 'last_name', 'email']
 
     def __init__(self, *args, **kwargs):
+        allow_username_edit = kwargs.pop('allow_username_edit', False)
         super().__init__(*args, **kwargs)
         self.fields['username'].disabled = True
         self.fields['username'].help_text = ''
