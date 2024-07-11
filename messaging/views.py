@@ -3,7 +3,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .forms import MessageForm, AttachmentFormSet
+from .forms import MessageForm, AttachmentFormSet, SenderFilterForm
 from .models import Message, Attachment
 
 
@@ -56,8 +56,14 @@ def send_message(request, receiver_username=None, replied_to_id=None):
 
 @login_required
 def view_inbox(request):
+    form = SenderFilterForm(request.GET)
     messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
-    return render(request, 'messaging/inbox.html', {'messages': messages})
+    if form.is_valid():
+        sender = form.cleaned_data.get('sender')
+        if sender:
+            messages = messages.filter(sender=sender)
+    return render(request, 'messaging/inbox.html', {'messages': messages, 'form': form})
+
 
 @login_required
 def view_outbox(request):

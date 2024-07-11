@@ -2,6 +2,11 @@
 
 {% block content %}
 <h1>Přijaté zprávy</h1>
+<form method="get" action="">
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Filtrovat</button>
+    <a href="{% url 'view_inbox' %}" class="btn btn-secondary">Zrušit filtr</a>
+</form>
 <ul>
     {% for message in messages %}
         <li>
@@ -19,7 +24,7 @@
                 {% endfor %}
             </ul>
             <a href="{% url 'send_message' receiver_username=message.sender.username replied_to_id=message.id %}" class="btn btn-primary">Odpovědět</a>
-            <a href="{% url 'forward_message' message.id %}" class="btn btn-secondary">Přeposlat</a>
+            <a href="{% url 'forward_message' message.id %}" class="btn btn-secondary">Přeposlat</a>  <!-- Přidáno tlačítko Přeposlat -->
             <form method="post" action="{% url 'delete_message' message.id %}" style="display:inline;">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger">Smazat</button>
@@ -30,3 +35,6 @@
     {% endfor %}
 </ul>
 {% endblock %}
+
+
+

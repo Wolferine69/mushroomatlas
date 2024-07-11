@@ -34,3 +34,6 @@ class AttachmentForm(forms.ModelForm):
 
 AttachmentFormSet = forms.inlineformset_factory(Message, Attachment, form=AttachmentForm, extra=1, can_delete=False)
 
+
+class SenderFilterForm(forms.Form):
+    sender = forms.ModelChoiceField(queryset=User.objects.all(), required=False, label="Filtr podle odesílatele")
