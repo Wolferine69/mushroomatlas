@@ -73,7 +73,7 @@ class AccountDetailView(LoginRequiredMixin, DetailView):
         return context
 
 class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
-    model = User
+    model = Profile
     form_class = UserProfileUpdateForm
     template_name = 'profile_update.html'
     success_url = reverse_lazy('profile_update')
