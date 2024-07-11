@@ -80,5 +80,6 @@ urlpatterns = [
     path('outbox/', messaging_views.view_outbox, name='view_outbox'),
     path('delete_message/<int:pk>/', messaging_views.delete_message, name='delete_message'),
     path('mark_message_read/<int:message_id>/', messaging_views.mark_message_read, name='mark_message_read'),
+    path('forward_message/<int:message_id>/', messaging_views.forward_message, name='forward_message'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

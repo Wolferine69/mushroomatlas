@@ -4,7 +4,7 @@
 <h1>Odeslané zprávy</h1>
 <ul>
     {% for message in sent_messages %}
-        <li>{{ message.timestamp }} - To: {{ message.receiver.username }} - {{ message.content }}</li>
+        <li>{{ message.timestamp }} - Komu: {{ message.receiver.username }} - {{ message.content }}</li>
     {% empty %}
         <li>Nebyly odeslány žádné zprávy.</li>
     {% endfor %}

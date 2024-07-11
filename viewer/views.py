@@ -226,7 +226,7 @@ class CommentsListView(LoginRequiredMixin, ListView):
         user_profile = self.request.user.profile
         return Comment.objects.filter(finding__user=user_profile)
 
-
+"""
 @login_required
 def send_message(request):
     if request.method == 'POST':
@@ -239,6 +239,8 @@ def send_message(request):
     else:
         form = MessageForm()
     return render(request, 'messaging/send_message.html', {'form': form})
+"""
+
 
 @login_required
 def inbox(request):

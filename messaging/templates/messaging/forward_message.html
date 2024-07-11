@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Přeposlat zprávu</h1>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {{ attachment_formset.management_form }}
+    {% for form in attachment_formset %}
+        {{ form.as_p }}
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Přeposlat</button>
+</form>
+{% endblock %}

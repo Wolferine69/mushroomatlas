@@ -4,7 +4,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .forms import MessageForm, AttachmentFormSet
-from .models import Message
+from .models import Message, Attachment
+
 
 @login_required
 def send_message(request, receiver_username=None, replied_to_id=None):
@@ -43,7 +44,7 @@ def send_message(request, receiver_username=None, replied_to_id=None):
                 attachment.delete()
 
             attachment_formset.save_m2m()
-            return redirect('view_inbox')
+            return redirect('view_outbox')
     else:
         form = MessageForm(initial={'receiver': receiver, 'replied_to': replied_to, 'subject': initial_subject}, user=request.user)
         attachment_formset = AttachmentFormSet()
@@ -76,3 +77,45 @@ def mark_message_read(request, message_id):
     message.read = True
     message.save()
     return redirect('view_inbox')
+
+
+# views.py
+
+@login_required
+def forward_message(request, message_id):
+    original_message = get_object_or_404(Message, id=message_id)
+
+    if request.method == 'POST':
+        form = MessageForm(request.POST, user=request.user)
+        attachment_formset = AttachmentFormSet(request.POST, request.FILES)
+
+        if form.is_valid() and attachment_formset.is_valid():
+            message = form.save(commit=False)
+            message.sender = request.user
+            message.save()
+
+            for original_attachment in original_message.attachments.all():
+                new_attachment = Attachment(message=message, file=original_attachment.file)
+                new_attachment.save()
+
+            attachments = attachment_formset.save(commit=False)
+            for attachment in attachments:
+                attachment.message = message
+                attachment.save()
+
+            for attachment in attachment_formset.deleted_objects:
+                attachment.delete()
+
+            attachment_formset.save_m2m()
+
+            return redirect('view_outbox')
+    else:
+        form = MessageForm(initial={'subject': f"Fwd: {original_message.subject}", 'content': original_message.content},
+                           user=request.user)
+        attachment_formset = AttachmentFormSet()
+
+    return render(request, 'messaging/forward_message.html', {
+        'form': form,
+        'attachment_formset': attachment_formset,
+        'original_message': original_message,
+    })
