@@ -8,18 +8,18 @@
     {% endif %}
 <p><strong>{{ account.user.first_name }} {{ account.user.last_name }}</strong></p>
     <p>{{ account.biography }}</p>
-
-<h3>Sent Messages</h3>
+    <a href="{% url 'accounts_list' %}" class="btn btn-primary">Zpět na seznam uživatelů</a>
+<h3>Odeslané zprávy</h3>
 <ul>
     {% for message in sent_messages %}
         <li>
-            <strong>To:</strong> {{ message.receiver.username }}<br>
-            <strong>Sent at:</strong> {{ message.timestamp }}<br>
+            <strong>Od:</strong> {{ message.receiver.username }}<br>
+            <strong>Datum odeslání:</strong> {{ message.timestamp }}<br>
             <p>{{ message.content }}</p>
-            <a href="{% url 'send_message' receiver_username=message.receiver.username replied_to_id=message.id %}">Reply</a>
+            <a href="{% url 'send_message' receiver_username=message.receiver.username replied_to_id=message.id %}">Odeslat</a>
         </li>
     {% empty %}
-        <li>No messages sent.</li>
+        <li>Nebyly odeslány žádné zprávy.</li>
     {% endfor %}
 </ul>
 {% endblock %}

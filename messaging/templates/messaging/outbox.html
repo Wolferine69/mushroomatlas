@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Outbox</h1>
+<h1>Odeslané zprávy</h1>
 <ul>
     {% for message in messages %}
         <li>{{ message.timestamp }} - To: {{ message.receiver.username }} - {{ message.content }}</li>

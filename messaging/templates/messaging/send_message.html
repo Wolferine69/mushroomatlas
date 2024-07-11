@@ -1,11 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Send a Message</h1>
+<h1>Poslat zprávu</h1>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
-    <h2>Attachments</h2>
     <div id="attachments">
         {{ attachment_formset.management_form }}
         {% for form in attachment_formset %}
@@ -14,7 +13,7 @@
             </div>
         {% endfor %}
     </div>
-    <button type="submit">Send</button>
+    <button type="submit">Odeslat</button>
 </form>
 
 <script>
@@ -22,6 +21,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var attachmentsDiv = document.getElementById('attachments');
     var totalForms = document.getElementById('id_form-TOTAL_FORMS');
     var currentCount = parseInt(totalForms.value);
+
+    console.log("Initial total forms: ", currentCount);
 
     // Hide additional attachment fields initially
     for (var i = 1; i < currentCount; i++) {
@@ -34,6 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (inputField && inputField.files.length > 0) {
                 if (i + 1 < currentCount) {
                     attachmentsDiv.children[i + 1].style.display = 'block';
+                    console.log("Showing next attachment field at index: ", i + 1);
                 } else {
                     addNewAttachmentField();
                 }
@@ -50,11 +52,12 @@ document.addEventListener('DOMContentLoaded', function() {
         currentCount++;
         totalForms.value = currentCount;
 
-        // Attach event listener to the new input field
+        console.log("Adding new attachment field, current count: ", currentCount);
+
+        // Clear the input field value
         var newInputField = newForm.querySelector('input[type="file"]');
-        if (newInputField) {
-            newInputField.addEventListener('change', showNextAttachmentField);
-        }
+        newInputField.value = '';
+        newInputField.addEventListener('change', showNextAttachmentField);
     }
 
     // Attach event listeners to the existing input fields
@@ -70,5 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
         attachmentsDiv.children[0].style.display = 'block';
     }
 });
+
+
 </script>
 {% endblock %}
