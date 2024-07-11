@@ -9,31 +9,50 @@
 		{% tailwind_css %}
         <link href="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.css" rel="stylesheet" />
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+                 integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+                 crossorigin=""/>
 
-     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-     crossorigin=""/>
+         <script defer>
+                {#JS to handle mobile menu#}
+                const initApp = () => {
+                    const hamburgerBtn = document.getElementById('hamburger-button')
+                    const mobileMenu = document.getElementById('mobile-menu')
+                    const link = document.getElementById('link')
+
+                    const toggleMenu = () => {
+                        mobileMenu.classList.toggle('hidden')
+                        mobileMenu.classList.toggle('flex')
+                    }
+
+                    hamburgerBtn.addEventListener('click', toggleMenu)
+                    mobileMenu.addEventListener('click', toggleMenu)
+                    link.addEventListener('click', toggleMenu)
+                }
+
+                document.addEventListener('DOMContentLoaded', initApp)
+            </script>
 	</head>
-    <style>
-{#problem with external CDN stylesheet, needed for input fields to be rendered properly#}
-[type='text'],input:where(:not([type])),[type='email'],[type='url'],[type='password'],[type='number'],
-[type='date'],[type='datetime-local'],[type='month'],[type='search'],[type='tel'],[type='time'],[type='week'],
-[multiple],textarea,select {
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-  background-color: #3f503f;
-  border-color: #40a37a;
-  border-width: 2px;
-  border-radius: 0px;
-  padding-top: 0.5rem;
-  padding-right: 0.75rem;
-  padding-bottom: 0.5rem;
-  padding-left: 0.75rem;
-  font-size: 1rem;
-  line-height: 1.5rem;
-  --tw-shadow: 0 0 #0000;
-}
-              </style>
+                 <style>
+                     {#css insert needed due to the problem with external CDN stylesheet, required for the input fields to be rendered properly#}
+                    [type='text'],input:where(:not([type])),[type='email'],[type='url'],[type='password'],[type='number'],
+                    [type='date'],[type='datetime-local'],[type='month'],[type='search'],[type='tel'],[type='time'],[type='week'],
+                    [multiple],textarea,select {
+                      -webkit-appearance: none;
+                         -moz-appearance: none;
+                              appearance: none;
+                      background-color: #3f503f;
+                      border-color: #40a37a;
+                      border-width: 2px;
+                      border-radius: 0px;
+                      padding-top: 0.5rem;
+                      padding-right: 0.75rem;
+                      padding-bottom: 0.5rem;
+                      padding-left: 0.75rem;
+                      font-size: 1rem;
+                      line-height: 1.5rem;
+                      --tw-shadow: 0 0 #0000;
+                    }
+                 </style>
 
 	<body class="min-h-screen bg-slate-50 dark:bg-black bg-gradient-to-b from-emerald-950 to-black dark:text-white">
             <header class="bg-teal-700 text-white sticky top-0 z-10">
@@ -41,20 +60,23 @@
             <h1 class="text-3xl font-medium">
                 <a href="{%  url 'home' %}">🍄MushroomAtlas</a>
             </h1>
-            <div><button id="mobile-open-button" class="text-3xl sm:hidden focus:outline-none">
-                &#9776;
-                </button>
+            <div>
+                    <button id="hamburger-button" class="text-3xl md:hidden cursor-pointer">
+                        &#9776;
+                    </button>
+
+            </div>
                 <nav class="hidden sm:block space-x-8 text-xl" aria-label="main">
-                    <a href="{%  url 'mushroom_list' %}" class="hover:opacity-90">Atlas Hub</a>
-                    <a href="{%  url 'family_list' %}" class="hover:opacity-90">Families</a>
-                    <a href="{%  url 'recipes_list' %}" class="hover:opacity-90">Recipes</a>
-                    <a href="{%  url 'tip_list' %}" class="hover:opacity-90">Tips</a>
-                    <a href="{%  url 'findings_map' %}" class="hover:opacity-90">Findings</a>
+                    <a href="{%  url 'mushroom_list' %}" class= hover:animate-pulse>Atlas Hub</a>
+                    <a href="{%  url 'family_list' %}" class= hover:animate-pulse>Families</a>
+                    <a href="{%  url 'recipes_list' %}" class= hover:animate-pulse>Recipes</a>
+                    <a href="{%  url 'tip_list' %}" class= hover:animate-pulse>Tips</a>
+                    <a href="{%  url 'findings_map' %}" class= hover:animate-pulse>Findings</a>
                     {% if user.is_authenticated %}
-                        <a href="{%  url 'add_mushroom' %}" class="hover:opacity-90 mt-2">Add Mushroom</a>
+                        <a href="{%  url 'add_mushroom' %}" class= "hover:animate-pulse mt-2">Add Mushroom</a>
                     {% endif %}
                     {% if user.is_authenticated %}
-                        <a href="{%  url 'accounts_list' %}" class="hover:opacity-90 mt-2">Users</a>
+                        <a href="{%  url 'accounts_list' %}" class= "hover:animate-pulse mt-2">Users</a>
                     {% endif %}
                 </nav>
             <div class="hidden lg:block ">
@@ -87,14 +109,39 @@
                     </ul>
                 </div>
             </div>
-            </div>
+
         </section>
+            <section id="mobile-menu" class="absolute top-0 bg-gradient-to-t from-teal-800 to-black w-full text-5xl flex-col justify-content-center origin-top
+              hidden ">
+                <button class="text-txl self-end px-6 hover:animate-pulse">
+                    &times;
+                </button>
+
+                <nav class="flex flex-col min-h-screen items-center py-8" aria-label="mobile">
+                    <a href="{% url 'mushroom_list' %}" id="link" class="w-full text-center py-6 hover:animate-pulse">Atlas Hub</a>
+                    <a href="{%  url 'family_list' %}" id="link" class="w-full text-center py-6 hover:animate-pulse">Řády</a>
+                    <a href="{% url 'recipes_list' %}" id="link" class="w-full text-center py-6 hover:animate-pulse">Recepty</a>
+                    <a href="{% url 'tip_list' %}" id="link" class="w-full text-center py-6 hover:animate-pulse">Tipy</a>
+                    <a href="{% url 'findings_map' %}" id="link" class="w-full text-center py-6 hover:animate-pulse">Mapa nálezů</a>
+                    {% if user.is_authenticated %}
+                        <a href="{%  url 'add_mushroom' %}" class= "w-full text-center py-6 hover:animate-pulse">Přidat houbu</a>
+                        <a href="{%  url 'accounts_list' %}" class= "w-full text-center py-6 hover:animate-pulse">Seznam uživatelů</a>
+
+                    {% else %}
+                        <a href="{%  url 'login' %}" class= "w-full text-center py-6 hover:animate-pulse">Login</a>
+                        <a href="{%  url 'registration' %}" class= "w-full text-center py-6 hover:animate-pulse">Registrovat</a>
+
+                    {% endif %}
+                </nav>
+
+            </section>
 
     </header>
     <main class=" max-w-4xl mx-auto">
         {% block content %}
         {% endblock %}
     </main>
+
      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
      crossorigin=""></script>
