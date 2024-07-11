@@ -91,6 +91,7 @@ class Recipe(models.Model):
     def num_ratings(self):
         return Rating.objects.filter(recipe=self).count()
 
+
 class Rating(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='hodnoceni')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -127,6 +128,7 @@ class Comment(models.Model):
     def __str__(self):
         return f"Comment by {self.user.user.username} on {self.finding}"
 
+
 class Message(models.Model):
     sender = models.ForeignKey(User, related_name='sent_messages', on_delete=models.CASCADE)
     receiver = models.ForeignKey(User, related_name='received_messages', on_delete=models.CASCADE)
@@ -135,3 +137,18 @@ class Message(models.Model):
 
     def __str__(self):
         return f"Message from {self.sender} to {self.receiver} at {self.timestamp}"
+
+
+class CommentRecipe(models.Model):
+    """Model representing a comment on a recipe."""
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='comments_recipe')
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='comments')
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    new = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Comment by {self.user.user.username} on {self.recipe}"
