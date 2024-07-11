@@ -1,4 +1,5 @@
 Example of naming commits
+
 Prefix:
 feature - adding a new functionality as part of a task
 fix - bug fix as part of added functionality
