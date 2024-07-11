@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -71,7 +73,7 @@ class Recipe(models.Model):
     image = models.ImageField(upload_to='recipe_images/', null=True, blank=True)
     main_mushroom = models.ForeignKey(Mushroom, on_delete=models.CASCADE, related_name='recipes', null=True, blank=True)
     source = models.CharField(max_length=200, null=True, blank=True)
-    rating = models.IntegerField(default=0)
+    rating = models.DecimalField(max_digits=2, decimal_places=1, default=0.0)
 
     class Meta:
         ordering = ['title']
@@ -83,9 +85,10 @@ class Recipe(models.Model):
         ratings = Rating.objects.filter(recipe=self)
         if ratings.exists():
             total_rating = sum(rating.hodnoceni for rating in ratings)
-            self.rating = total_rating / ratings.count()
+            average_rating = total_rating / ratings.count()
+            self.rating = round(Decimal(average_rating), 1)  # zaokrouhlení na jedno desetinné místo
         else:
-            self.rating = 0
+            self.rating = Decimal('0.0')
         self.save()
 
     def num_ratings(self):
