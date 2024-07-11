@@ -9,6 +9,8 @@ admin.site.register(Recipe)
 admin.site.register(Comment)
 admin.site.register(Tip)
 admin.site.register(Habitat)
+admin.site.register(CommentRecipe)
+admin.site.register(Rating)
 
 
 @admin.register(Mushroom)
