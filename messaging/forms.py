@@ -1,4 +1,7 @@
+# forms.py
+
 from django import forms
+from django.contrib.auth.models import User
 from .models import Message, Attachment
 
 class MessageForm(forms.ModelForm):
@@ -15,6 +18,12 @@ class MessageForm(forms.ModelForm):
             'replied_to': forms.HiddenInput()
         }
 
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(MessageForm, self).__init__(*args, **kwargs)
+        if user:
+            self.fields['receiver'].queryset = User.objects.exclude(pk=user.pk)
+
 class AttachmentForm(forms.ModelForm):
     class Meta:
         model = Attachment
@@ -24,5 +33,4 @@ class AttachmentForm(forms.ModelForm):
         }
 
 AttachmentFormSet = forms.inlineformset_factory(Message, Attachment, form=AttachmentForm, extra=1, can_delete=False)
-
 

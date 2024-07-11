@@ -38,6 +38,14 @@ class FindingForm(forms.ModelForm):
     class Meta:
         model = Finding
         fields = ['mushroom', 'description', 'date_found', 'image', 'latitude', 'longitude']
+        labels = {
+            'mushroom': 'Houba',
+            'description': 'Popis',
+            'date_found': 'Datum nálezu',
+            'image': 'Stanoviště',
+            'latitude': 'Obrázek',
+            'longitude': 'Rodina',
+        }
         widgets = {
             'latitude': forms.HiddenInput(),
             'longitude': forms.HiddenInput(),

@@ -7,13 +7,14 @@ from .models import Profile
 
 class UserProfileUpdateForm(forms.ModelForm):
     biography = forms.CharField(label='Tady můžeš napsat něco o sobě', widget=forms.Textarea, required=False)
-    profile_picture = forms.ImageField(label='Nahrát profilový obrázek', required=False)
+    profile_picture = forms.ImageField(label='Nahrát profilový obrázek', required=True)
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email']
+        fields = ['username', 'first_name', 'last_name', 'email', 'profile_picture']
 
     def __init__(self, *args, **kwargs):
+        allow_username_edit = kwargs.pop('allow_username_edit', False)
         super().__init__(*args, **kwargs)
         self.fields['username'].disabled = True
         self.fields['username'].help_text = ''
