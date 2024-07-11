@@ -22,7 +22,7 @@ class MessageForm(forms.ModelForm):
         user = kwargs.pop('user', None)
         super(MessageForm, self).__init__(*args, **kwargs)
         if user:
-            self.fields['receiver'].queryset = User.objects.exclude(pk=user.pk)
+            self.fields['receiver'].queryset = User.objects.exclude(pk=user.pk).order_by('username')
 
 class AttachmentForm(forms.ModelForm):
     class Meta:
@@ -36,4 +36,15 @@ AttachmentFormSet = forms.inlineformset_factory(Message, Attachment, form=Attach
 
 
 class SenderFilterForm(forms.Form):
-    sender = forms.ModelChoiceField(queryset=User.objects.all(), required=False, label="Filtr podle odesílatele")
+    sender = forms.ModelChoiceField(
+        queryset=User.objects.all().order_by('username'),
+        required=False,
+        label="Filtr podle odesílatele"
+    )
+
+class ReceiverFilterForm(forms.Form):
+    receiver = forms.ModelChoiceField(
+        queryset=User.objects.all().order_by('username'),
+        required=False,
+        label="Filtr podle příjemce"
+    )

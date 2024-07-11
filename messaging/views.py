@@ -3,7 +3,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .forms import MessageForm, AttachmentFormSet, SenderFilterForm
+from .forms import MessageForm, AttachmentFormSet, SenderFilterForm, ReceiverFilterForm
 from .models import Message, Attachment
 
 
@@ -67,8 +67,13 @@ def view_inbox(request):
 
 @login_required
 def view_outbox(request):
+    form = ReceiverFilterForm(request.GET)
     messages = Message.objects.filter(sender=request.user).order_by('-timestamp')
-    return render(request, 'messaging/outbox.html', {'messages': messages})
+    if form.is_valid():
+        receiver = form.cleaned_data.get('receiver')
+        if receiver:
+            messages = messages.filter(receiver=receiver)
+    return render(request, 'messaging/outbox.html', {'sent_messages': messages, 'form': form})
 
 @login_required
 def delete_message(request, pk):
@@ -114,7 +119,7 @@ def forward_message(request, message_id):
 
             attachment_formset.save_m2m()
 
-            return redirect('view_outbox')
+            return redirect('view_outbox')  # Přesměrujte uživatele na stránku s odeslanou poštou
     else:
         form = MessageForm(
             initial={
