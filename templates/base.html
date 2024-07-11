@@ -19,14 +19,17 @@
                     const mobileMenu = document.getElementById('mobile-menu')
                     const link = document.getElementById('link')
 
+
                     const toggleMenu = () => {
                         mobileMenu.classList.toggle('hidden')
                         mobileMenu.classList.toggle('flex')
                     }
 
+
                     hamburgerBtn.addEventListener('click', toggleMenu)
                     mobileMenu.addEventListener('click', toggleMenu)
                     link.addEventListener('click', toggleMenu)
+
                 }
 
                 document.addEventListener('DOMContentLoaded', initApp)
@@ -142,9 +145,11 @@
         {% endblock %}
     </main>
 
+
      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
      crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.js"></script>
     </body>
+
 </html>

@@ -2,10 +2,10 @@
 
 {% block content %}
 
-<section class="flex flex-col items-center justify-center p-4">
-    <article class="p-2 bg-emerald-900 rounded-lg flex flex-col items-center
+<section class="flex flex-col items-center justify-center p-12 md:bg-emerald-950 max-h-screen shadow-4xl rounded-lg">
+    <article class="py-2 px-4 bg-emerald-900 rounded-lg flex flex-col items-center
      justify-center border-emerald-700 border-2">
-        <h2><strong>{{ mushroom.name_cz }}</strong></h2>
+        <h2 class="text-2xl"><strong>{{ mushroom.name_cz }}</strong></h2>
             <p><strong> Popis:</strong>  {{ mushroom.description }}</p>
             <div class="flex flex-col items-center justify-center py-3">
                 <p><strong class="underline text-emerald-500"> Místo výskytu:</strong>
@@ -35,7 +35,7 @@
     <article class="p-3 bg-emerald-900 rounded-lg flex flex-col
      items-center mt-3 justify-center border-emerald-700 border-2">
     {% if mushroom.image %}
-    <p><img src="{{ mushroom.image.url }}" alt="{{ mushroom.name_cz }}" class="md:max-h-2xl md:max-w-2xl"></p>
+    <p><img src="{{ mushroom.image.url }}" alt="{{ mushroom.name_cz }}" class="md:max-h-2xl md:max-w-full"></p>
     {% endif %}
     <p><strong> Řád:</strong>  <a href="{% url 'family_detail' mushroom.family.id %}">{{ mushroom.family.name }}</a></p>
     <p><strong>Recepty:</strong>

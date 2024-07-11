@@ -9,4 +9,29 @@
             </article>
 
         </section>
+    <footer id="footer" class="mx-auto p-4 fixed bottom-0 right-0 left-0 z-10  bg-gradient-to-b from-black to-teal-950 flex flex-col justify-between items-center">
+        <p class="text-lg text-green-600">© 2024 MushroomAtlas. All rights reserved.</p>
+    </footer>
+
+    <script defer>
+                {#JS to handle mobile menu#}
+                const initAppHome = () => {
+                    const hamburgerBtn = document.getElementById('hamburger-button')
+                    const mobileMenu = document.getElementById('mobile-menu')
+                    const footer = document.getElementById('footer')
+
+
+                    const toggleHidden = () => {
+                        footer.classList.toggle('hidden')
+                        footer.classList.toggle('flex')
+                    }
+
+                    hamburgerBtn.addEventListener('click', toggleHidden)
+                    mobileMenu.addEventListener('click', toggleHidden)
+
+                }
+
+                document.addEventListener('DOMContentLoaded', initAppHome)
+
+    </script>
 {% endblock %}
