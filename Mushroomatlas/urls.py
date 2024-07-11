@@ -78,5 +78,6 @@ urlpatterns = [
     path('send/<str:receiver_username>/<int:replied_to_id>/', messaging_views.send_message, name='send_message'),
     path('inbox/', messaging_views.view_inbox, name='view_inbox'),
     path('outbox/', messaging_views.view_outbox, name='view_outbox'),
+    path('delete_message/<int:pk>/', messaging_views.delete_message, name='delete_message'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

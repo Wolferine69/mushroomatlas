@@ -16,7 +16,7 @@
             <strong>Od:</strong> {{ message.receiver.username }}<br>
             <strong>Datum odeslání:</strong> {{ message.timestamp }}<br>
             <p>{{ message.content }}</p>
-            <a href="{% url 'send_message' receiver_username=message.receiver.username replied_to_id=message.id %}">Odeslat</a>
+            <a href="{% url 'send_message' receiver_username=message.receiver.username replied_to_id=message.id %}">Odpovdět</a>
         </li>
     {% empty %}
         <li>Nebyly odeslány žádné zprávy.</li>

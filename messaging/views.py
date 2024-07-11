@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from .forms import MessageForm, AttachmentFormSet
 from .models import Message
 
+
 @login_required
 def send_message(request, receiver_username=None, replied_to_id=None):
     receiver = None
@@ -18,7 +19,8 @@ def send_message(request, receiver_username=None, replied_to_id=None):
     if request.method == 'POST':
         form = MessageForm(request.POST)
         attachment_formset = AttachmentFormSet(request.POST, request.FILES)
-        if form.is_valid():
+
+        if form.is_valid() and attachment_formset.is_valid():
             message = form.save(commit=False)
             message.sender = request.user
             if receiver:
@@ -29,9 +31,17 @@ def send_message(request, receiver_username=None, replied_to_id=None):
 
             attachments = attachment_formset.save(commit=False)
             for attachment in attachments:
-                attachment.message = message
-                attachment.save()
+                if attachment.pk:  # Check if the attachment already exists
+                    attachment.message = message
+                    attachment.save()
+                elif not attachment.pk and attachment.file:  # Handle new attachments
+                    attachment.message = message
+                    attachment.save()
 
+            for attachment in attachment_formset.deleted_objects:
+                attachment.delete()
+
+            attachment_formset.save_m2m()
             return redirect('view_inbox')
     else:
         form = MessageForm(initial={'receiver': receiver, 'replied_to': replied_to, 'subject': initial_subject})
@@ -42,12 +52,22 @@ def send_message(request, receiver_username=None, replied_to_id=None):
         'attachment_formset': attachment_formset
     })
 
+
 @login_required
 def view_inbox(request):
     messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
     return render(request, 'messaging/inbox.html', {'messages': messages})
 
+
 @login_required
 def view_outbox(request):
     messages = Message.objects.filter(sender=request.user).order_by('-timestamp')
     return render(request, 'messaging/outbox.html', {'messages': messages})
+
+
+@login_required
+def delete_message(request, pk):
+    message = get_object_or_404(Message, pk=pk)
+    if message.sender == request.user or message.receiver == request.user:
+        message.delete()
+    return redirect('view_inbox')

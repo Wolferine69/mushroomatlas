@@ -3,8 +3,10 @@
 {% block content %}
 <h1>Odeslané zprávy</h1>
 <ul>
-    {% for message in messages %}
+    {% for message in sent_messages %}
         <li>{{ message.timestamp }} - To: {{ message.receiver.username }} - {{ message.content }}</li>
+    {% empty %}
+        <li>Nebyly odeslány žádné zprávy.</li>
     {% endfor %}
 </ul>
 {% endblock %}

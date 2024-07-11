@@ -23,4 +23,6 @@ class AttachmentForm(forms.ModelForm):
             'file': 'Soubor',
         }
 
-AttachmentFormSet = forms.inlineformset_factory(Message, Attachment, form=AttachmentForm, extra=1, can_delete=True)
+AttachmentFormSet = forms.inlineformset_factory(Message, Attachment, form=AttachmentForm, extra=1, can_delete=False)
+
+
