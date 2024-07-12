@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "api.apps.ApiConfig",
     'backupbase',
     'messaging',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -171,3 +172,8 @@ REST_FRAMEWORK = {
 }
 
 CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']
+
+GRAPH_MODELS = {
+  'all_applications': True,
+  'graph_models': True,
+}
