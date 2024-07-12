@@ -20,9 +20,13 @@ class MessageForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
+        receiver = kwargs.pop('receiver', None)
         super(MessageForm, self).__init__(*args, **kwargs)
         if user:
             self.fields['receiver'].queryset = User.objects.exclude(pk=user.pk).order_by('username')
+        if receiver:
+            self.fields['receiver'].initial = receiver
+            self.fields['receiver'].widget = forms.HiddenInput()
 
 class AttachmentForm(forms.ModelForm):
     class Meta:

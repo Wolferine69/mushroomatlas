@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Přeposlat zprávu</h1>
+<h1>{% if reply %}Odpovědět na {% else %}Přeposlat{% endif %} zprávu</h1>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
@@ -9,9 +9,10 @@
     {% for form in attachment_formset %}
         {{ form.as_p }}
     {% endfor %}
-    <button type="submit" class="btn btn-primary">Přeposlat</button>
+    <button type="submit" class="btn btn-primary">{% if reply %}Odpovědět{% else %}Přeposlat{% endif %}</button>
 </form>
 
+{% if not reply %}
 <hr style="margin: 20px 0; border: 1px solid #ccc;">
 
 <h2>Původní přílohy</h2>
@@ -24,7 +25,9 @@
 {% else %}
 <p>Žádné přílohy.</p>
 {% endif %}
+{% endif %}
 
 <hr style="margin: 20px 0; border: 1px solid #ccc;">
-{% endblock %}
 
+<a href="{% url 'view_inbox' %}" class="btn btn-secondary">Zpět do přijatých zpráv</a>
+{% endblock %}

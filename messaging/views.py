@@ -93,21 +93,28 @@ def mark_message_read(request, message_id):
 # views.py
 
 @login_required
-def forward_message(request, message_id):
+def forward_message(request, message_id, reply=False):
     original_message = get_object_or_404(Message, id=message_id)
+    receiver = None
+
+    if reply:
+        receiver = original_message.sender  # Příjemcem je původní odesílatel
 
     if request.method == 'POST':
-        form = MessageForm(request.POST, user=request.user)
+        form = MessageForm(request.POST, user=request.user, receiver=receiver)
         attachment_formset = AttachmentFormSet(request.POST, request.FILES)
 
         if form.is_valid() and attachment_formset.is_valid():
             message = form.save(commit=False)
             message.sender = request.user
+            if reply:
+                message.receiver = receiver
             message.save()
 
-            for original_attachment in original_message.attachments.all():
-                new_attachment = Attachment(message=message, file=original_attachment.file)
-                new_attachment.save()
+            if not reply:  # Při odpovědi nepřeposíláme přílohy
+                for original_attachment in original_message.attachments.all():
+                    new_attachment = Attachment(message=message, file=original_attachment.file)
+                    new_attachment.save()
 
             attachments = attachment_formset.save(commit=False)
             for attachment in attachments:
@@ -118,19 +125,18 @@ def forward_message(request, message_id):
                 attachment.delete()
 
             attachment_formset.save_m2m()
-
-            return redirect('view_outbox')  # Přesměrujte uživatele na stránku s odeslanou poštou
+            return redirect('view_outbox')
     else:
+        initial_subject = f"Fwd: {original_message.subject}" if not reply else f"Re: {original_message.subject}"
+        initial_content = f"\n\n------ Původní zpráva ------\nDatum: {original_message.timestamp}\nOd: {original_message.sender.username}\nText:\n{original_message.content}\n------ Konec původní zprávy ------\n"
+
         form = MessageForm(
             initial={
-                'subject': f"Fwd: {original_message.subject}",
-                'content': f"\n\n------ Původní zpráva ------\n"
-                           f"Datum: {original_message.timestamp}\n"
-                           f"Od: {original_message.sender.username}\n"
-                           f"Text:\n{original_message.content}\n"
-                           f"------ Konec původní zprávy ------\n"
+                'subject': initial_subject,
+                'content': initial_content
             },
-            user=request.user
+            user=request.user,
+            receiver=receiver
         )
         attachment_formset = AttachmentFormSet()
 
@@ -138,7 +144,9 @@ def forward_message(request, message_id):
         'form': form,
         'attachment_formset': attachment_formset,
         'original_message': original_message,
+        'reply': reply
     })
+
 
 @login_required
 def view_message_detail(request, message_id):
