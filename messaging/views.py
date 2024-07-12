@@ -54,7 +54,7 @@ def send_message(request, receiver_username=None, replied_to_id=None):
 @login_required
 def view_inbox(request):
     form = SenderFilterForm(request.GET)
-    messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
+    messages = Message.objects.filter(receiver=request.user, is_deleted_by_receiver=False).order_by('-timestamp')
     if form.is_valid():
         sender = form.cleaned_data.get('sender')
         if sender:
@@ -65,7 +65,7 @@ def view_inbox(request):
 @login_required
 def view_outbox(request):
     form = ReceiverFilterForm(request.GET)
-    messages = Message.objects.filter(sender=request.user).order_by('-timestamp')
+    messages = Message.objects.filter(sender=request.user, is_deleted_by_sender=False).order_by('-timestamp')
     if form.is_valid():
         receiver = form.cleaned_data.get('receiver')
         if receiver:
@@ -75,8 +75,15 @@ def view_outbox(request):
 @login_required
 def delete_message(request, pk):
     message = get_object_or_404(Message, pk=pk)
-    if message.sender == request.user or message.receiver == request.user:
+    if message.sender == request.user:
+        message.is_deleted_by_sender = True
+    elif message.receiver == request.user:
+        message.is_deleted_by_receiver = True
+    message.save()
+
+    if message.is_deleted_by_sender and message.is_deleted_by_receiver:
         message.delete()
+
     return redirect('view_inbox')
 
 @login_required
