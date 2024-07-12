@@ -81,5 +81,6 @@ urlpatterns = [
     path('delete_message/<int:pk>/', messaging_views.delete_message, name='delete_message'),
     path('mark_message_read/<int:message_id>/', messaging_views.mark_message_read, name='mark_message_read'),
     path('forward_message/<int:message_id>/', messaging_views.forward_message, name='forward_message'),
+    path('message/<int:message_id>/', messaging_views.view_message_detail, name='message_detail'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

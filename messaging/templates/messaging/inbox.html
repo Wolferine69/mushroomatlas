@@ -10,31 +10,21 @@
 <ul>
     {% for message in messages %}
         <li>
-            <a href="{% url 'mark_message_read' message.id %}">
+            <a href="{% url 'message_detail' message.id %}">
                 {% if not message.is_read %}
                     <mark><strong>{{ message.timestamp }} - Od: {{ message.sender.username }} - Předmět: {{ message.subject }}</strong></mark>
                 {% else %}
                     {{ message.timestamp }} - Od: {{ message.sender.username }} - Předmět: {{ message.subject }}
                 {% endif %}
             </a>
-            <p>{{ message.content }}</p>
-            <ul>
-                {% for attachment in message.attachments.all %}
-                    <li><strong>Příloha:</strong> <a href="{{ attachment.file.url }}">{{ attachment.file.name }}</a></li>
-                {% endfor %}
-            </ul>
-            <a href="{% url 'send_message' receiver_username=message.sender.username replied_to_id=message.id %}" class="btn btn-primary">Odpovědět</a>
-            <a href="{% url 'forward_message' message.id %}" class="btn btn-secondary">Přeposlat</a>  <!-- Přidáno tlačítko Přeposlat -->
-            <form method="post" action="{% url 'delete_message' message.id %}" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Smazat</button>
-            </form>
+            <p>{{ message.content|truncatewords:10 }}</p>
         </li>
     {% empty %}
         <li>Nemáte žádné zprávy.</li>
     {% endfor %}
 </ul>
 {% endblock %}
+
 
 
 

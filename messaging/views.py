@@ -139,3 +139,10 @@ def forward_message(request, message_id):
         'attachment_formset': attachment_formset,
         'original_message': original_message,
     })
+
+@login_required
+def view_message_detail(request, message_id):
+    message = get_object_or_404(Message, id=message_id)
+    if message.receiver != request.user:
+        return redirect('view_inbox')  # Ujistěte se, že uživatel nemůže vidět zprávy, které nejsou jejich
+    return render(request, 'messaging/message_detail.html', {'message': message})
