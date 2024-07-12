@@ -18,7 +18,6 @@
                     <li><strong>Příloha:</strong> <a href="{{ attachment.file.url }}">{{ attachment.file.name }}</a></li>
                 {% endfor %}
             </ul>
-            <a href="{% url 'send_message' receiver_username=message.receiver.username replied_to_id=message.id %}" class="btn btn-primary">Odpovědět</a>
             <form method="post" action="{% url 'delete_message' message.id %}" style="display:inline;">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger">Smazat</button>
