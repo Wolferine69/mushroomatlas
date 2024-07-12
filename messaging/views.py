@@ -85,9 +85,10 @@ def delete_message(request, pk):
 @login_required
 def mark_message_read(request, message_id):
     message = get_object_or_404(Message, id=message_id, receiver=request.user)
-    message.read = True
+    message.is_read = True
     message.save()
-    return redirect('view_inbox')
+    next_url = request.GET.get('next', 'view_inbox')
+    return redirect(next_url)
 
 
 # views.py
