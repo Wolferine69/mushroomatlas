@@ -33,12 +33,8 @@ def send_message(request, receiver_username=None, replied_to_id=None):
 
             attachments = attachment_formset.save(commit=False)
             for attachment in attachments:
-                if attachment.pk:  # Check if the attachment already exists
-                    attachment.message = message
-                    attachment.save()
-                elif not attachment.pk and attachment.file:  # Handle new attachments
-                    attachment.message = message
-                    attachment.save()
+                attachment.message = message
+                attachment.save()
 
             for attachment in attachment_formset.deleted_objects:
                 attachment.delete()
@@ -53,6 +49,7 @@ def send_message(request, receiver_username=None, replied_to_id=None):
         'form': form,
         'attachment_formset': attachment_formset
     })
+
 
 @login_required
 def view_inbox(request):

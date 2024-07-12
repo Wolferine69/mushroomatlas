@@ -10,10 +10,54 @@
         {% for form in attachment_formset %}
             <div class="attachment-form" data-form-index="{{ forloop.counter0 }}">
                 {{ form.as_p }}
-
+                <button type="button" class="remove-attachment">Odebrat</button>
             </div>
         {% endfor %}
     </div>
+    <button type="button" id="add-attachment">Přidat přílohu</button>
     <button type="submit">Odeslat</button>
 </form>
+
+<template id="attachment-template">
+    <div class="attachment-form">
+        {{ attachment_formset.empty_form.as_p }}
+        <button type="button" class="remove-attachment">Odebrat</button>
+    </div>
+</template>
+
+<script>
+    document.getElementById('add-attachment').addEventListener('click', function() {
+        var attachmentTemplate = document.getElementById('attachment-template').content.cloneNode(true);
+        var formIndex = document.querySelectorAll('.attachment-form').length;
+        var newForm = attachmentTemplate.querySelector('.attachment-form');
+        newForm.innerHTML = newForm.innerHTML.replace(/__prefix__/g, formIndex);
+        document.getElementById('attachments').appendChild(newForm);
+        addRemoveEvent(newForm.querySelector('.remove-attachment'));
+    });
+
+    document.querySelectorAll('.remove-attachment').forEach(function(button) {
+        addRemoveEvent(button);
+    });
+
+    function addRemoveEvent(button) {
+        button.addEventListener('click', function() {
+            var form = button.closest('.attachment-form');
+            form.remove();
+            updateFormIndexes();
+        });
+    }
+
+    function updateFormIndexes() {
+        var forms = document.querySelectorAll('.attachment-form');
+        forms.forEach(function(form, index) {
+            form.setAttribute('data-form-index', index);
+            var inputs = form.querySelectorAll('input, select, textarea');
+            inputs.forEach(function(input) {
+                input.name = input.name.replace(/-\d+-/, '-' + index + '-');
+                input.id = input.id.replace(/_\d+_/, '_' + index + '_');
+            });
+        });
+    }
+</script>
 {% endblock %}
+
