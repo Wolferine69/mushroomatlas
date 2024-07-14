@@ -49,6 +49,25 @@
     <p>Pro přidání hodnocení se musíte <a href="{% url 'login' %}">přihlásit</a>.</p>
 {% endif %}
 
+    <h2>Komentáře</h2>
+    {% if comments %}
+        <ul>
+            {% for comment in comments %}
+                <li>
+                    <strong>{{ comment.user.user.username }}:</strong> {{ comment.text }} <br>
+                    <em>{{ comment.created_at }}</em>
+                    {% if comment.image %}
+                        <div>
+                            <img src="{{ comment.image.url }}" alt="Komentář obrázek" style="max-width: 100%; height: auto;">
+                        </div>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Zatím žádné komentáře. Buďte první, kdo přidá komentář!</p>
+    {% endif %}
+
 <a href="{% url 'recipes_list' %}" class="btn btn-secondary">Zpět na seznam receptů</a>
 
 {% endblock %}

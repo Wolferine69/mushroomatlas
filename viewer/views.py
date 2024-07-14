@@ -6,7 +6,7 @@ from django.views.generic import ListView, DetailView, CreateView, TemplateView
 
 from accounts.forms import RatingForm
 from accounts.models import Profile
-from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding, Comment, Message, Rating
+from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding, Comment, Message, Rating, CommentRecipe
 from .forms import MushroomForm, MushroomFilterForm, FindingForm, CommentForm, RecipeForm, MessageForm
 
 
@@ -80,10 +80,14 @@ class RecipeDetailView(DetailView):
         else:
             has_rated = False
 
+        # Get comments for the recipe
+        comments = recipe.comments.all()
+
         context = {
             'recipe': recipe,
             'form': form,
             'has_rated': has_rated,
+            'comments': comments,
         }
         return render(request, 'recipe_detail.html', context)
 
