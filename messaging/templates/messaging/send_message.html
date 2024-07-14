@@ -33,6 +33,8 @@
         newForm.innerHTML = newForm.innerHTML.replace(/__prefix__/g, formIndex);
         document.getElementById('attachments').appendChild(newForm);
         addRemoveEvent(newForm.querySelector('.remove-attachment'));
+        updateFormIndexes();
+        document.getElementById('id_attachments-TOTAL_FORMS').value = formIndex + 1;  // Aktualizace TOTAL_FORMS
     });
 
     document.querySelectorAll('.remove-attachment').forEach(function(button) {
@@ -44,6 +46,8 @@
             var form = button.closest('.attachment-form');
             form.remove();
             updateFormIndexes();
+            var formIndex = document.querySelectorAll('.attachment-form').length;
+            document.getElementById('id_attachments-TOTAL_FORMS').value = formIndex;  // Aktualizace TOTAL_FORMS
         });
     }
 
@@ -53,11 +57,14 @@
             form.setAttribute('data-form-index', index);
             var inputs = form.querySelectorAll('input, select, textarea');
             inputs.forEach(function(input) {
-                input.name = input.name.replace(/-\d+-/, '-' + index + '-');
-                input.id = input.id.replace(/_\d+_/, '_' + index + '_');
+                var nameRegex = /-\d+-/;
+                var idRegex = /_\d+_/;
+                input.name = input.name.replace(nameRegex, '-' + index + '-');
+                input.id = input.id.replace(idRegex, '_' + index + '_');
             });
         });
     }
+
+    console.log("Formuláře příloh:", document.querySelectorAll('.attachment-form').length);  // Debugging
 </script>
 {% endblock %}
-

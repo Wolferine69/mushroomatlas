@@ -21,7 +21,15 @@ def send_message(request, receiver_username=None, replied_to_id=None):
 
     if request.method == 'POST':
         form = MessageForm(request.POST, user=request.user)
-        attachment_formset = AttachmentFormSet(request.POST, request.FILES)
+        total_forms = len(request.FILES)
+        data = request.POST.copy()
+        data['attachments-TOTAL_FORMS'] = total_forms
+        attachment_formset = AttachmentFormSet(data, request.FILES)
+
+        print("request.POST:", request.POST)  # Debugging
+        print("request.FILES:", request.FILES)  # Debugging
+        for key in request.FILES:
+            print(f"{key}: {request.FILES[key].name}")  # Debugging
 
         if form.is_valid() and attachment_formset.is_valid():
             message = form.save(commit=False)
@@ -33,6 +41,7 @@ def send_message(request, receiver_username=None, replied_to_id=None):
             message.save()
 
             attachments = attachment_formset.save(commit=False)
+            print(f"Počet přijatých příloh po validaci: {len(attachments)}")  # Debugging
             for attachment in attachments:
                 attachment.message = message
                 attachment.save()
@@ -42,6 +51,8 @@ def send_message(request, receiver_username=None, replied_to_id=None):
 
             attachment_formset.save_m2m()
             return redirect('view_outbox')
+        else:
+            print("Formset errors:", attachment_formset.errors)  # Debugging
     else:
         form = MessageForm(initial={'receiver': receiver, 'replied_to': replied_to, 'subject': initial_subject}, user=request.user)
         attachment_formset = AttachmentFormSet()
