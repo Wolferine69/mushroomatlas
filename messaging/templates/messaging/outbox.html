@@ -19,13 +19,11 @@
                     <li><strong>Příloha:</strong> <a href="{{ attachment.file.url }}">{{ attachment.file.name }}</a></li>
                 {% endfor %}
             </ul>
-            <form method="post" action="{% url 'delete_message' message.id %}" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Smazat</button>
-            </form>
+            <a href="{% url 'trash_message' message.id %}" class="btn btn-warning">Přesunout do koše</a>
         </li>
     {% empty %}
         <li>Nebyly odeslány žádné zprávy.</li>
     {% endfor %}
 </ul>
 {% endblock %}
+

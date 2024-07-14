@@ -19,6 +19,7 @@
             {% endif %}
         </a>
         <p>{{ message.content|truncatewords:10 }}</p> <!-- Zobrazení částečného obsahu zprávy -->
+        <a href="{% url 'trash_message' message.id %}" class="btn btn-warning">Přesunout do koše</a>
     </li>
 {% empty %}
     <li>Nemáte žádné zprávy.</li>

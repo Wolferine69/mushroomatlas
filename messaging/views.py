@@ -54,29 +54,38 @@ def send_message(request, receiver_username=None, replied_to_id=None):
         'attachment_formset': attachment_formset
     })
 
+
 @login_required
 def restore_message(request, pk):
     message = get_object_or_404(Message, pk=pk)
     if message.sender == request.user:
         message.is_trashed_by_sender = False
+        message.is_deleted_by_sender = False
+        next_url = 'view_outbox'
     elif message.receiver == request.user:
         message.is_trashed_by_receiver = False
+        message.is_deleted_by_receiver = False
+        next_url = 'view_inbox'
     message.save()
-    return redirect('view_trash')
+    print(
+        f"Zpráva {message.id} obnovena. is_trashed_by_sender: {message.is_trashed_by_sender}, is_trashed_by_receiver: {message.is_trashed_by_receiver}")
+    return redirect(next_url)
+
 
 @login_required
 def trash_message(request, pk):
     message = get_object_or_404(Message, pk=pk)
     if message.sender == request.user:
         message.is_trashed_by_sender = True
-        message.is_deleted_by_sender = False  # Ujistěte se, že zpráva není označena jako smazaná
+        message.is_deleted_by_sender = False
         print(f"Zpráva {message.id} označena jako trashed by sender")
     elif message.receiver == request.user:
         message.is_trashed_by_receiver = True
-        message.is_deleted_by_receiver = False  # Ujistěte se, že zpráva není označena jako smazaná
+        message.is_deleted_by_receiver = False
         print(f"Zpráva {message.id} označena jako trashed by receiver")
     message.save()
-    return redirect('view_inbox')
+    print(f"Zpráva {message.id} uložena po přesunu do koše.")
+    return redirect('view_trash')
 
 
 @login_required
@@ -91,14 +100,23 @@ def delete_message(request, pk):
         message.is_trashed_by_receiver = True
         print(f"Zpráva {message.id} označena jako deleted by receiver a trashed by receiver")
 
-    message.save()
-    print(
-        f"Ukládání zprávy: {message.id} - trashed_by_sender: {message.is_trashed_by_sender}, trashed_by_receiver: {message.is_trashed_by_receiver}")
-
-    # Smažeme zprávu, pokud ji smazali oba uživatelé
-    if message.is_deleted_by_sender and message.is_deleted_by_receiver:
-        message.delete()
-        print(f"Zpráva {message.id} smazána trvale")
+    if (message.sender == request.user and message.is_deleted_by_sender) or (
+            message.receiver == request.user and message.is_deleted_by_receiver):
+        if message.sender == request.user and message.is_deleted_by_sender:
+            message.is_trashed_by_sender = True
+            message.is_deleted_by_sender = True
+            print(f"Zpráva {message.id} smazána trvale pro odesílatele")
+        if message.receiver == request.user and message.is_deleted_by_receiver:
+            message.is_trashed_by_receiver = True
+            message.is_deleted_by_receiver = True
+            print(f"Zpráva {message.id} smazána trvale pro příjemce")
+        if message.is_deleted_by_sender and message.is_deleted_by_receiver:
+            message.delete()
+            print(f"Zpráva {message.id} smazána trvale")
+        else:
+            message.save()
+            print(
+                f"Ukládání zprávy: {message.id} - trashed_by_sender: {message.is_trashed_by_sender}, trashed_by_receiver: {message.is_trashed_by_receiver}")
 
     return redirect('view_trash')
 
@@ -106,38 +124,42 @@ def delete_message(request, pk):
 @login_required
 def view_inbox(request):
     form = SenderFilterForm(request.GET)
-    messages = Message.objects.filter(receiver=request.user, is_trashed_by_receiver=False, is_deleted_by_receiver=False).order_by('-timestamp')
+    messages = Message.objects.filter(receiver=request.user, is_trashed_by_receiver=False,
+                                      is_deleted_by_receiver=False).order_by('-timestamp')
     if form.is_valid():
         sender = form.cleaned_data.get('sender')
         if sender:
             messages = messages.filter(sender=sender)
+    print(f"Přehled přijatých zpráv pro uživatele {request.user.username}: {messages.count()} zpráv")
     return render(request, 'messaging/inbox.html', {'messages': messages, 'form': form})
+
 
 @login_required
 def view_outbox(request):
     form = ReceiverFilterForm(request.GET)
-    messages = Message.objects.filter(sender=request.user, is_trashed_by_sender=False, is_deleted_by_sender=False).order_by('-timestamp')
+    messages = Message.objects.filter(sender=request.user, is_trashed_by_sender=False,
+                                      is_deleted_by_sender=False).order_by('-timestamp')
     if form.is_valid():
         receiver = form.cleaned_data.get('receiver')
         if receiver:
             messages = messages.filter(receiver=receiver)
+    print(f"Přehled odeslaných zpráv pro uživatele {request.user.username}: {messages.count()} zpráv")
     return render(request, 'messaging/outbox.html', {'sent_messages': messages, 'form': form})
 
 
 @login_required
 def view_trash(request):
     trashed_messages = Message.objects.filter(
-        Q(receiver=request.user, is_trashed_by_receiver=True) |
-        Q(sender=request.user, is_trashed_by_sender=True)
+        Q(receiver=request.user, is_trashed_by_receiver=True, is_deleted_by_receiver=False) |
+        Q(sender=request.user, is_trashed_by_sender=True, is_deleted_by_sender=False)
     ).order_by('-timestamp')
 
     print(f"Uživatel {request.user.username} má {trashed_messages.count()} zpráv v koši")
     for msg in trashed_messages:
-        print(f"Zpráva {msg.id} - Od: {msg.sender.username} - Komu: {msg.receiver.username} - Předmět: {msg.subject} - is_trashed_by_sender: {msg.is_trashed_by_sender}, is_trashed_by_receiver: {msg.is_trashed_by_receiver}")
+        print(
+            f"Zpráva {msg.id} - Od: {msg.sender.username} - Komu: {msg.receiver.username} - Předmět: {msg.subject} - is_trashed_by_sender: {msg.is_trashed_by_sender}, is_trashed_by_receiver: {msg.is_trashed_by_receiver}")
 
     return render(request, 'messaging/trash.html', {'trashed_messages': trashed_messages})
-
-
 
 
 @login_required
@@ -147,7 +169,6 @@ def mark_message_read(request, message_id):
     message.save()
     next_url = request.GET.get('next', 'view_inbox')
     return redirect(next_url)
-
 @login_required
 def forward_message(request, message_id, reply=False):
     original_message = get_object_or_404(Message, id=message_id)

@@ -18,8 +18,8 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
-                <a href="{% url 'restore_message' message.pk %}">Obnovit</a>
-                <a href="{% url 'delete_message' message.pk %}">Smazat</a>
+                <a href="{% url 'restore_message' message.pk %}" class="btn btn-primary">Obnovit</a>
+                <a href="{% url 'delete_message' message.pk %}" class="btn btn-danger">Smazat</a>
             </li>
         {% endfor %}
     </ul>
