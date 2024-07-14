@@ -22,6 +22,7 @@ class Family(models.Model):
 
 
 class Habitat(models.Model):
+    """Model representing a habitat of a mushroom"""
     name = models.CharField(max_length=50)
 
     def __str__(self):
@@ -96,6 +97,7 @@ class Recipe(models.Model):
 
 
 class Rating(models.Model):
+    """Model representing a rating of recipe"""
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='hodnoceni')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     hodnoceni = models.IntegerField(default=1, choices=((1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')))
@@ -105,6 +107,7 @@ class Rating(models.Model):
 
 
 class Tip(models.Model):
+    """Model representing a tip or trick"""
     user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='tip', null=True, blank=True)
     title = models.CharField(max_length=500)
     content = models.TextField()
@@ -147,6 +150,7 @@ class CommentRecipe(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='comments_recipe')
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='comments')
     text = models.TextField()
+    image = models.ImageField(upload_to='comments_images/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     new = models.BooleanField(default=False)
 
