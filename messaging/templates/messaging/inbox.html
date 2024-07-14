@@ -9,20 +9,20 @@
     <a href="{% url 'view_trash' %}" class="btn btn-warning">Koš</a>
 </form>
 <ul>
-   {% for message in messages %}
-    <li>
-        <a href="{% url 'mark_message_read' message.id %}?next={% url 'message_detail' message.id %}">
-            {% if not message.is_read %}
-                <mark><strong>{{ message.timestamp }} - Od: {{ message.sender.username }} - Předmět: {{ message.subject }}</strong></mark>
-            {% else %}
-                {{ message.timestamp }} - Od: {{ message.sender.username }} - Předmět: {{ message.subject }}
-            {% endif %}
-        </a>
-        <p>{{ message.content|truncatewords:10 }}</p> <!-- Zobrazení částečného obsahu zprávy -->
-        <a href="{% url 'trash_message' message.id %}" class="btn btn-warning">Přesunout do koše</a>
-    </li>
-{% empty %}
-    <li>Nemáte žádné zprávy.</li>
-{% endfor %}
+    {% for message in messages %}
+        <li>
+            <a href="{% url 'mark_message_read' message.id %}?next={% url 'message_detail' message.id %}">
+                {% if not message.is_read %}
+                    <mark><strong>{{ message.timestamp }} - Od: {{ message.sender.username }} - Předmět: {{ message.subject }}</strong></mark>
+                {% else %}
+                    {{ message.timestamp }} - Od: {{ message.sender.username }} - Předmět: {{ message.subject }}
+                {% endif %}
+            </a>
+            <p>{{ message.content|truncatewords:10 }}</p>
+            <a href="{% url 'trash_message' message.id %}" class="btn btn-warning">Smazat</a>
+        </li>
+    {% empty %}
+        <li>Nemáte žádné zprávy.</li>
+    {% endfor %}
 </ul>
 {% endblock %}

@@ -67,8 +67,6 @@ def restore_message(request, pk):
         message.is_deleted_by_receiver = False
         next_url = 'view_inbox'
     message.save()
-    print(
-        f"Zpráva {message.id} obnovena. is_trashed_by_sender: {message.is_trashed_by_sender}, is_trashed_by_receiver: {message.is_trashed_by_receiver}")
     return redirect(next_url)
 
 
@@ -78,13 +76,10 @@ def trash_message(request, pk):
     if message.sender == request.user:
         message.is_trashed_by_sender = True
         message.is_deleted_by_sender = False
-        print(f"Zpráva {message.id} označena jako trashed by sender")
     elif message.receiver == request.user:
         message.is_trashed_by_receiver = True
         message.is_deleted_by_receiver = False
-        print(f"Zpráva {message.id} označena jako trashed by receiver")
     message.save()
-    print(f"Zpráva {message.id} uložena po přesunu do koše.")
     return redirect('view_trash')
 
 
@@ -94,29 +89,14 @@ def delete_message(request, pk):
     if message.sender == request.user:
         message.is_deleted_by_sender = True
         message.is_trashed_by_sender = True
-        print(f"Zpráva {message.id} označena jako deleted by sender a trashed by sender")
     elif message.receiver == request.user:
         message.is_deleted_by_receiver = True
         message.is_trashed_by_receiver = True
-        print(f"Zpráva {message.id} označena jako deleted by receiver a trashed by receiver")
 
-    if (message.sender == request.user and message.is_deleted_by_sender) or (
-            message.receiver == request.user and message.is_deleted_by_receiver):
-        if message.sender == request.user and message.is_deleted_by_sender:
-            message.is_trashed_by_sender = True
-            message.is_deleted_by_sender = True
-            print(f"Zpráva {message.id} smazána trvale pro odesílatele")
-        if message.receiver == request.user and message.is_deleted_by_receiver:
-            message.is_trashed_by_receiver = True
-            message.is_deleted_by_receiver = True
-            print(f"Zpráva {message.id} smazána trvale pro příjemce")
-        if message.is_deleted_by_sender and message.is_deleted_by_receiver:
-            message.delete()
-            print(f"Zpráva {message.id} smazána trvale")
-        else:
-            message.save()
-            print(
-                f"Ukládání zprávy: {message.id} - trashed_by_sender: {message.is_trashed_by_sender}, trashed_by_receiver: {message.is_trashed_by_receiver}")
+    if message.is_deleted_by_sender and message.is_deleted_by_receiver:
+        message.delete()
+    else:
+        message.save()
 
     return redirect('view_trash')
 
@@ -130,7 +110,6 @@ def view_inbox(request):
         sender = form.cleaned_data.get('sender')
         if sender:
             messages = messages.filter(sender=sender)
-    print(f"Přehled přijatých zpráv pro uživatele {request.user.username}: {messages.count()} zpráv")
     return render(request, 'messaging/inbox.html', {'messages': messages, 'form': form})
 
 
@@ -143,7 +122,6 @@ def view_outbox(request):
         receiver = form.cleaned_data.get('receiver')
         if receiver:
             messages = messages.filter(receiver=receiver)
-    print(f"Přehled odeslaných zpráv pro uživatele {request.user.username}: {messages.count()} zpráv")
     return render(request, 'messaging/outbox.html', {'sent_messages': messages, 'form': form})
 
 
@@ -154,12 +132,16 @@ def view_trash(request):
         Q(sender=request.user, is_trashed_by_sender=True, is_deleted_by_sender=False)
     ).order_by('-timestamp')
 
-    print(f"Uživatel {request.user.username} má {trashed_messages.count()} zpráv v koši")
-    for msg in trashed_messages:
-        print(
-            f"Zpráva {msg.id} - Od: {msg.sender.username} - Komu: {msg.receiver.username} - Předmět: {msg.subject} - is_trashed_by_sender: {msg.is_trashed_by_sender}, is_trashed_by_receiver: {msg.is_trashed_by_receiver}")
-
     return render(request, 'messaging/trash.html', {'trashed_messages': trashed_messages})
+
+
+@login_required
+def mark_message_read(request, message_id):
+    message = get_object_or_404(Message, id=message_id, receiver=request.user)
+    message.is_read = True
+    message.save()
+    next_url = request.GET.get('next', 'view_inbox')
+    return redirect(next_url)
 
 
 @login_required
