@@ -127,12 +127,25 @@ def view_outbox(request):
 
 @login_required
 def view_trash(request):
+    form_sender = SenderFilterForm(request.GET)
+    form_receiver = ReceiverFilterForm(request.GET)
     trashed_messages = Message.objects.filter(
         Q(receiver=request.user, is_trashed_by_receiver=True, is_deleted_by_receiver=False) |
         Q(sender=request.user, is_trashed_by_sender=True, is_deleted_by_sender=False)
     ).order_by('-timestamp')
 
-    return render(request, 'messaging/trash.html', {'trashed_messages': trashed_messages})
+    if form_sender.is_valid():
+        sender = form_sender.cleaned_data.get('sender')
+        if sender:
+            trashed_messages = trashed_messages.filter(sender=sender)
+
+    if form_receiver.is_valid():
+        receiver = form_receiver.cleaned_data.get('receiver')
+        if receiver:
+            trashed_messages = trashed_messages.filter(receiver=receiver)
+
+    return render(request, 'messaging/trash.html',
+                  {'trashed_messages': trashed_messages, 'form_sender': form_sender, 'form_receiver': form_receiver})
 
 
 @login_required

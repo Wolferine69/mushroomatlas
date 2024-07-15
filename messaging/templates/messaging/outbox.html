@@ -1,24 +1,18 @@
-{% extends 'base.html' %}
-{% block content %}
-<h1>Odeslané zprávy</h1>
+{% extends 'messaging/messages_base.html' %}
+
+{% block messages_content %}
 <form method="get" action="">
     {{ form.as_p }}
     <button type="submit" class="btn btn-primary">Filtrovat</button>
     <a href="{% url 'view_outbox' %}" class="btn btn-secondary">Zrušit filtr</a>
-    <a href="{% url 'view_trash' %}" class="btn btn-warning">Koš</a>
 </form>
 <ul>
     {% for message in sent_messages %}
         <li>
-            <strong>Komu:</strong> {{ message.receiver.username }}<br>
-            <strong>Datum odeslání:</strong> {{ message.timestamp }}<br>
-            <strong>Předmět:</strong> {{ message.subject }}<br>
-            <p>{{ message.content }}</p>
-            <ul>
-                {% for attachment in message.attachments.all %}
-                    <li><strong>Příloha:</strong> <a href="{{ attachment.file.url }}">{{ attachment.file.name }}</a></li>
-                {% endfor %}
-            </ul>
+            <a href="{% url 'message_detail' message.id %}">
+                <strong>{{ message.timestamp }} - Komu: {{ message.receiver.username }} - Předmět: {{ message.subject }}</strong>
+            </a>
+            <p>{{ message.content|truncatewords:10 }}</p>
             <a href="{% url 'trash_message' message.id %}" class="btn btn-warning">Přesunout do koše</a>
         </li>
     {% empty %}
@@ -26,4 +20,3 @@
     {% endfor %}
 </ul>
 {% endblock %}
-
