@@ -1,5 +1,3 @@
-# forms.py
-
 from django import forms
 from django.contrib.auth.models import User
 from .models import Message, Attachment
@@ -38,17 +36,28 @@ class AttachmentForm(forms.ModelForm):
 
 AttachmentFormSet = forms.inlineformset_factory(Message, Attachment, form=AttachmentForm, extra=1, can_delete=False)
 
-
 class SenderFilterForm(forms.Form):
     sender = forms.ModelChoiceField(
-        queryset=User.objects.all().order_by('username'),
+        queryset=User.objects.none(),
         required=False,
         label="Filtr podle odesílatele"
     )
 
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(SenderFilterForm, self).__init__(*args, **kwargs)
+        if user:
+            self.fields['sender'].queryset = User.objects.exclude(pk=user.pk).order_by('username')
+
 class ReceiverFilterForm(forms.Form):
     receiver = forms.ModelChoiceField(
-        queryset=User.objects.all().order_by('username'),
+        queryset=User.objects.none(),
         required=False,
         label="Filtr podle příjemce"
     )
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(ReceiverFilterForm, self).__init__(*args, **kwargs)
+        if user:
+            self.fields['receiver'].queryset = User.objects.exclude(pk=user.pk).order_by('username')

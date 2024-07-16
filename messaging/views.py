@@ -111,7 +111,7 @@ def delete_message(request, pk):
 
 @login_required
 def view_inbox(request):
-    form = SenderFilterForm(request.GET)
+    form = SenderFilterForm(request.GET, user=request.user)
     messages = Message.objects.filter(receiver=request.user, is_trashed_by_receiver=False,
                                       is_deleted_by_receiver=False).order_by('-timestamp')
     if form.is_valid():
@@ -132,7 +132,7 @@ def view_inbox(request):
 
 @login_required
 def view_outbox(request):
-    form = ReceiverFilterForm(request.GET)
+    form = ReceiverFilterForm(request.GET, user=request.user)
     messages = Message.objects.filter(sender=request.user, is_trashed_by_sender=False,
                                       is_deleted_by_sender=False).order_by('-timestamp')
     if form.is_valid():
@@ -174,8 +174,6 @@ def view_trash(request):
         'sent_count': sent_count,
         'trashed_count': trashed_count,
     })
-
-
 
 
 @login_required

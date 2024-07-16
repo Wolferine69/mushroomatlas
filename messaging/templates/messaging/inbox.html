@@ -1,6 +1,11 @@
 {% extends 'messaging/messages_base.html' %}
 
 {% block messages_content %}
+<form method="get" action="">
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Filtrovat</button>
+    <a href="{% url 'view_inbox' %}" class="btn btn-secondary">Zrušit filtr</a>
+</form>
 <form method="post" action="{% url 'bulk_trash_messages' %}">
     {% csrf_token %}
     <div>
