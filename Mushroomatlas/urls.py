@@ -24,6 +24,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 from accounts.views import SubmittableLoginView, RegistrationView, SubmittablePasswordChangeView, AccountsListView, \
     AccountDetailView, ProfileUpdateView
 from api.views import Mushrooms, Families, Recipes, Findings, Habitats, Profiles
+from messaging.views import bulk_trash_messages
 from viewer.views import (home,
                           MushroomListView, MushroomDetailView,
                           FamilyListView, FamilyDetailView, RecipeListView, RecipeDetailView, TipListView,
@@ -87,5 +88,6 @@ urlpatterns = [
     path('forward_message/<int:message_id>/', messaging_views.forward_message, name='forward_message'),
     path('message/<int:message_id>/', messaging_views.view_message_detail, name='message_detail'),
     path('reply_message/<int:message_id>/', messaging_views.forward_message, {'reply': True}, name='reply_message'),
+    path('bulk_trash_messages/', bulk_trash_messages, name='bulk_trash_messages'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

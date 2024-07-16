@@ -276,3 +276,18 @@ def get_message_counts(user):
     ).count()
     return received_count, unread_count, sent_count, trashed_count
 
+@login_required
+def bulk_trash_messages(request):
+    if request.method == 'POST':
+        message_ids = request.POST.getlist('message_ids')
+        if message_ids:
+            messages = Message.objects.filter(id__in=message_ids)
+            for message in messages:
+                if message.sender == request.user:
+                    message.is_trashed_by_sender = True
+                    message.is_deleted_by_sender = False
+                elif message.receiver == request.user:
+                    message.is_trashed_by_receiver = True
+                    message.is_deleted_by_receiver = False
+                message.save()
+    return redirect('view_trash')

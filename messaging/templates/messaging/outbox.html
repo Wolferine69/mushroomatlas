@@ -1,37 +1,23 @@
 {% extends 'messaging/messages_base.html' %}
 
 {% block messages_content %}
-<form method="get" action="">
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Filtrovat</button>
-    <a href="{% url 'view_outbox' %}" class="btn btn-secondary">Zrušit filtr</a>
+<form method="post" action="{% url 'bulk_trash_messages' %}">
+    {% csrf_token %}
+    <div>
+        <button type="submit" class="btn btn-danger">Přesunout do koše</button>
+    </div>
+    <ul>
+        {% for message in sent_messages %}
+            <li>
+                <input type="checkbox" name="message_ids" value="{{ message.id }}">
+                <a href="{% url 'message_detail' message.id %}">
+                    <strong>{{ message.timestamp }} - Komu: {{ message.receiver.username }} - Předmět: {{ message.subject }}</strong>
+                </a>
+                <p>{{ message.content|truncatewords:10 }}</p>
+            </li>
+        {% empty %}
+            <li>Nebyly odeslány žádné zprávy.</li>
+        {% endfor %}
+    </ul>
 </form>
-<ul>
-    {% for message in sent_messages %}
-        <li>
-            <a href="{% url 'message_detail' message.id %}">
-                <strong>{{ message.timestamp }} - Komu: {{ message.receiver.username }} - Předmět: {{ message.subject }}</strong>
-            </a>
-            <p>{{ message.content|truncatewords:10 }}</p>
-            <button onclick="deleteMessage('{{ message.id }}')" class="btn btn-danger">Smazat</button>
-        </li>
-    {% empty %}
-        <li>Nebyly odeslány žádné zprávy.</li>
-    {% endfor %}
-</ul>
-
-<script>
-function deleteMessage(messageId) {
-    fetch(`/delete_message/${messageId}/`, {
-        method: 'DELETE',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-        }
-    }).then(response => {
-        if (response.ok) {
-            location.reload();
-        }
-    });
-}
-</script>
 {% endblock %}

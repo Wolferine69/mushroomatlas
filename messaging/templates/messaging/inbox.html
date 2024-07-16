@@ -1,26 +1,27 @@
 {% extends 'messaging/messages_base.html' %}
 
 {% block messages_content %}
-<form method="get" action="">
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Filtrovat</button>
-    <a href="{% url 'view_inbox' %}" class="btn btn-secondary">Zrušit filtr</a>
+<form method="post" action="{% url 'bulk_trash_messages' %}">
+    {% csrf_token %}
+    <div>
+        <button type="submit" class="btn btn-danger">Přesunout do koše</button>
+    </div>
+    <ul>
+        {% for message in messages %}
+            <li>
+                <input type="checkbox" name="message_ids" value="{{ message.id }}">
+                <a href="{% url 'mark_message_read' message.id %}?next={% url 'message_detail' message.id %}">
+                    {% if not message.is_read %}
+                        <mark><strong>{{ message.timestamp }} - Od: {{ message.sender.username }} - Předmět: {{ message.subject }}</strong></mark>
+                    {% else %}
+                        {{ message.timestamp }} - Od: {{ message.sender.username }} - Předmět: {{ message.subject }}
+                    {% endif %}
+                </a>
+                <p>{{ message.content|truncatewords:10 }}</p>
+            </li>
+        {% empty %}
+            <li>Nemáte žádné zprávy.</li>
+        {% endfor %}
+    </ul>
 </form>
-<ul>
-    {% for message in messages %}
-        <li>
-            <a href="{% url 'mark_message_read' message.id %}?next={% url 'message_detail' message.id %}">
-                {% if not message.is_read %}
-                    <mark><strong>{{ message.timestamp }} - Od: {{ message.sender.username }} - Předmět: {{ message.subject }}</strong></mark>
-                {% else %}
-                    {{ message.timestamp }} - Od: {{ message.sender.username }} - Předmět: {{ message.subject }}
-                {% endif %}
-            </a>
-            <p>{{ message.content|truncatewords:10 }}</p>
-            <a href="{% url 'trash_message' message.id %}" class="btn btn-warning">Smazat</a>
-        </li>
-    {% empty %}
-        <li>Nemáte žádné zprávy.</li>
-    {% endfor %}
-</ul>
 {% endblock %}
