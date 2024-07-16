@@ -1,5 +1,5 @@
 # views.py
-
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -86,19 +86,21 @@ def trash_message(request, pk):
 @login_required
 def delete_message(request, pk):
     message = get_object_or_404(Message, pk=pk)
-    if message.sender == request.user:
-        message.is_deleted_by_sender = True
-        message.is_trashed_by_sender = True
-    elif message.receiver == request.user:
-        message.is_deleted_by_receiver = True
-        message.is_trashed_by_receiver = True
+    if request.method == 'DELETE':
+        if message.sender == request.user:
+            message.is_deleted_by_sender = True
+            message.is_trashed_by_sender = True
+        elif message.receiver == request.user:
+            message.is_deleted_by_receiver = True
+            message.is_trashed_by_receiver = True
 
-    if message.is_deleted_by_sender and message.is_deleted_by_receiver:
-        message.delete()
-    else:
-        message.save()
+        if message.is_deleted_by_sender and message.is_deleted_by_receiver:
+            message.delete()
+        else:
+            message.save()
 
-    return redirect('view_trash')
+        return JsonResponse({'success': True})
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
 @login_required

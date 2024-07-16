@@ -13,10 +13,25 @@
                 <strong>{{ message.timestamp }} - Komu: {{ message.receiver.username }} - Předmět: {{ message.subject }}</strong>
             </a>
             <p>{{ message.content|truncatewords:10 }}</p>
-            <a href="{% url 'trash_message' message.id %}" class="btn btn-warning">Přesunout do koše</a>
+            <button onclick="deleteMessage('{{ message.id }}')" class="btn btn-danger">Smazat</button>
         </li>
     {% empty %}
         <li>Nebyly odeslány žádné zprávy.</li>
     {% endfor %}
 </ul>
+
+<script>
+function deleteMessage(messageId) {
+    fetch(`/delete_message/${messageId}/`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+        }
+    }).then(response => {
+        if (response.ok) {
+            location.reload();
+        }
+    });
+}
+</script>
 {% endblock %}
