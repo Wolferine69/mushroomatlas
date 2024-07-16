@@ -5,9 +5,15 @@
     <div class="col-md-3">
         <div class="list-group">
             <a href="{% url 'send_message' %}" class="list-group-item list-group-item-action">Nová zpráva</a>
-            <a href="{% url 'view_inbox' %}" class="list-group-item list-group-item-action">Přijaté zprávy</a>
-            <a href="{% url 'view_outbox' %}" class="list-group-item list-group-item-action">Odeslané zprávy</a>
-            <a href="{% url 'view_trash' %}" class="list-group-item list-group-item-action">Koš</a>
+            <a href="{% url 'view_inbox' %}" class="list-group-item list-group-item-action">
+                Přijaté zprávy ({{ received_count }})
+            </a>
+            <a href="{% url 'view_outbox' %}" class="list-group-item list-group-item-action">
+                Odeslané zprávy ({{ sent_count }})
+            </a>
+            <a href="{% url 'view_trash' %}" class="list-group-item list-group-item-action">
+                Koš ({{ trashed_count }})
+            </a>
         </div>
     </div>
     <div class="col-md-9">

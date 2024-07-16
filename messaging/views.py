@@ -112,8 +112,16 @@ def view_inbox(request):
         sender = form.cleaned_data.get('sender')
         if sender:
             messages = messages.filter(sender=sender)
-    return render(request, 'messaging/inbox.html', {'messages': messages, 'form': form})
 
+    received_count, sent_count, trashed_count = get_message_counts(request.user)
+
+    return render(request, 'messaging/inbox.html', {
+        'messages': messages,
+        'form': form,
+        'received_count': received_count,
+        'sent_count': sent_count,
+        'trashed_count': trashed_count,
+    })
 
 @login_required
 def view_outbox(request):
@@ -124,14 +132,23 @@ def view_outbox(request):
         receiver = form.cleaned_data.get('receiver')
         if receiver:
             messages = messages.filter(receiver=receiver)
-    return render(request, 'messaging/outbox.html', {'sent_messages': messages, 'form': form})
 
+    received_count, sent_count, trashed_count = get_message_counts(request.user)
+
+    return render(request, 'messaging/outbox.html', {
+        'sent_messages': messages,
+        'form': form,
+        'received_count': received_count,
+        'sent_count': sent_count,
+        'trashed_count': trashed_count,
+    })
 
 @login_required
 def view_trash(request):
     form_sender = SenderFilterForm(request.GET)
     trashed_messages = Message.objects.filter(
-        Q(receiver=request.user, is_trashed_by_receiver=True, is_deleted_by_receiver=False)
+        Q(receiver=request.user, is_trashed_by_receiver=True, is_deleted_by_receiver=False) |
+        Q(sender=request.user, is_trashed_by_sender=True, is_deleted_by_sender=False)
     ).order_by('-timestamp')
 
     if form_sender.is_valid():
@@ -139,8 +156,16 @@ def view_trash(request):
         if sender:
             trashed_messages = trashed_messages.filter(sender=sender)
 
-    return render(request, 'messaging/trash.html',
-                  {'trashed_messages': trashed_messages, 'form_sender': form_sender})
+    received_count, sent_count, trashed_count = get_message_counts(request.user)
+
+    return render(request, 'messaging/trash.html', {
+        'trashed_messages': trashed_messages,
+        'form_sender': form_sender,
+        'received_count': received_count,
+        'sent_count': sent_count,
+        'trashed_count': trashed_count,
+    })
+
 
 
 @login_required
@@ -220,3 +245,13 @@ def view_message_detail(request, message_id):
     if request.user not in [message.receiver, message.sender]:
         return redirect('view_inbox')  # Nebo jiná logická stránka
     return render(request, 'messaging/message_detail.html', {'message': message})
+
+def get_message_counts(user):
+    received_count = Message.objects.filter(receiver=user, is_trashed_by_receiver=False, is_deleted_by_receiver=False).count()
+    sent_count = Message.objects.filter(sender=user, is_trashed_by_sender=False, is_deleted_by_sender=False).count()
+    trashed_count = Message.objects.filter(
+        Q(receiver=user, is_trashed_by_receiver=True, is_deleted_by_receiver=False) |
+        Q(sender=user, is_trashed_by_sender=True, is_deleted_by_sender=False)
+    ).count()
+    return received_count, sent_count, trashed_count
+
