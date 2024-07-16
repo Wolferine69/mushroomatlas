@@ -243,8 +243,16 @@ def forward_message(request, message_id, reply=False):
 def view_message_detail(request, message_id):
     message = get_object_or_404(Message, id=message_id)
     if request.user not in [message.receiver, message.sender]:
-        return redirect('view_inbox')  # Nebo jiná logická stránka
-    return render(request, 'messaging/message_detail.html', {'message': message})
+        return redirect('view_inbox')
+
+    received_count, sent_count, trashed_count = get_message_counts(request.user)
+
+    return render(request, 'messaging/message_detail.html', {
+        'message': message,
+        'received_count': received_count,
+        'sent_count': sent_count,
+        'trashed_count': trashed_count,
+    })
 
 def get_message_counts(user):
     received_count = Message.objects.filter(receiver=user, is_trashed_by_receiver=False, is_deleted_by_receiver=False).count()
