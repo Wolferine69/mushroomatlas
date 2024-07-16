@@ -9,7 +9,7 @@
 <form method="post" action="{% url 'bulk_trash_messages' %}">
     {% csrf_token %}
     <div>
-        <button type="submit" class="btn btn-danger">Přesunout do koše</button>
+        <button type="submit" class="btn btn-danger">Smazat</button>
     </div>
     <ul>
         {% for message in messages %}

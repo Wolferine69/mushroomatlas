@@ -9,17 +9,11 @@
                 Přijaté zprávy ({{ received_count }}/{{ unread_count }})
             </a>
             <a href="{% url 'view_outbox' %}" class="list-group-item list-group-item-action">
-                Odeslané zprávy ({{ sent_count }})
+                Odeslané zprávy ({{ sent_messages_count }})
             </a>
             <a href="{% url 'view_trash' %}" class="list-group-item list-group-item-action">
-                Koš ({{ trashed_count }})
+                Koš ({{ trashed_messages_count }})
             </a>
-        </div>
-        <div>
-            <p>Debug: Přijaté zprávy - {{ received_count }}</p>
-            <p>Debug: Nepřečtené zprávy - {{ unread_count }}</p>
-            <p>Debug: Odeslané zprávy - {{ sent_count }}</p>
-            <p>Debug: Koš - {{ trashed_count }}</p>
         </div>
     </div>
     <div class="col-md-9">

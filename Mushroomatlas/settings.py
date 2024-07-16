@@ -63,7 +63,7 @@ ROOT_URLCONF = 'Mushroomatlas.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -73,6 +73,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'viewer.context_processors.new_comments_count',
                 'viewer.context_processors.new_messages_count',
+                'viewer.context_processors.sent_messages_count',
+                'viewer.context_processors.trashed_messages_count',
                 'viewer.context_processors.can_add_mushroom',
             ],
         },
