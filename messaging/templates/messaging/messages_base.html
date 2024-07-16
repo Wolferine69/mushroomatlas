@@ -15,6 +15,12 @@
                 Koš ({{ trashed_count }})
             </a>
         </div>
+        <div>
+            <p>Debug: Přijaté zprávy - {{ received_count }}</p>
+            <p>Debug: Nepřečtené zprávy - {{ unread_count }}</p>
+            <p>Debug: Odeslané zprávy - {{ sent_count }}</p>
+            <p>Debug: Koš - {{ trashed_count }}</p>
+        </div>
     </div>
     <div class="col-md-9">
         {% block messages_content %}

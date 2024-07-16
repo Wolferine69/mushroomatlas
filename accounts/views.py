@@ -19,6 +19,23 @@ from accounts.models import Profile
 class SubmittableLoginView(LoginView):
     template_name = 'login.html'
 
+    def form_valid(self, form):
+        # Call the parent's form_valid method to log the user in
+        response = super().form_valid(form)
+
+        # Get the count of unread messages for the logged-in user
+        new_messages_count = Message.objects.filter(
+            receiver=self.request.user,
+            is_read=False,
+            is_trashed_by_receiver=False,
+            is_deleted_by_receiver=False
+        ).count()
+
+        # Store the new messages count in the session
+        self.request.session['new_messages_count'] = new_messages_count
+
+        return response
+
 
 class RegistrationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):

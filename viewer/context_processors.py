@@ -16,7 +16,12 @@ def new_comments_count(request):
 
 def new_messages_count(request):
     if request.user.is_authenticated:
-        new_messages = Message.objects.filter(receiver=request.user, is_read=False).count()
+        new_messages = Message.objects.filter(
+            receiver=request.user,
+            is_read=False,
+            is_trashed_by_receiver=False,
+            is_deleted_by_receiver=False
+        ).count()
         return {
             'new_messages_count': new_messages
         }

@@ -112,14 +112,14 @@ def delete_message(request, pk):
 @login_required
 def view_inbox(request):
     form = SenderFilterForm(request.GET, user=request.user)
-    messages = Message.objects.filter(receiver=request.user, is_trashed_by_receiver=False,
-                                      is_deleted_by_receiver=False).order_by('-timestamp')
+    messages = Message.objects.filter(receiver=request.user, is_trashed_by_receiver=False, is_deleted_by_receiver=False).order_by('-timestamp')
     if form.is_valid():
         sender = form.cleaned_data.get('sender')
         if sender:
             messages = messages.filter(sender=sender)
 
     received_count, unread_count, sent_count, trashed_count = get_message_counts(request.user)
+    new_messages_count = unread_count  # Počet nových zpráv pro horní menu
 
     return render(request, 'messaging/inbox.html', {
         'messages': messages,
@@ -128,7 +128,9 @@ def view_inbox(request):
         'unread_count': unread_count,
         'sent_count': sent_count,
         'trashed_count': trashed_count,
+        'new_messages_count': new_messages_count  # Přidejte tuto hodnotu do kontextu
     })
+
 
 @login_required
 def view_outbox(request):
@@ -192,6 +194,8 @@ def mark_message_read(request, message_id):
     message.save()
     next_url = request.GET.get('next', 'view_inbox')
     return redirect(next_url)
+
+
 @login_required
 def forward_message(request, message_id, reply=False):
     original_message = get_object_or_404(Message, id=message_id)
@@ -273,6 +277,7 @@ def get_message_counts(user):
         Q(sender=user, is_trashed_by_sender=True, is_deleted_by_sender=False)
     ).count()
     return received_count, unread_count, sent_count, trashed_count
+
 
 @login_required
 def bulk_trash_messages(request):
