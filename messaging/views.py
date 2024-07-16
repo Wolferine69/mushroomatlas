@@ -130,10 +130,8 @@ def view_outbox(request):
 @login_required
 def view_trash(request):
     form_sender = SenderFilterForm(request.GET)
-    form_receiver = ReceiverFilterForm(request.GET)
     trashed_messages = Message.objects.filter(
-        Q(receiver=request.user, is_trashed_by_receiver=True, is_deleted_by_receiver=False) |
-        Q(sender=request.user, is_trashed_by_sender=True, is_deleted_by_sender=False)
+        Q(receiver=request.user, is_trashed_by_receiver=True, is_deleted_by_receiver=False)
     ).order_by('-timestamp')
 
     if form_sender.is_valid():
@@ -141,13 +139,8 @@ def view_trash(request):
         if sender:
             trashed_messages = trashed_messages.filter(sender=sender)
 
-    if form_receiver.is_valid():
-        receiver = form_receiver.cleaned_data.get('receiver')
-        if receiver:
-            trashed_messages = trashed_messages.filter(receiver=receiver)
-
     return render(request, 'messaging/trash.html',
-                  {'trashed_messages': trashed_messages, 'form_sender': form_sender, 'form_receiver': form_receiver})
+                  {'trashed_messages': trashed_messages, 'form_sender': form_sender})
 
 
 @login_required
@@ -224,6 +217,6 @@ def forward_message(request, message_id, reply=False):
 @login_required
 def view_message_detail(request, message_id):
     message = get_object_or_404(Message, id=message_id)
-    if message.receiver != request.user:
-        return redirect('view_inbox')  # Ujistěte se, že uživatel nemůže vidět zprávy, které nejsou jejich
+    if request.user not in [message.receiver, message.sender]:
+        return redirect('view_inbox')  # Nebo jiná logická stránka
     return render(request, 'messaging/message_detail.html', {'message': message})
