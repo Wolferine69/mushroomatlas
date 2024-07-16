@@ -7,7 +7,8 @@ from django.views.generic import ListView, DetailView, CreateView, TemplateView
 from accounts.forms import RatingForm
 from accounts.models import Profile
 from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding, Comment, Message, Rating, CommentRecipe
-from .forms import MushroomForm, MushroomFilterForm, FindingForm, CommentForm, RecipeForm, MessageForm
+from .forms import MushroomForm, MushroomFilterForm, FindingForm, CommentForm, RecipeForm, MessageForm, \
+    CommentRecipeForm
 
 
 # Create your views here.
@@ -69,55 +70,52 @@ class RecipeListView(ListView):
 
 
 class RecipeDetailView(DetailView):
-    def get(self, request, pk):
-        recipe = get_object_or_404(Recipe, pk=pk)
-        user = request.user
-        form = RatingForm(user=user, recipe=recipe)
+    model = Recipe
+    template_name = 'recipe_detail.html'
 
-        # Check if the current user has already rated this recipe
-        if user.is_authenticated:
-            has_rated = Rating.objects.filter(recipe=recipe, user=user).exists()
-        else:
-            has_rated = False
-
-        # Get comments for the recipe
-        comments = recipe.comments.all()
-
-        context = {
-            'recipe': recipe,
-            'form': form,
-            'has_rated': has_rated,
-            'comments': comments,
-        }
-        return render(request, 'recipe_detail.html', context)
-
-    def post(self, request, pk):
-        recipe = get_object_or_404(Recipe, pk=pk)
-        user = request.user
-        form = RatingForm(request.POST, user=user, recipe=recipe)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        recipe = self.get_object()
+        user = self.request.user
+        context['form'] = RatingForm(user=user, recipe=recipe)
+        context['comment_form'] = CommentRecipeForm()
+        context['comments'] = recipe.comments.all()
 
         if user.is_authenticated:
-            if form.is_valid():
-
-                has_rated = Rating.objects.filter(recipe=recipe, user=user).exists()
-
-                if not has_rated:
-                    form.save()
-
-                has_rated = Rating.objects.filter(recipe=recipe, user=user).exists()
-
-                recipe.update_average_rating()
-
-                return redirect('recipe_detail', pk=pk)
+            context['has_rated'] = Rating.objects.filter(recipe=recipe, user=user).exists()
         else:
-            has_rated = False
+            context['has_rated'] = False
 
-        context = {
-            'recipe': recipe,
-            'form': form,
-            'has_rated': has_rated,
-        }
-        return render(request, 'recipe_detail.html', context)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        recipe = self.object
+        user = request.user
+
+        if 'rating' in request.POST:
+            form = RatingForm(request.POST, user=user, recipe=recipe)
+            if user.is_authenticated:
+                if form.is_valid():
+                    has_rated = Rating.objects.filter(recipe=recipe, user=user).exists()
+                    if not has_rated:
+                        form.save()
+                    recipe.update_average_rating()
+                    return redirect('recipe_detail', pk=recipe.pk)
+        else:
+            comment_form = CommentRecipeForm(request.POST, request.FILES)
+            if comment_form.is_valid():
+                comment = comment_form.save(commit=False)
+                comment.recipe = recipe
+                comment.user = user.profile
+                comment.new = True
+                comment.save()
+                return redirect('recipe_detail', pk=recipe.pk)
+
+        context = self.get_context_data()
+        context['form'] = form
+        context['comment_form'] = comment_form
+        return self.render_to_response(context)
 
 
 class TipListView(ListView):

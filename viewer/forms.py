@@ -1,15 +1,16 @@
 from django import forms
-from .models import Habitat, Finding, Comment, Recipe, Family
+from .models import Habitat, Finding, Comment, Recipe, Family, CommentRecipe
 
 from viewer.models import Mushroom, Message
 
 
 class MushroomForm(forms.ModelForm):
     """Meta class to specify the model and fields to include in the form"""
+
     class Meta:
         model = Mushroom
         fields = ['name_cz', 'name_latin', 'description', 'edibility', 'habitats', 'image', 'family']
-        widgets = {'habitats': forms.CheckboxSelectMultiple(),}
+        widgets = {'habitats': forms.CheckboxSelectMultiple(), }
         labels = {
             'name_cz': 'Název cz',
             'name_latin': 'Název latinsky',
@@ -64,7 +65,6 @@ class CommentForm(forms.ModelForm):
 
 
 class RecipeForm(forms.ModelForm):
-
     class Meta:
         model = Recipe
         fields = ['title', 'ingredients', 'instructions', 'image', 'main_mushroom', 'user', 'source']
@@ -78,7 +78,22 @@ class RecipeForm(forms.ModelForm):
             'user': 'Přidal',
         }
 
+
 class MessageForm(forms.ModelForm):
     class Meta:
         model = Message
         fields = ['receiver', 'content']
+
+
+class CommentRecipeForm(forms.ModelForm):
+    class Meta:
+        model = CommentRecipe
+        fields = ['text', 'image']
+        labels = {
+            'text': 'Komentář',
+            'image': 'Obrázek (volitelně)',
+        }
+        widgets = {
+            'text': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Napište komentář...'}),
+            'new': forms.HiddenInput(),
+        }
