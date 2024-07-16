@@ -7,7 +7,6 @@ from .forms import MessageForm, AttachmentFormSet, SenderFilterForm, ReceiverFil
 from .models import Message, Attachment
 from django.db.models import Q
 
-
 @login_required
 def send_message(request, receiver_username=None, replied_to_id=None):
     receiver = None
@@ -60,7 +59,6 @@ def send_message(request, receiver_username=None, replied_to_id=None):
         'trashed_count': trashed_count,
     })
 
-
 @login_required
 def restore_message(request, pk):
     message = get_object_or_404(Message, pk=pk)
@@ -75,7 +73,6 @@ def restore_message(request, pk):
     message.save()
     return redirect(next_url)
 
-
 @login_required
 def trash_message(request, pk):
     message = get_object_or_404(Message, pk=pk)
@@ -88,11 +85,10 @@ def trash_message(request, pk):
     message.save()
     return redirect('view_trash')
 
-
 @login_required
 def delete_message(request, pk):
     message = get_object_or_404(Message, pk=pk)
-    if request.method == 'DELETE':
+    if request.method == 'POST' or request.method == 'DELETE':
         if message.sender == request.user:
             message.is_deleted_by_sender = True
             message.is_trashed_by_sender = True
@@ -105,7 +101,7 @@ def delete_message(request, pk):
         else:
             message.save()
 
-        return JsonResponse({'success': True})
+        return JsonResponse({'success': True, 'redirect_url': '/view_trash/'})
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
@@ -130,7 +126,6 @@ def view_inbox(request):
         'trashed_count': trashed_count,
         'new_messages_count': new_messages_count  # Přidejte tuto hodnotu do kontextu
     })
-
 
 @login_required
 def view_outbox(request):
@@ -177,7 +172,6 @@ def view_trash(request):
         'trashed_count': trashed_count,
     })
 
-
 @login_required
 def mark_message_read(request, message_id):
     message = get_object_or_404(Message, id=message_id, receiver=request.user)
@@ -185,16 +179,6 @@ def mark_message_read(request, message_id):
     message.save()
     next_url = request.GET.get('next', 'view_inbox')
     return redirect(next_url)
-
-
-@login_required
-def mark_message_read(request, message_id):
-    message = get_object_or_404(Message, id=message_id, receiver=request.user)
-    message.is_read = True
-    message.save()
-    next_url = request.GET.get('next', 'view_inbox')
-    return redirect(next_url)
-
 
 @login_required
 def forward_message(request, message_id, reply=False):
@@ -267,7 +251,6 @@ def view_message_detail(request, message_id):
         'trashed_count': trashed_count,
     })
 
-
 def get_message_counts(user):
     received_count = Message.objects.filter(receiver=user, is_trashed_by_receiver=False, is_deleted_by_receiver=False).count()
     unread_count = Message.objects.filter(receiver=user, is_trashed_by_receiver=False, is_deleted_by_receiver=False, is_read=False).count()
@@ -277,7 +260,6 @@ def get_message_counts(user):
         Q(sender=user, is_trashed_by_sender=True, is_deleted_by_sender=False)
     ).count()
     return received_count, unread_count, sent_count, trashed_count
-
 
 @login_required
 def bulk_trash_messages(request):

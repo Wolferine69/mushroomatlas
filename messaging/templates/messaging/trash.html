@@ -19,18 +19,26 @@
         <li>Žádné zprávy v koši.</li>
     {% endfor %}
 </ul>
-
 <script>
 function deleteMessage(messageId) {
     fetch(`/delete_message/${messageId}/`, {
-        method: 'DELETE',
+        method: 'POST',
         headers: {
             'X-CSRFToken': '{{ csrf_token }}',
         }
     }).then(response => {
         if (response.ok) {
-            location.reload();
+            return response.json();
         }
+        throw new Error('Network response was not ok.');
+    }).then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            console.error('Error:', data.error);
+        }
+    }).catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
     });
 }
 </script>
