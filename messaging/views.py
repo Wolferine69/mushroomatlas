@@ -49,9 +49,15 @@ def send_message(request, receiver_username=None, replied_to_id=None):
         form = MessageForm(initial={'receiver': receiver, 'replied_to': replied_to, 'subject': initial_subject}, user=request.user)
         attachment_formset = AttachmentFormSet()
 
+    received_count, unread_count, sent_count, trashed_count = get_message_counts(request.user)
+
     return render(request, 'messaging/send_message.html', {
         'form': form,
-        'attachment_formset': attachment_formset
+        'attachment_formset': attachment_formset,
+        'received_count': received_count,
+        'unread_count': unread_count,
+        'sent_count': sent_count,
+        'trashed_count': trashed_count,
     })
 
 
@@ -113,12 +119,13 @@ def view_inbox(request):
         if sender:
             messages = messages.filter(sender=sender)
 
-    received_count, sent_count, trashed_count = get_message_counts(request.user)
+    received_count, unread_count, sent_count, trashed_count = get_message_counts(request.user)
 
     return render(request, 'messaging/inbox.html', {
         'messages': messages,
         'form': form,
         'received_count': received_count,
+        'unread_count': unread_count,
         'sent_count': sent_count,
         'trashed_count': trashed_count,
     })
@@ -133,12 +140,13 @@ def view_outbox(request):
         if receiver:
             messages = messages.filter(receiver=receiver)
 
-    received_count, sent_count, trashed_count = get_message_counts(request.user)
+    received_count, unread_count, sent_count, trashed_count = get_message_counts(request.user)
 
     return render(request, 'messaging/outbox.html', {
         'sent_messages': messages,
         'form': form,
         'received_count': received_count,
+        'unread_count': unread_count,
         'sent_count': sent_count,
         'trashed_count': trashed_count,
     })
@@ -156,15 +164,17 @@ def view_trash(request):
         if sender:
             trashed_messages = trashed_messages.filter(sender=sender)
 
-    received_count, sent_count, trashed_count = get_message_counts(request.user)
+    received_count, unread_count, sent_count, trashed_count = get_message_counts(request.user)
 
     return render(request, 'messaging/trash.html', {
         'trashed_messages': trashed_messages,
         'form_sender': form_sender,
         'received_count': received_count,
+        'unread_count': unread_count,
         'sent_count': sent_count,
         'trashed_count': trashed_count,
     })
+
 
 
 
@@ -245,21 +255,24 @@ def view_message_detail(request, message_id):
     if request.user not in [message.receiver, message.sender]:
         return redirect('view_inbox')
 
-    received_count, sent_count, trashed_count = get_message_counts(request.user)
+    received_count, unread_count, sent_count, trashed_count = get_message_counts(request.user)
 
     return render(request, 'messaging/message_detail.html', {
         'message': message,
         'received_count': received_count,
+        'unread_count': unread_count,
         'sent_count': sent_count,
         'trashed_count': trashed_count,
     })
 
+
 def get_message_counts(user):
     received_count = Message.objects.filter(receiver=user, is_trashed_by_receiver=False, is_deleted_by_receiver=False).count()
+    unread_count = Message.objects.filter(receiver=user, is_trashed_by_receiver=False, is_deleted_by_receiver=False, is_read=False).count()
     sent_count = Message.objects.filter(sender=user, is_trashed_by_sender=False, is_deleted_by_sender=False).count()
     trashed_count = Message.objects.filter(
         Q(receiver=user, is_trashed_by_receiver=True, is_deleted_by_receiver=False) |
         Q(sender=user, is_trashed_by_sender=True, is_deleted_by_sender=False)
     ).count()
-    return received_count, sent_count, trashed_count
+    return received_count, unread_count, sent_count, trashed_count
 
