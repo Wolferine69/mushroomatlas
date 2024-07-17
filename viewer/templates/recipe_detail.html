@@ -15,32 +15,40 @@
         margin-bottom: 10px;
     }
 </style>
+<section class="flex flex-col items-center justify-center p-12 md:bg-emerald-950 max-h-3xl shadow-4xl rounded-lg">
+    <article class="p-4 my-2 bg-emerald-900 rounded-lg flex flex-col items-center border-2 border-emerald-700">
+        <h2><strong>{{ recipe.title }}</strong></h2>
+        <p><strong>Ingredience: </strong> {{ recipe.ingredients }}</p>
+        <p><strong>Instrukce: </strong> {{ recipe.instructions }}</p>
+    </article>
 
-<h2><strong>{{ recipe.title }}</strong></h2>
-<p><strong>Ingredience: </strong> {{ recipe.ingredients }}</p>
-<p><strong>Instrukce: </strong> {{ recipe.instructions }}</p>
-{% if recipe.image %}
-    <div class="recipe-images">
-        <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="recipe-image">
-        {% for additional_image in recipe.additional_images.all %}
-            <img src="{{ additional_image.url }}" alt="{{ recipe.title }}" class="recipe-image">
-        {% endfor %}
-    </div>
-    <p><span style="font-size: small; font-style: italic;">Zdroj obrázků: </span> {{ recipe.source }}</p>
-{% endif %}
-<p><strong>Hlavní houba: </strong> <a href="{% url 'mushroom_detail' pk=recipe.main_mushroom.pk %}">{{ recipe.main_mushroom.name_cz }}</a></p>
-<p><strong>Přidal uživatel: </strong> <a href="{% url 'account_detail' pk=recipe.user.pk %}">{{ recipe.user.user.username }}</a></p>
+    <article class="p-4 my-2 bg-emerald-900 rounded-lg flex flex-col items-center border-2 border-emerald-700">
+        {% if recipe.image %}
+            <div class="recipe-images">
+                <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="recipe-image rounded-xl">
+                {% for additional_image in recipe.additional_images.all %}
+                    <img src="{{ additional_image.url }}" alt="{{ recipe.title }}" class="recipe-image rounded-xl">
+                {% endfor %}
+            </div>
+            <p><span style="font-size: small; font-style: italic;">Zdroj obrázků: </span> {{ recipe.source }}</p>
+        {% endif %}
 
-<!-- Zobrazit aktuální hodnocení -->
-<p><strong>Celkové hodnocení: </strong> {{ recipe.rating }}</p>
 
-<!-- Formulář pro přidání hodnocení -->
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Odeslat hodnocení</button>
-</form>
 
-<a href="{% url 'recipes_list' %}" class="btn btn-secondary">Zpět na seznam receptů</a>
+        <p><strong>Hlavní houba: </strong> <a href="{% url 'mushroom_detail' pk=recipe.main_mushroom.pk %}">{{ recipe.main_mushroom.name_cz }}</a></p>
+        <p><strong>Přidal uživatel: </strong> <a href="{% url 'account_detail' pk=recipe.user.pk %}">{{ recipe.user.user.username }}</a></p>
 
+        <!-- Zobrazit aktuální hodnocení -->
+        <p><strong>Celkové hodnocení: </strong> {{ recipe.rating }}</p>
+
+        <!-- Formulář pro přidání hodnocení -->
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Odeslat hodnocení</button>
+        </form>
+
+        <a href="{% url 'recipes_list' %}" class="btn btn-secondary">Zpět na seznam receptů</a>
+    </article>
+</section>
 {% endblock %}

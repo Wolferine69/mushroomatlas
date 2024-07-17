@@ -61,10 +61,12 @@ class AccountsListView(LoginRequiredMixin, ListView):
                 'viewer.add_mushroom')
         return context
 
+
 class AccountDetailView(LoginRequiredMixin, DetailView):
     model = Profile
     template_name = 'account_detail.html'
     context_object_name = 'account'
+
 
 class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = User

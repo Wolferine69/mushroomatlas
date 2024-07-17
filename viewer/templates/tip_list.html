@@ -1,12 +1,17 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Tipy a triky</h1>
-<ul>
-    {% for tip in tips %}
-    <li>
-        <a href="{% url 'tip_detail' pk=tip.pk %}">{{ tip.title }}</a> - Přidal: {{ tip.user.user.username }}
-    </li>
-    {% endfor %}
-</ul>
+<section class="flex flex-col items-center justify-center
+                  shadow-2xl bg-emerald-950 p-4 rounded-lg">
+    <article class="">
+        <h1 class="mb-3 underline text-xl">Tipy a triky</h1>
+    </article>
+    <ul class="flex flex-col items-center justify-center ">
+        {% for tip in tips %}
+        <li class="py-2 m-2 px-4 bg-emerald-900 rounded-lg hover:bg-emerald-800">
+            <a href="{% url 'tip_detail' pk=tip.pk %}">{{ tip.title }}</a> - Přidal: {{ tip.user.user.username }}
+        </li>
+        {% endfor %}
+    </ul>
+</section>
 {% endblock %}

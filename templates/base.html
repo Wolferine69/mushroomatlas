@@ -35,6 +35,7 @@
                 document.addEventListener('DOMContentLoaded', initApp)
             </script>
 	</head>
+
                  <style>
                      {#css insert needed due to the problem with external CDN stylesheet, required for the input fields to be rendered properly#}
                     [type='text'],input:where(:not([type])),[type='email'],[type='url'],[type='password'],[type='number'],
@@ -61,15 +62,21 @@
             <header class="bg-teal-700 text-white sticky top-0 z-10">
         <section class="max-w-4xl mx-auto p-4 flex justify-between items-center">
             <h1 class="text-3xl font-medium">
+
+                {% if user.is_authenticated %}
+                <a href="{%  url 'home' %}" class="block">🍄</a>
+                {% else %}
                 <a href="{%  url 'home' %}">🍄MushroomAtlas</a>
+
+                {% endif %}
             </h1>
             <div>
-                    <button id="hamburger-button" class="text-3xl md:hidden cursor-pointer">
+                    <button id="hamburger-button" class="text-3xl lg:hidden cursor-pointer">
                         &#9776;
                     </button>
 
             </div>
-                <nav class="hidden sm:block space-x-8 text-xl" aria-label="main">
+                <nav class="hidden lg:block space-x-8 text-xl" aria-label="main">
                     <a href="{%  url 'mushroom_list' %}" class= hover:animate-pulse>Atlas Hub</a>
                     <a href="{%  url 'family_list' %}" class= hover:animate-pulse>Families</a>
                     <a href="{%  url 'recipes_list' %}" class= hover:animate-pulse>Recipes</a>
@@ -82,7 +89,7 @@
                         <a href="{%  url 'accounts_list' %}" class= "hover:animate-pulse mt-2">Users</a>
                     {% endif %}
                 </nav>
-            <div class="hidden lg:block ">
+            <div class="hidden lg:block">
                 <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="fixed right-6 top-3 text-white bg-emerald-600 hover:bg-emerald-400 focus:ring-4 focus:outline-none focus:ring-emerald-300
                  font-medium rounded-lg text-sm px-5 py-2.5 inline-flex text-center items-center
                   dark:bg-teal-700 dark:hover:bg-emerald-400 dark:focus:ring-emerald-300"
@@ -115,7 +122,7 @@
 
         </section>
             <section id="mobile-menu" class="absolute top-0 bg-gradient-to-t from-teal-800 to-black w-full text-5xl flex-col justify-content-center origin-top
-              hidden ">
+              hidden min-h-screen">
                 <button class="text-txl self-end px-6 hover:animate-pulse">
                     &times;
                 </button>

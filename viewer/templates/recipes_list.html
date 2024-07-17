@@ -3,7 +3,7 @@
 {% load form_tags %}
 
 {% block content %}
-<div class="container mt-4">
+<section class="container">
     <form method="get" class="form-inline mb-4">
         <div class="form-group mr-2">
             <!-- Vaše filtrovací pole -->
@@ -11,28 +11,28 @@
         <div class="form-group mr-2">
             <!-- Další filtrovací pole -->
         </div>
-        <button type="submit" class="btn btn-primary">Filtrovat</button>
+        <button type="submit" class="">Filtrovat</button>
     </form>
     {% if user.is_authenticated %}
-        <a class="nav-link" href="{% url 'add_recipe' %}">Přidej recept</a>
+        <a href="{% url 'add_recipe' %}">Přidej recept</a>
     {% endif %}
-    <div class="row">
+    <article class="grid grid-cols-1 mx-6 md:grid-cols-2 gap-6 mt-4 lg:grid-cols-3 items-start justify-start min-w-xl">
         {% for recipe in recipes %}
-        <div class="col-md-4 mb-4">
-            <div class="card">
+        <section class="flex flex-col items-center justify-center p-4 rounded-lg bg-emerald-900 hover:bg-emerald-800">
+            <a href="{% url 'recipe_detail' recipe.id %}" class="flex flex-col items-center justify-center">
                 {% if recipe.image %}
-                <img src="{{ recipe.image.url }}" class="card-img-top img-fluid img-fixed" alt="{{ recipe.title }}">
+                <img src="{{ recipe.image.url }}" class="rounded-lg max-w-full" alt="{{ recipe.title }}">
                 {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ recipe.title }}</h5>
-                    <p class="card-text">Přidal: {{ recipe.user.user.username }}</p>
-                    <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-primary">Více informací</a>
-                </div>
-            </div>
-        </div>
+
+                <h5 class="text-xl font-bold">{{ recipe.title }}</h5>
+                <p>Přidal: {{ recipe.user.user.username }}</p>
+
+
+            </a>
+        </section>
         {% endfor %}
-    </div>
-</div>
+    </article>
+</section>
 {% endblock %}
 
 
