@@ -28,6 +28,7 @@ from viewer.views import (home,
                           FamilyListView, FamilyDetailView, RecipeListView, RecipeDetailView, TipListView,
                           TipDetailView, add_mushroom, FindingsMapView, AddFindingView, AddCommentView, add_recipe,
                           CommentsListView,
+
                           )
 
 urlpatterns = [

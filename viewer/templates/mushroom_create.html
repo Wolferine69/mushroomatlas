@@ -7,7 +7,6 @@
     <section class="container p-4 bg-emerald-950 rounded-lg drop-shadow-xl">
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-
             <table>
                 <tr>
                     <td><label for="{{ form.name_cz.id_for_label }}"><strong>Název cz:</strong></label></td>
