@@ -36,13 +36,17 @@
     {% if mushroom.image %}
     <p><img src="{{ mushroom.image.url }}" alt="{{ mushroom.name_cz }}" class="md:max-h-2xl md:max-w-full"></p>
     {% endif %}
-    <p><strong> Řád:</strong>  <a href="{% url 'family_detail' mushroom.family.id %}">{{ mushroom.family.name }}</a></p>
+    <p ><strong> Řád:</strong>  <a href="{% url 'family_detail' mushroom.family.id %}" class="underline">{{ mushroom.family.name }}</a></p>
     <p><strong>Recepty:</strong>
-    <ul>
+    {% if mushroom.recipes.exists%}
+        <ul>
         {% for recipe in mushroom.recipes.all %}
-            <li><a href="{% url 'recipe_detail' pk=recipe.pk %}">{{ recipe.title }}</a></li>
+            <li class='underline'><a href="{% url 'recipe_detail' pk=recipe.pk %}">{{ recipe.title }}</a></li>
         {% endfor %}
-    </ul>
+        </ul>
+    {% else %}
+        <span>Nejsou k dispozici žádné recepty.</span>
+    {% endif %}
     </article>
 </section>
 {% endblock %}

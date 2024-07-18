@@ -10,7 +10,7 @@
         <h3> <strong> Houby v daném řádu: </strong> </h3>
         <ul>
         {% for mushroom in family.mushrooms.all %}
-        <li><a href="{% url 'mushroom_detail' mushroom.id %}">{{ mushroom.name_cz }} ({{ mushroom.name_latin }})</a></li>
+        <li class="underline"><a href="{% url 'mushroom_detail' mushroom.id %}">{{ mushroom.name_cz }} ({{ mushroom.name_latin }})</a></li>
         {% endfor %}
         </ul>
     </article>

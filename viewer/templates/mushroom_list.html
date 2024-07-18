@@ -22,7 +22,7 @@
         </div>
         <button type="submit" class=" text-white mt-2 bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br
          focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg
-          dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2">Filtrovat</button>
+          dark:shadow-green-800/80 font-medium rounded-lg text-sm px-3 py-2 text-center me-2">Filtrovat</button>
     </form>
 
 
@@ -32,7 +32,7 @@
             <h5 class="text-xl mb-3">{{ mushroom.name_cz }} <br> ({{ mushroom.name_latin }})</h5>
                 <div>
                 {% if mushroom.image %}
-                <img src="{{ mushroom.image.url }}" alt="{{ mushroom.name_cz }}" class="rounded-xl">
+                    <img src="{{ mushroom.image.url }}" alt="{{ mushroom.name_cz }}" class="object-cover h-64 w-64 rounded-xl">
                 {% endif %}
                 </div>
             <hr>

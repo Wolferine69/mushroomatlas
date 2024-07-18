@@ -4,24 +4,31 @@
 
 {% block content %}
 <section class="container">
-    <form method="get" class="form-inline mb-4">
-        <div class="form-group mr-2">
-            <!-- Vaše filtrovací pole -->
-        </div>
-        <div class="form-group mr-2">
-            <!-- Další filtrovací pole -->
-        </div>
-        <button type="submit" class="">Filtrovat</button>
-    </form>
+{#    <form method="get" class="form-inline mb-4">#}
+{#        <div class="form-group mr-2">#}
+{#            <!-- Vaše filtrovací pole -->#}
+{#        </div>#}
+{#        <div class="form-group mr-2">#}
+{#            <!-- Další filtrovací pole -->#}
+{#        </div>#}
+{#        <button type="submit" class="">Filtrovat</button>#}
+{#    </form>#}
+
     {% if user.is_authenticated %}
-        <a href="{% url 'add_recipe' %}">Přidej recept</a>
+        <div class="py-4 my-2 mx-16 bg-transparent flex flex-col items-center ">
+            <a href="{% url 'add_recipe' %}" class="text-white mt-2 bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br
+             focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg
+              dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2">Přidej recept</a>
+        </div>
     {% endif %}
     <article class="grid grid-cols-1 mx-6 md:grid-cols-2 gap-6 mt-4 lg:grid-cols-3 items-start justify-start min-w-xl">
         {% for recipe in recipes %}
         <section class="flex flex-col items-center justify-center p-4 rounded-lg bg-emerald-900 hover:bg-emerald-800">
             <a href="{% url 'recipe_detail' recipe.id %}" class="flex flex-col items-center justify-center">
                 {% if recipe.image %}
-                <img src="{{ recipe.image.url }}" class="rounded-lg max-w-full" alt="{{ recipe.title }}">
+                    <div class="">
+                        <img src="{{ recipe.image.url }}" class="object-cover h-64 w-64 rounded-xl" alt="{{ recipe.title }}">
+                    </div>
                 {% endif %}
 
                 <h5 class="text-xl font-bold">{{ recipe.title }}</h5>
