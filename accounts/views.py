@@ -75,8 +75,9 @@ class AccountsListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
-                'viewer.add_mushroom')
+            'viewer.add_mushroom')
         return context
+
 
 class AccountDetailView(LoginRequiredMixin, DetailView):
     model = Profile
@@ -88,6 +89,7 @@ class AccountDetailView(LoginRequiredMixin, DetailView):
         user = self.get_object().user  # Assuming Profile has a one-to-one relationship with User
         context['sent_messages'] = Message.objects.filter(sender=user).order_by('-timestamp')
         return context
+
 
 class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Profile
@@ -101,6 +103,6 @@ class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm('viewer.add_mushroom')
+        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
+            'viewer.add_mushroom')
         return context
-
