@@ -81,6 +81,10 @@
                                 {% if new_comments_count > 0 %}
                                     <span class="badge badge-pill badge-primary">{{ new_comments_count }} nových</span>
                                 {% endif %}
+                                <a class="dropdown-item text-right" href="{% url 'comments_recipe' %}">Komentáře k receptům</a>
+                                {% if new_comments_recipe_count > 0 %}
+                                    <span class="badge badge-pill badge-primary">{{ new_comments_recipe_count }} nových</span>
+                                {% endif %}
                                 <a class="dropdown-item text-right" href="{% url 'view_inbox' %}">Zprávy</a>
                                 {% if new_messages_count > 0 %}
                                     <span class="badge badge-pill badge-primary">{{ new_messages_count }} nových</span>

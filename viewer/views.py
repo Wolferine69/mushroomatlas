@@ -228,6 +228,7 @@ class CommentsListView(LoginRequiredMixin, ListView):
         user_profile = self.request.user.profile
         return Comment.objects.filter(finding__user=user_profile)
 
+
 """
 @login_required
 def send_message(request):
@@ -255,3 +256,20 @@ def mark_comment_read(request, comment_id):
     comment.new = False
     comment.save()
     return redirect('findings_map_with_pk', pk=comment.finding.id)
+
+
+class CommentsRecipeListView(LoginRequiredMixin, ListView):
+    model = CommentRecipe
+    template_name = 'comments_recipe_list.html'
+    context_object_name = 'comments_recipe'
+
+    def get_queryset(self):
+        user_profile = self.request.user.profile
+        return CommentRecipe.objects.filter(recipe__user=user_profile)
+
+
+# def mark_comment_recipe_read(request, comment_id):
+#     comment = get_object_or_404(Comment, id=comment_id)
+#     comment.new = False
+#     comment.save()
+#     return redirect('findings_map_with_pk', pk=comment.finding.id)

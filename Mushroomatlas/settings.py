@@ -76,6 +76,7 @@ TEMPLATES = [
                 'viewer.context_processors.sent_messages_count',
                 'viewer.context_processors.trashed_messages_count',
                 'viewer.context_processors.can_add_mushroom',
+                'viewer.context_processors.new_comments_recipe_count',
             ],
         },
     },

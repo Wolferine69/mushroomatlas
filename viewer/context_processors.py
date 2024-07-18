@@ -1,6 +1,7 @@
 from messaging.models import Message
-from viewer.models import Comment, Finding
+from viewer.models import Comment, Finding, Recipe, CommentRecipe
 from django.db.models import Q
+
 
 def new_comments_count(request):
     if request.user.is_authenticated:
@@ -12,6 +13,19 @@ def new_comments_count(request):
     return {
         'new_comments_count': 0
     }
+
+
+def new_comments_recipe_count(request):
+    if request.user.is_authenticated:
+        user_recipes = Recipe.objects.filter(user=request.user.profile)
+        new_comments_recipe = CommentRecipe.objects.filter(recipe__in=user_recipes, new=True).count()
+        return {
+            'new_comments_recipe_count': new_comments_recipe
+        }
+    return {
+        'new_comments_recipe_count': 0
+    }
+
 
 def new_messages_count(request):
     if request.user.is_authenticated:
@@ -28,6 +42,7 @@ def new_messages_count(request):
         'new_messages_count': 0
     }
 
+
 def sent_messages_count(request):
     if request.user.is_authenticated:
         sent_messages = Message.objects.filter(
@@ -42,6 +57,7 @@ def sent_messages_count(request):
         'sent_messages_count': 0
     }
 
+
 def trashed_messages_count(request):
     if request.user.is_authenticated:
         trashed_messages = Message.objects.filter(
@@ -54,6 +70,7 @@ def trashed_messages_count(request):
     return {
         'trashed_messages_count': 0
     }
+
 
 def can_add_mushroom(request):
     if request.user.is_authenticated:

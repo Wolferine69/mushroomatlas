@@ -2,13 +2,13 @@
 
 {% block content %}
 <ul>
-    {% for comment in comments %}
+    {% for comment in comments_recipe %}
         <li>
             <a href="{% url 'mark_comment_read' comment.id %}">
                 {% if comment.new %}
-                    <mark><strong>{{ comment.user }} | {{ comment.finding.mushroom.name_cz }} | {{ comment.created_at }}</strong></mark>
+                    <mark><strong>{{ comment.user }} | {{ comment.recipe.title }} | {{ comment.created_at }}</strong></mark>
                 {% else %}
-                    {{ comment.user }} | {{ comment.finding.mushroom.name_cz }} | {{ comment.created_at }}
+                    {{ comment.user }} | {{ comment.recipe.title }} | {{ comment.created_at }}
                 {% endif %}
             </a>
         </li>
