@@ -8,14 +8,14 @@
         <h2 class="text-2xl"><strong>{{ mushroom.name_cz }}</strong></h2>
             <p><strong> Popis:</strong>  {{ mushroom.description }}</p>
             <div class="flex flex-col items-center justify-center py-3">
-                <p><strong class="underline text-emerald-500"> Místo výskytu:</strong>
+                <p><strong> Místo výskytu:</strong>
                  {% if mushroom.habitats.exists %}
                     {% for habitat in mushroom.habitats.all %}
                         {{ habitat.name }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
-                    {% else %}
+                 {% else %}
                         <span>Nejsou k dispozici žádná data o místech výskytu.</span>
-                    {% endif %}
+                 {% endif %}
                 </p>
                     </div>
 

@@ -446,7 +446,6 @@ video {
   display: none;
 }
 
-
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
@@ -694,10 +693,6 @@ video {
 
 .top-3 {
   top: 0.75rem;
-}
-
-.bottom-2 {
-  bottom: 0.5rem;
 }
 
 .isolate {
