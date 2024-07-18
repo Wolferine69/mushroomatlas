@@ -268,8 +268,8 @@ class CommentsRecipeListView(LoginRequiredMixin, ListView):
         return CommentRecipe.objects.filter(recipe__user=user_profile)
 
 
-# def mark_comment_recipe_read(request, comment_id):
-#     comment = get_object_or_404(Comment, id=comment_id)
-#     comment.new = False
-#     comment.save()
-#     return redirect('findings_map_with_pk', pk=comment.finding.id)
+def mark_comment_recipe_read(request, comment_id):
+    comment = get_object_or_404(CommentRecipe, id=comment_id)
+    comment.new = False
+    comment.save()
+    return redirect('recipe_detail', pk=comment.recipe.id)
