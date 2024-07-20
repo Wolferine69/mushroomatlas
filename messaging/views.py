@@ -1,5 +1,5 @@
 # views.py
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -121,7 +121,7 @@ def view_inbox(request):
             messages = messages.filter(sender=sender)
 
     received_count, unread_count, sent_count, trashed_count = get_message_counts(request.user)
-    new_messages_count = unread_count  # Počet nových zpráv pro horní menu
+    new_messages_count = unread_count
 
     return render(request, 'messaging/inbox.html', {
         'messages': messages,
@@ -130,7 +130,7 @@ def view_inbox(request):
         'unread_count': unread_count,
         'sent_count': sent_count,
         'trashed_count': trashed_count,
-        'new_messages_count': new_messages_count  # Přidejte tuto hodnotu do kontextu
+        'new_messages_count': new_messages_count
     })
 
 
@@ -182,12 +182,11 @@ def view_trash(request):
 
 
 @login_required
-def mark_message_read(request, message_id):
-    message = get_object_or_404(Message, id=message_id, receiver=request.user)
+def mark_message_read(request, pk):
+    message = get_object_or_404(Message, pk=pk)
     message.is_read = True
     message.save()
-    next_url = request.GET.get('next', 'view_inbox')
-    return redirect(next_url)
+    return HttpResponse(status=200)
 
 
 @login_required
