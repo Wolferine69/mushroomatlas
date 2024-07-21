@@ -91,6 +91,7 @@ urlpatterns = [
     path('message/<int:message_id>/', messaging_views.view_message_detail, name='message_detail'),
     path('reply_message/<int:message_id>/', messaging_views.forward_message, {'reply': True}, name='reply_message'),
     path('bulk_trash_messages/', bulk_trash_messages, name='bulk_trash_messages'),
+    path('bulk_delete_trash_messages/', messaging_views.bulk_delete_trash_messages,name='bulk_delete_trash_messages'),
     path('bulk_delete_messages/', messaging_views.bulk_delete_messages, name='bulk_delete_messages'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

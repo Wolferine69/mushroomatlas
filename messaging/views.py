@@ -3,6 +3,8 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.views.decorators.http import require_POST
+
 from .forms import MessageForm, AttachmentFormSet, SenderFilterForm, ReceiverFilterForm
 from .models import Message, Attachment
 from django.db.models import Q
@@ -77,6 +79,24 @@ def restore_message(request, pk):
     return redirect(next_url)
 
 
+@require_POST
+@login_required
+def bulk_delete_trash_messages(request):
+    message_ids = request.POST.getlist('message_ids')
+    if message_ids:
+        messages = Message.objects.filter(id__in=message_ids)
+        for message in messages:
+            if message.sender == request.user:
+                message.is_deleted_by_sender = True
+            if message.receiver == request.user:
+                message.is_deleted_by_receiver = True
+            if message.is_deleted_by_sender and message.is_deleted_by_receiver:
+                message.delete()
+            else:
+                message.save()
+    return redirect('view_trash')
+
+
 @login_required
 def trash_message(request, pk):
     message = get_object_or_404(Message, pk=pk)
@@ -89,30 +109,40 @@ def trash_message(request, pk):
     message.save()
     return redirect('view_trash')
 
+
 @login_required
 def bulk_delete_messages(request):
     if request.method == 'POST':
         message_ids = request.POST.getlist('message_ids')
         if message_ids:
             messages = Message.objects.filter(id__in=message_ids, sender=request.user)
-            messages.delete()
+            for message in messages:
+                message.is_deleted_by_sender = True
+                if message.is_deleted_by_sender and message.is_deleted_by_receiver:
+                    message.delete()
+                else:
+                    message.save()
     return redirect('view_outbox')
 
+
+@login_required
 def delete_message(request, pk):
     message = get_object_or_404(Message, pk=pk)
     if request.method == 'POST' or request.method == 'DELETE':
         if message.sender == request.user:
-            message.delete()
-            return JsonResponse({'success': True, 'redirect_url': '/outbox/'})
+            message.is_deleted_by_sender = True
+            message.is_trashed_by_sender = True
         elif message.receiver == request.user:
             message.is_deleted_by_receiver = True
             message.is_trashed_by_receiver = True
-            if message.is_deleted_by_sender and message.is_deleted_by_receiver:
-                message.delete()
-            else:
-                message.save()
-            return JsonResponse({'success': True, 'redirect_url': '/inbox/'})
+
+        if message.is_deleted_by_sender and message.is_deleted_by_receiver:
+            message.delete()
+        else:
+            message.save()
+        return JsonResponse({'success': True, 'redirect_url': '/outbox/' if message.sender == request.user else '/inbox/'})
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+
 
 @login_required
 def view_inbox(request):
