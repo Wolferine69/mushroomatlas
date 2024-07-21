@@ -6,10 +6,10 @@
     <button type="submit" class="btn btn-primary">Filtrovat</button>
     <a href="{% url 'view_outbox' %}" class="btn btn-secondary">Zrušit filtr</a>
 </form>
-<form method="post" action="{% url 'bulk_trash_messages' %}">
+<form method="post" action="{% url 'bulk_delete_messages' %}">
     {% csrf_token %}
     <div>
-        <button type="submit" class="btn btn-danger">Přesunout do koše</button>
+        <button type="submit" class="btn btn-danger">Smazat</button>
     </div>
     <ul>
         {% for message in sent_messages %}

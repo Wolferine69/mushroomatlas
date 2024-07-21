@@ -89,26 +89,31 @@ def trash_message(request, pk):
     message.save()
     return redirect('view_trash')
 
+@login_required
+def bulk_delete_messages(request):
+    if request.method == 'POST':
+        message_ids = request.POST.getlist('message_ids')
+        if message_ids:
+            messages = Message.objects.filter(id__in=message_ids, sender=request.user)
+            messages.delete()
+    return redirect('view_outbox')
 
 @login_required
 def delete_message(request, pk):
     message = get_object_or_404(Message, pk=pk)
     if request.method == 'POST' or request.method == 'DELETE':
         if message.sender == request.user:
-            message.is_deleted_by_sender = True
-            message.is_trashed_by_sender = True
+            message.delete()
+            return JsonResponse({'success': True, 'redirect_url': '/view_outbox/'})
         elif message.receiver == request.user:
             message.is_deleted_by_receiver = True
             message.is_trashed_by_receiver = True
-
-        if message.is_deleted_by_sender and message.is_deleted_by_receiver:
-            message.delete()
-        else:
-            message.save()
-
-        return JsonResponse({'success': True, 'redirect_url': '/view_trash/'})
+            if message.is_deleted_by_sender and message.is_deleted_by_receiver:
+                message.delete()
+            else:
+                message.save()
+            return JsonResponse({'success': True, 'redirect_url': '/view_inbox/'})
     return JsonResponse({'error': 'Invalid request method'}, status=400)
-
 
 @login_required
 def view_inbox(request):
