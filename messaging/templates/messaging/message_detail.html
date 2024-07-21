@@ -1,3 +1,4 @@
+<!-- message_detail.html -->
 {% extends 'messaging/messages_base.html' %}
 
 {% block messages_content %}
@@ -27,21 +28,25 @@
         <button type="button" class="btn btn-danger" onclick="deleteMessage('{{ message.id }}')">Smazat</button>
     </form>
 </div>
-{% endblock %}
 
 <script>
+const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
 function deleteMessage(messageId) {
+    console.log('Delete button clicked for message ID:', messageId);
     fetch(`/delete_message/${messageId}/`, {
         method: 'POST',
         headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
+            'X-CSRFToken': csrftoken,
         }
     }).then(response => {
+        console.log('Fetch response received:', response);
         if (response.ok) {
             return response.json();
         }
         throw new Error('Network response was not ok.');
     }).then(data => {
+        console.log('Data received from server:', data);
         if (data.success) {
             window.location.href = data.redirect_url;
         } else {
@@ -52,3 +57,4 @@ function deleteMessage(messageId) {
     });
 }
 </script>
+{% endblock %}
