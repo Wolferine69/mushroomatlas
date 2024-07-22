@@ -23,4 +23,8 @@
     </ul>
     <button type="submit" class="btn btn-danger">Smazat vybrané</button>
 </form>
+<form method="post" action="{% url 'bulk_restore_trash_messages' %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-success">Obnovit vybrané</button>
+</form>
 {% endblock %}

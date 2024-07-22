@@ -1,4 +1,5 @@
 # views.py
+from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -317,18 +318,36 @@ def get_message_counts(user):
     return received_count, unread_count, sent_count, trashed_count
 
 
+@require_POST
 @login_required
 def bulk_trash_messages(request):
+    message_ids = request.POST.getlist('message_ids')
+    if message_ids:
+        messages = Message.objects.filter(id__in=message_ids)
+        for message in messages:
+            if message.sender == request.user:
+                message.is_trashed_by_sender = False
+            if message.receiver == request.user:
+                message.is_trashed_by_receiver = False
+            message.save()
+    return redirect('view_trash')
+
+
+def bulk_restore_trash_messages(request):
     if request.method == 'POST':
         message_ids = request.POST.getlist('message_ids')
-        if message_ids:
-            messages = Message.objects.filter(id__in=message_ids)
-            for message in messages:
-                if message.sender == request.user:
-                    message.is_trashed_by_sender = True
-                    message.is_deleted_by_sender = False
-                elif message.receiver == request.user:
-                    message.is_trashed_by_receiver = True
-                    message.is_deleted_by_receiver = False
+        print(f"Přijaté ID zpráv pro obnovení: {message_ids}")  # Debugovací řádek
+        for message_id in message_ids:
+            try:
+                message = Message.objects.get(id=message_id)
+                print(f"Původní stav zprávy {message_id} - is_trashed_by_sender: {message.is_trashed_by_sender}, is_trashed_by_receiver: {message.is_trashed_by_receiver}")
+                message.is_trashed_by_sender = False
+                message.is_trashed_by_receiver = False
                 message.save()
+                print(f"Nový stav zprávy {message_id} - is_trashed_by_sender: {message.is_trashed_by_sender}, is_trashed_by_receiver: {message.is_trashed_by_receiver}")
+            except Message.DoesNotExist:
+                print(f"Zpráva s ID {message_id} neexistuje")  # Debugovací řádek
+
+        messages.success(request, 'Vybrané zprávy byly obnoveny.')
     return redirect('view_trash')
+
