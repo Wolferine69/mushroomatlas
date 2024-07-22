@@ -140,7 +140,8 @@ def delete_message(request, pk):
             message.delete()
         else:
             message.save()
-        return JsonResponse({'success': True, 'redirect_url': '/outbox/' if message.sender == request.user else '/inbox/'})
+        return (JsonResponse
+                ({'success': True, 'redirect_url': '/outbox/' if message.sender == request.user else '/inbox/'}))
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
