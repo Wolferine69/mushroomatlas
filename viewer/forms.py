@@ -1,5 +1,5 @@
 from django import forms
-from .models import Habitat, Finding, Comment, Recipe, Family, CommentRecipe
+from .models import Habitat, Finding, Comment, Recipe, Family, CommentRecipe, Profile
 
 from viewer.models import Mushroom, Message
 
@@ -67,7 +67,7 @@ class CommentForm(forms.ModelForm):
 class RecipeForm(forms.ModelForm):
     class Meta:
         model = Recipe
-        fields = ['title', 'ingredients', 'instructions', 'image', 'main_mushroom', 'user', 'source']
+        fields = ['title', 'ingredients', 'instructions', 'image', 'main_mushroom', 'source']
         labels = {
             'title': 'Název receptu',
             'ingredients': 'Ingredience',
@@ -75,7 +75,6 @@ class RecipeForm(forms.ModelForm):
             'image': 'Obrázek',
             'source': 'Zdroj obrázku',
             'main_mushroom': 'Hlavní houba',
-            'user': 'Přidal',
         }
 
 
@@ -97,3 +96,7 @@ class CommentRecipeForm(forms.ModelForm):
             'text': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Napište komentář...'}),
             'new': forms.HiddenInput(),
         }
+class RecipeFilterForm(forms.Form):
+    main_mushroom = forms.ModelChoiceField(queryset=Mushroom.objects.all(), required=False, label='Hlavní houba')
+    min_rating = forms.DecimalField(required=False, min_value=0, max_value=5, decimal_places=1, label='Minimální hodnocení')
+    user = forms.ModelChoiceField(queryset=Profile.objects.all(), required=False, label='Přidal uživatel')

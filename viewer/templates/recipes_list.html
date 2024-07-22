@@ -19,6 +19,19 @@
             <a href="{% url 'add_recipe' %}" class="text-white mt-2 bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br
              focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg
               dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2">Přidej recept</a>
+<div class="container mt-4">
+    <form method="get" class="form-inline mb-4">
+        <div class="form-group mr-2">
+            <label for="id_main_mushroom" class="mr-2">Hlavní houba:</label>
+            {{ form.main_mushroom|add_class:"form-control" }}
+        </div>
+        <div class="form-group mr-2">
+            <label for="id_min_rating" class="mr-2">Minimální hodnocení:</label>
+            {{ form.min_rating|add_class:"form-control" }}
+        </div>
+        <div class="form-group mr-2">
+            <label for="id_user" class="mr-2">Přidal uživatel:</label>
+            {{ form.user|add_class:"form-control" }}
         </div>
     {% endif %}
     <article class="grid grid-cols-1 mx-6 md:grid-cols-2 gap-6 mt-4 lg:grid-cols-3 items-start justify-start min-w-xl">

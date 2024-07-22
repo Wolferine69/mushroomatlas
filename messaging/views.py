@@ -140,7 +140,8 @@ def delete_message(request, pk):
             message.delete()
         else:
             message.save()
-        return JsonResponse({'success': True, 'redirect_url': '/outbox/' if message.sender == request.user else '/inbox/'})
+        return (JsonResponse
+                ({'success': True, 'redirect_url': '/outbox/' if message.sender == request.user else '/inbox/'}))
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
@@ -259,7 +260,9 @@ def forward_message(request, message_id, reply=False):
             return redirect('view_outbox')
     else:
         initial_subject = f"Fwd: {original_message.subject}" if not reply else f"Re: {original_message.subject}"
-        initial_content = f"\n\n------ Původní zpráva ------\nDatum: {original_message.timestamp}\nOd: {original_message.sender.username}\nText:\n{original_message.content}\n------ Konec původní zprávy ------\n"
+        initial_content = (f"\n\n------ Původní zpráva ------\nDatum: {original_message.timestamp}\n"
+                           f"Od: {original_message.sender.username}\n"
+                           f"Text:\n{original_message.content}\n------ Konec původní zprávy ------\n")
 
         form = MessageForm(
             initial={

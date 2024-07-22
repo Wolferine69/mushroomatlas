@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from .models import Message, Attachment
 
+
 class MessageForm(forms.ModelForm):
     class Meta:
         model = Message
@@ -26,6 +27,7 @@ class MessageForm(forms.ModelForm):
             self.fields['receiver'].initial = receiver
             self.fields['receiver'].widget = forms.HiddenInput()
 
+
 class AttachmentForm(forms.ModelForm):
     class Meta:
         model = Attachment
@@ -34,7 +36,9 @@ class AttachmentForm(forms.ModelForm):
             'file': 'Soubor',
         }
 
+
 AttachmentFormSet = forms.inlineformset_factory(Message, Attachment, form=AttachmentForm, extra=1, can_delete=False)
+
 
 class SenderFilterForm(forms.Form):
     sender = forms.ModelChoiceField(
@@ -48,6 +52,7 @@ class SenderFilterForm(forms.Form):
         super(SenderFilterForm, self).__init__(*args, **kwargs)
         if user:
             self.fields['sender'].queryset = User.objects.exclude(pk=user.pk).order_by('username')
+
 
 class ReceiverFilterForm(forms.Form):
     receiver = forms.ModelChoiceField(

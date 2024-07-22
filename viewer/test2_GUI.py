@@ -50,7 +50,6 @@ class GuiTestWithSelenium(TestCase):
         time.sleep(3)
         assert 'ForestExplorer' in self.selenium_webdriver.page_source
 
-
     def test_findings_map_firefox(self):
         selenium_webdriver = webdriver.Firefox()
         selenium_webdriver.get('http://127.0.0.1:8000/findings_map/')

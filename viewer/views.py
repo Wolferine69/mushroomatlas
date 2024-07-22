@@ -8,7 +8,7 @@ from accounts.forms import RatingForm
 from accounts.models import Profile
 from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding, Comment, Message, Rating, CommentRecipe
 from .forms import MushroomForm, MushroomFilterForm, FindingForm, CommentForm, RecipeForm, MessageForm, \
-    CommentRecipeForm
+    CommentRecipeForm, RecipeFilterForm
 
 
 # Create your views here.
@@ -64,7 +64,24 @@ class RecipeListView(ListView):
     template_name = 'recipes_list.html'
     context_object_name = 'recipes'
 
-    def recipes_list(request):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = RecipeFilterForm(self.request.GET or None)
+        context['form'] = form
+        recipes = self.get_queryset()
+
+        if form.is_valid():
+            if form.cleaned_data['main_mushroom']:
+                recipes = recipes.filter(main_mushroom=form.cleaned_data['main_mushroom'])
+            if form.cleaned_data['min_rating']:
+                recipes = recipes.filter(rating__gte=form.cleaned_data['min_rating'])
+            if form.cleaned_data['user']:
+                recipes = recipes.filter(user=form.cleaned_data['user'])
+
+        context['recipes'] = recipes
+        return context
+
+    def recipes_list(self, request):
         recipes = Recipe.objects.all().select_related('user')
         return render(request, 'recipes_list.html', {'recipes': recipes})
 
@@ -123,10 +140,6 @@ class TipListView(ListView):
     template_name = 'tip_list.html'
     context_object_name = 'tips'
 
-    def tips_list(request):
-        tips = Tip.objects.all().select_related('user')
-        return render(request, 'your_template.html', {'tips': tips})
-
 
 class TipDetailView(DetailView):
     model = Tip
@@ -152,9 +165,10 @@ def add_recipe(request):
     if request.method == 'POST':
         form = RecipeForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            recipe = form.save(commit=False)  # Neuložíme hned do databáze
+            recipe.user = request.user.profile  # Nastavíme uživatele podle přihlášeného uživatele
+            recipe.save()  # Uložíme recept do databáze
             return redirect('recipes_list')
-
     else:
         form = RecipeForm()
     return render(request, 'recipe_create.html', {'form': form})

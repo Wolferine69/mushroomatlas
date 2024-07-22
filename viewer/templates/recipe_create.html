@@ -42,29 +42,4 @@
         </form>
     </section>
 
-    <script>
-        var map = L.map('map').setView([49.5, 15.5], 7); // Initial display settings
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
-        }).addTo(map);
-
-        var marker;
-
-
-        // Function to add or move marker on click
-        function onMapClick(e) {
-            if (marker) {
-                // Moves the marker if it exists
-                marker.setLatLng(e.latlng);
-            } else {
-                // If the marker does not exist, it creates one
-                marker = L.marker(e.latlng).addTo(map);
-            }
-            document.getElementById('id_latitude').value = e.latlng.lat;
-            document.getElementById('id_longitude').value = e.latlng.lng;
-        }
-
-        map.on('click', onMapClick);
-    </script>
 {% endblock %}
