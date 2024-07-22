@@ -67,7 +67,7 @@ class CommentForm(forms.ModelForm):
 class RecipeForm(forms.ModelForm):
     class Meta:
         model = Recipe
-        fields = ['title', 'ingredients', 'instructions', 'image', 'main_mushroom', 'user', 'source']
+        fields = ['title', 'ingredients', 'instructions', 'image', 'main_mushroom', 'source']
         labels = {
             'title': 'Název receptu',
             'ingredients': 'Ingredience',
