@@ -2,9 +2,10 @@
 {% load static %}
 
 {% block content %}
-<h2>Nálezy hub</h2>
-<div style="display: flex;" >
-    <div style="width: 70%;">
+
+<section class="flex flex-col items-center justify-center p-12 md:bg-emerald-950 max-h-3xl shadow-4xl rounded-lg">
+    <div id="map" style="height: 500px; width: 100%;" class="rounded-lg border-2 border-emerald-500 mb-4"></div>
+    <article class="p-4 my-2 bg-emerald-900 rounded-lg flex flex-col items-center">
 
         <form id="filter-form">
             <label for="mushroom-filter">Druh houby:</label>
@@ -33,20 +34,22 @@
             </select>
         </form>
         {% if user.is_authenticated %}
-            <a href="{% url 'add_finding' %}" class="btn btn-primary">Přidej nález</a>
+            <a href="{% url 'add_finding' %}" class="text-white my-2 bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br
+             focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg
+              dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2">Přidej nález</a>
         {% endif %}
 
-    </div>
+    </article>
 
-    <div id="details" style="width: 30%; padding-left: 20px;">
+    <article id="details" class="p-4 my-2 bg-emerald-900 rounded-lg flex flex-col items-center">
         <h3>Detaily nálezu</h3>
         <div id="details-content">
             Klikněte na marker na mapě pro zobrazení detailů.
         </div>
-    </div>
-</div>
+    </article>
+</section>
 
-<div id="map" style="height: 500px; width: 100%;"></div>
+
 
 
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -107,9 +110,9 @@
             <strong>Datum nálezu:</strong> ${finding.date_found}</p>
         `;
         if (finding.image) {
-            detailsContent += `<p><img src="${finding.image}" alt="obrázek nálezu" style="max-width: 100%; height: auto;"></p>`;
+            detailsContent += `<p><img src="${finding.image}" alt="obrázek nálezu" class="max-w-full rounded-lg"></p>`;
         }
-        detailsContent += `<h4>Komentáře</h4>`;
+        detailsContent += `<h4>Komentáře:</h4>`;
         if (finding.comments.length > 0) {
             finding.comments.forEach(comment => {
                 detailsContent += `<p><strong>${comment.user}:</strong> ${comment.text} <br><em>${comment.created_at}</em></p>`;
@@ -117,7 +120,7 @@
         } else {
             detailsContent += `<p>Žádné komentáře.</p>`;
         }
-        detailsContent += `<a href="/add_comment/${finding.id}/" class="btn btn-primary">Přidat komentář</a>`;
+        detailsContent += `<a href="/add_comment/${finding.id}/" class="underline">Přidat komentář</a>`;
         document.getElementById('details-content').innerHTML = detailsContent;
     }
 
@@ -215,5 +218,26 @@
     document.getElementById('edibility-filter').addEventListener('change', filterMarkers);
     document.getElementById('time-filter').addEventListener('change', filterMarkers);
 </script>
+    <script defer>
+                {#JS to handle mobile menu#}
+                const initAppHome = () => {
+                    const hamburgerBtn = document.getElementById('hamburger-button')
+                    const mobileMenu = document.getElementById('mobile-menu')
+                    const map = document.getElementById('map')
+
+
+                    const toggleHidden = () => {
+                        map.classList.toggle('hidden')
+                        map.classList.toggle('flex')
+                    }
+
+                    hamburgerBtn.addEventListener('click', toggleHidden)
+                    mobileMenu.addEventListener('click', toggleHidden)
+
+                }
+
+                document.addEventListener('DOMContentLoaded', initAppHome)
+
+    </script>
 {% endblock %}
 

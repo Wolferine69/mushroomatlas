@@ -16,7 +16,7 @@ class GuiTestWithSelenium(TestCase):
     def test_home_page_chrome(self):
         selenium_webdriver = webdriver.Chrome()
         selenium_webdriver.get('http://127.0.0.1:8000/')
-        assert 'Vítej v našem houbovém světě!' in selenium_webdriver.page_source
+        assert 'Jsme MushroomAtlas. Milujeme houby. A proto jste tady. Zaregistrujte se a procházejte rozsáhlou databázi hub, receptů a tipů. Tak ať rostou! © 2024 MushroomAtlas. All rights reserved.' in selenium_webdriver.page_source
 
     def test_signup(self):
         selenium_webdriver = webdriver.Firefox()
