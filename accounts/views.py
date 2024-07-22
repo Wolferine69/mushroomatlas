@@ -10,7 +10,7 @@ from django.forms import Textarea, CharField, ImageField
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, TemplateView
-
+from messaging.models import Message
 from accounts.forms import UserProfileUpdateForm
 from accounts.models import Profile
 
@@ -18,6 +18,23 @@ from accounts.models import Profile
 # Create your views here.
 class SubmittableLoginView(LoginView):
     template_name = 'login.html'
+
+    def form_valid(self, form):
+        # Call the parent's form_valid method to log the user in
+        response = super().form_valid(form)
+
+        # Get the count of unread messages for the logged-in user
+        new_messages_count = Message.objects.filter(
+            receiver=self.request.user,
+            is_read=False,
+            is_trashed_by_receiver=False,
+            is_deleted_by_receiver=False
+        ).count()
+
+        # Store the new messages count in the session
+        self.request.session['new_messages_count'] = new_messages_count
+
+        return response
 
 
 class RegistrationForm(UserCreationForm):
@@ -58,7 +75,7 @@ class AccountsListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
-                'viewer.add_mushroom')
+            'viewer.add_mushroom')
         return context
 
 
@@ -67,9 +84,15 @@ class AccountDetailView(LoginRequiredMixin, DetailView):
     template_name = 'account_detail.html'
     context_object_name = 'account'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.get_object().user  # Assuming Profile has a one-to-one relationship with User
+        context['sent_messages'] = Message.objects.filter(sender=user).order_by('-timestamp')
+        return context
+
 
 class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
-    model = User
+    model = Profile
     form_class = UserProfileUpdateForm
     template_name = 'profile_update.html'
     success_url = reverse_lazy('profile_update')
@@ -80,6 +103,7 @@ class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm('viewer.add_mushroom')
+        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
+            'viewer.add_mushroom')
         return context
 

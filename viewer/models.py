@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -20,6 +22,7 @@ class Family(models.Model):
 
 
 class Habitat(models.Model):
+    """Model representing a habitat of a mushroom"""
     name = models.CharField(max_length=50)
 
     def __str__(self):
@@ -71,7 +74,7 @@ class Recipe(models.Model):
     image = models.ImageField(upload_to='recipe_images/', null=True, blank=True)
     main_mushroom = models.ForeignKey(Mushroom, on_delete=models.CASCADE, related_name='recipes', null=True, blank=True)
     source = models.CharField(max_length=200, null=True, blank=True)
-    rating = models.IntegerField(default=0)
+    rating = models.DecimalField(max_digits=2, decimal_places=1, default=0.0)
 
     class Meta:
         ordering = ['title']
@@ -80,22 +83,31 @@ class Recipe(models.Model):
         return self.title
 
     def update_average_rating(self):
-        ratings = self.ratings.all()
-        if ratings.count() > 0:
-            total_rating = sum(rating.rating for rating in ratings)
-            self.rating = total_rating / ratings.count()
+        ratings = Rating.objects.filter(recipe=self)
+        if ratings.exists():
+            total_rating = sum(rating.hodnoceni for rating in ratings)
+            average_rating = total_rating / ratings.count()
+            self.rating = round(Decimal(average_rating), 1)  # zaokrouhlení na jedno desetinné místo
         else:
-            self.rating = 0
+            self.rating = Decimal('0.0')
         self.save()
+
+    def num_ratings(self):
+        return Rating.objects.filter(recipe=self).count()
 
 
 class Rating(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='ratings')
+    """Model representing a rating of recipe"""
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='hodnoceni')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    rating = models.IntegerField(default=1, choices=((1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')))
+    hodnoceni = models.IntegerField(default=1, choices=((1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')))
+
+    def __str__(self):
+        return f"{self.recipe.title} - {self.user.username}"
 
 
 class Tip(models.Model):
+    """Model representing a tip or trick"""
     user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='tip', null=True, blank=True)
     title = models.CharField(max_length=500)
     content = models.TextField()
@@ -122,3 +134,28 @@ class Comment(models.Model):
     def __str__(self):
         return f"Comment by {self.user.user.username} on {self.finding}"
 
+
+class Message(models.Model):
+    sender = models.ForeignKey(User, related_name='sent_messages', on_delete=models.CASCADE)
+    receiver = models.ForeignKey(User, related_name='received_messages', on_delete=models.CASCADE)
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message from {self.sender} to {self.receiver} at {self.timestamp}"
+
+
+class CommentRecipe(models.Model):
+    """Model representing a comment on a recipe."""
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='comments_recipe')
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='comments')
+    text = models.TextField()
+    image = models.ImageField(upload_to='comments_images/', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    new = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Comment by {self.user.user.username} on {self.recipe}"

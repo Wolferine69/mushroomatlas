@@ -6,8 +6,9 @@ from django.views.generic import ListView, DetailView, CreateView, TemplateView
 
 from accounts.forms import RatingForm
 from accounts.models import Profile
-from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding, Comment
-from .forms import MushroomForm, MushroomFilterForm, FindingForm, CommentForm, RecipeForm
+from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding, Comment, Message, Rating, CommentRecipe
+from .forms import MushroomForm, MushroomFilterForm, FindingForm, CommentForm, RecipeForm, MessageForm, \
+    CommentRecipeForm
 
 
 # Create your views here.
@@ -32,11 +33,11 @@ class MushroomListView(ListView):
                 mushrooms = mushrooms.filter(edibility=form.cleaned_data['edibility'])
             if form.cleaned_data['habitat']:
                 mushrooms = mushrooms.filter(habitats=form.cleaned_data['habitat'])
+            if form.cleaned_data['family']:
+                mushrooms = mushrooms.filter(family=form.cleaned_data['family'])
 
         context['mushrooms'] = mushrooms
         context['habitats'] = Habitat.objects.all()
-        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
-            'viewer.add_mushroom')
         return context
 
 
@@ -45,35 +46,17 @@ class MushroomDetailView(DetailView):
     template_name = 'mushroom_detail.html'
     context_object_name = 'mushroom'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
-            'viewer.add_mushroom')
-        return context
-
 
 class FamilyListView(ListView):
     model = Family
     template_name = 'family_list.html'
     context_object_name = 'families'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
-            'viewer.add_mushroom')
-        return context
-
 
 class FamilyDetailView(DetailView):
     model = Family
     template_name = 'family_detail.html'
     context_object_name = 'family'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
-            'viewer.add_mushroom')
-        return context
 
 
 class RecipeListView(ListView):
@@ -85,40 +68,55 @@ class RecipeListView(ListView):
         recipes = Recipe.objects.all().select_related('user')
         return render(request, 'recipes_list.html', {'recipes': recipes})
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
-            'viewer.add_mushroom')
-        return context
-
 
 class RecipeDetailView(DetailView):
-    def get(self, request, pk):
-        recipe = get_object_or_404(Recipe, pk=pk)
-        form = RatingForm()
-        context = {
-            'recipe': recipe,
-            'form': form,
-        }
-        return render(request, 'recipe_detail.html', context)
+    model = Recipe
+    template_name = 'recipe_detail.html'
 
-    def post(self, request, pk):
-        recipe = get_object_or_404(Recipe, pk=pk)
-        form = RatingForm(request.POST, user=request.user)
-        if form.is_valid():
-            form.instance.recipe = recipe
-            form.instance.user = request.user
-            form.save()
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        recipe = self.get_object()
+        user = self.request.user
+        context['form'] = RatingForm(user=user, recipe=recipe)
+        context['comment_form'] = CommentRecipeForm()
+        context['comments'] = recipe.comments.all()
 
-            # Aktualizace průměrného hodnocení receptu
-            recipe.update_average_rating()
+        if user.is_authenticated:
+            context['has_rated'] = Rating.objects.filter(recipe=recipe, user=user).exists()
+        else:
+            context['has_rated'] = False
 
-            return redirect('recipe_detail', pk=pk)
-        context = {
-            'recipe': recipe,
-            'form': form,
-        }
-        return render(request, 'recipe_detail.html', context)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        recipe = self.object
+        user = request.user
+
+        if 'rating' in request.POST:
+            form = RatingForm(request.POST, user=user, recipe=recipe)
+            if user.is_authenticated:
+                if form.is_valid():
+                    has_rated = Rating.objects.filter(recipe=recipe, user=user).exists()
+                    if not has_rated:
+                        form.save()
+                    recipe.update_average_rating()
+                    return redirect('recipe_detail', pk=recipe.pk)
+        else:
+            comment_form = CommentRecipeForm(request.POST, request.FILES)
+            if comment_form.is_valid():
+                comment = comment_form.save(commit=False)
+                comment.recipe = recipe
+                comment.user = user.profile
+                comment.new = True
+                comment.save()
+                return redirect('recipe_detail', pk=recipe.pk)
+
+        context = self.get_context_data()
+        context['form'] = form
+        context['comment_form'] = comment_form
+        return self.render_to_response(context)
+
 
 class TipListView(ListView):
     model = Tip
@@ -129,23 +127,11 @@ class TipListView(ListView):
         tips = Tip.objects.all().select_related('user')
         return render(request, 'your_template.html', {'tips': tips})
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
-            'viewer.add_mushroom')
-        return context
-
 
 class TipDetailView(DetailView):
     model = Tip
     template_name = 'tip_detail.html'
     context_object_name = 'tip'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
-            'viewer.add_mushroom')
-        return context
 
 
 @login_required
@@ -188,8 +174,12 @@ class FindingsMapView(ListView):
             finding.latitude = str(finding.latitude).replace(',', '.')
             finding.longitude = str(finding.longitude).replace(',', '.')
         context['findings'] = findings
-        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
-            'viewer.add_mushroom')
+
+        # Přidání vybraného nálezu do kontextu, pokud je pk v URL
+        pk = self.kwargs.get('pk')
+        if pk:
+            context['selected_finding'] = get_object_or_404(Finding, id=pk)
+
         return context
 
 
@@ -228,11 +218,6 @@ class MushroomAddPermissionRequiredMixin(UserPassesTestMixin):
 class HomePageView(MushroomAddPermissionRequiredMixin, TemplateView):
     template_name = 'base.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['can_add_mushroom'] = self.request.user.has_perm('viewer.add_mushroom')
-        return context
-
 
 class CommentsListView(LoginRequiredMixin, ListView):
     model = Comment
@@ -243,8 +228,48 @@ class CommentsListView(LoginRequiredMixin, ListView):
         user_profile = self.request.user.profile
         return Comment.objects.filter(finding__user=user_profile)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
-            'viewer.add_mushroom')
-        return context
+
+"""
+@login_required
+def send_message(request):
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.sender = request.user
+            message.save()
+            return redirect('inbox')
+    else:
+        form = MessageForm()
+    return render(request, 'messaging/send_message.html', {'form': form})
+"""
+
+
+@login_required
+def inbox(request):
+    messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
+    return render(request, 'messaging/inbox.html', {'messages': messages})
+
+
+def mark_comment_read(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    comment.new = False
+    comment.save()
+    return redirect('findings_map_with_pk', pk=comment.finding.id)
+
+
+class CommentsRecipeListView(LoginRequiredMixin, ListView):
+    model = CommentRecipe
+    template_name = 'comments_recipe_list.html'
+    context_object_name = 'comments_recipe'
+
+    def get_queryset(self):
+        user_profile = self.request.user.profile
+        return CommentRecipe.objects.filter(recipe__user=user_profile)
+
+
+def mark_comment_recipe_read(request, comment_id):
+    comment = get_object_or_404(CommentRecipe, id=comment_id)
+    comment.new = False
+    comment.save()
+    return redirect('recipe_detail', pk=comment.recipe.id)

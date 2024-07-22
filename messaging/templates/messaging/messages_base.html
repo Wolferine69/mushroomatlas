@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="list-group">
+            <a href="{% url 'send_message' %}" class="list-group-item list-group-item-action">Nová zpráva</a>
+            <a href="{% url 'view_inbox' %}" class="list-group-item list-group-item-action">
+                Přijaté zprávy ({{ received_count }}/{{ unread_count }})
+            </a>
+            <a href="{% url 'view_outbox' %}" class="list-group-item list-group-item-action">
+                Odeslané zprávy ({{ sent_messages_count }})
+            </a>
+            <a href="{% url 'view_trash' %}" class="list-group-item list-group-item-action">
+                Koš ({{ trashed_messages_count }})
+            </a>
+        </div>
+    </div>
+    <div class="col-md-9">
+        {% block messages_content %}
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}

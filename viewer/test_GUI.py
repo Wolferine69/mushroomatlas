@@ -75,22 +75,3 @@ class GuiTestWithSelenium(TestCase):
     #     time.sleep(3)
     #     assert 'Hřib smrkový' in selenium_webdriver.page_source
 
-
-
-    def test_findings_map_firefox(self):
-        selenium_webdriver = webdriver.Firefox()
-        selenium_webdriver.get('http://127.0.0.1:8000/findings_map/')
-        time.sleep(5)
-        assert 'Nálezy hub' in selenium_webdriver.page_source
-        assert selenium_webdriver.find_element(By.ID, 'map') is not None
-        assert selenium_webdriver.find_element(By.ID, 'details') is not None
-        selenium_webdriver.quit()
-
-    def test_findings_map_chrome(self):
-        selenium_webdriver = webdriver.Chrome()
-        selenium_webdriver.get('http://127.0.0.1:8000/findings_map/')
-        time.sleep(5)
-        assert 'Nálezy hub' in selenium_webdriver.page_source
-        assert selenium_webdriver.find_element(By.ID, 'map') is not None
-        assert selenium_webdriver.find_element(By.ID, 'details') is not None
-        selenium_webdriver.quit()

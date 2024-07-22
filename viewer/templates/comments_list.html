@@ -4,11 +4,11 @@
 <ul>
     {% for comment in comments %}
         <li>
-            <a href="{% url 'findings_map' %}?finding={{ comment.finding.id }}">
+            <a href="{% url 'mark_comment_read' comment.id %}">
                 {% if comment.new %}
-                    <mark><strong>{{ comment.user }} | {{ comment.finding.mushroom.name_cz }} | {{ comment.text }} | {{ comment.created_at }}</strong></mark>
+                    <mark><strong>{{ comment.user }} | {{ comment.finding.mushroom.name_cz }} | {{ comment.created_at }}</strong></mark>
                 {% else %}
-                    {{ comment.user }} | {{ comment.finding.mushroom.name_cz }} | {{ comment.text }} | {{ comment.created_at }}
+                    {{ comment.user }} | {{ comment.finding.mushroom.name_cz }} | {{ comment.created_at }}
                 {% endif %}
             </a>
         </li>

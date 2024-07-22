@@ -8,5 +8,43 @@
     {% endif %}
 <p><strong>{{ account.user.first_name }} {{ account.user.last_name }}</strong></p>
     <p>{{ account.biography }}</p>
+    <a href="{% url 'accounts_list' %}" class="btn btn-primary">Zpět na seznam uživatelů</a>
 
+<h3>Odeslané zprávy</h3>
+<ul>
+    {% for message in sent_messages %}
+        <li>
+            <strong>Od:</strong> {{ message.receiver.username }}<br>
+            <strong>Datum odeslání:</strong> {{ message.timestamp }}<br>
+            <strong>Předmět:</strong> {{ message.subject }}<br>
+            <p>{{ message.content }}</p>
+            <a href="{% url 'send_message' receiver_username=message.receiver.username replied_to_id=message.id %}" class="btn btn-primary">Odpovědět</a>
+            <form method="post" action="{% url 'delete_message' message.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Smazat</button>
+            </form>
+        </li>
+    {% empty %}
+        <li>Nebyly odeslány žádné zprávy.</li>
+    {% endfor %}
+</ul>
+
+<h3>Přijaté zprávy</h3>
+<ul>
+    {% for message in received_messages %}
+        <li>
+            <strong>Od:</strong> {{ message.sender.username }}<br>
+            <strong>Datum přijetí:</strong> {{ message.timestamp }}<br>
+            <strong>Předmět:</strong> {{ message.subject }}<br>
+            <p>{{ message.content }}</p>
+            <a href="{% url 'send_message' receiver_username=message.sender.username replied_to_id=message.id %}" class="btn btn-primary">Odpovědět</a>
+            <form method="post" action="{% url 'delete_message' message.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Smazat</button>
+            </form>
+        </li>
+    {% empty %}
+        <li>Nebyly přijaty žádné zprávy.</li>
+    {% endfor %}
+</ul>
 {% endblock %}

@@ -96,7 +96,7 @@
 
 
     var markers = [];
-    var selectedFindingId = new URLSearchParams(window.location.search).get('finding');
+    var selectedFindingId = "{{ selected_finding.id }}" || null;
 
     // Funkce pro zobrazení detailů nálezu
     function showDetails(finding) {
@@ -109,7 +109,7 @@
         if (finding.image) {
             detailsContent += `<p><img src="${finding.image}" alt="obrázek nálezu" style="max-width: 100%; height: auto;"></p>`;
         }
-        detailsContent += `<h4>Komentáře:</h4>`;
+        detailsContent += `<h4>Komentáře</h4>`;
         if (finding.comments.length > 0) {
             finding.comments.forEach(comment => {
                 detailsContent += `<p><strong>${comment.user}:</strong> ${comment.text} <br><em>${comment.created_at}</em></p>`;
@@ -151,9 +151,7 @@
     });
     markers.push(marker);
     marker.addTo(map);
-    console.log(marker.findingId,"mid")
-    console.log(selectedFindingId,"cid")
-    if (marker.findingId === selectedFindingId) {
+    if (selectedFindingId && selectedFindingId == "{{ finding.id }}") {
         map.setView(marker.getLatLng(), 13);
         showDetails({
             id: "{{ finding.id }}",

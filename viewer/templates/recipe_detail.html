@@ -44,6 +44,8 @@
     <article class="p-4 my-2 bg-emerald-900 rounded-lg flex flex-col items-center border-2 border-emerald-700">
         <!-- Zobrazit aktuální hodnocení -->
         <p><strong>Celkové hodnocení: </strong> {{ recipe.rating }}</p>
+<!-- Zobrazit aktuální hodnocení -->
+<p><strong>Celkové hodnocení: </strong> {{ recipe.rating }} <span style="font-size: small;">({{ recipe.num_ratings }} hodnocení)</span></p>
 
         <!-- Formulář pro přidání hodnocení -->
         <form method="post">
@@ -55,4 +57,53 @@
         </form>
     </article>
     </section>
+<!-- Formulář pro přidání hodnocení -->
+{% if user.is_authenticated %}
+    {% if not has_rated %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="hidden" name="rating" value="true">
+            <button type="submit" class="btn btn-primary">Odeslat hodnocení</button>
+        </form>
+    {% else %}
+        <p>Již jste tento recept ohodnotili.</p>
+    {% endif %}
+{% else %}
+    <p>Pro přidání hodnocení se musíte <a href="{% url 'login' %}">přihlásit</a>.</p>
+{% endif %}
+
+<h2>Komentáře</h2>
+{% if comments %}
+    <ul>
+        {% for comment in comments %}
+            <li>
+                <strong>{{ comment.user.user.username }}:</strong> {{ comment.text }} <br>
+                <em>{{ comment.created_at }}</em>
+                {% if comment.image %}
+                    <div>
+                        <img src="{{ comment.image.url }}" alt="Komentář obrázek" style="max-width: 300px; height: auto;">
+                    </div>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Zatím žádné komentáře. Buďte první, kdo přidá komentář!</p>
+{% endif %}
+
+<!-- Formulář pro přidání komentáře -->
+{% if user.is_authenticated %}
+    <h3>Přidat komentář</h3>
+    <form method="post" action="{% url 'recipe_detail' recipe.pk %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        <button type="submit" class="btn btn-primary">Odeslat komentář</button>
+    </form>
+{% else %}
+    <p>Pro přidání komentáře se musíte <a href="{% url 'login' %}">přihlásit</a>.</p>
+{% endif %}
+
+<a href="{% url 'recipes_list' %}" class="btn btn-secondary">Zpět na seznam receptů</a>
+
 {% endblock %}

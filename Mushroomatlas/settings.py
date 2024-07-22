@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
 from pathlib import Path
-
 import sys
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,6 +47,9 @@ INSTALLED_APPS = [
     'django_browser_reload',
     'crispy_forms',
     'crispy_tailwind',
+    'backupbase',
+    'messaging',
+    'django_extensions',
 ]
 
 TAILWIND_APP_NAME = 'theme'
@@ -79,7 +81,7 @@ ROOT_URLCONF = 'Mushroomatlas.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -87,6 +89,12 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'viewer.context_processors.new_comments_count',
+                'viewer.context_processors.new_messages_count',
+                'viewer.context_processors.sent_messages_count',
+                'viewer.context_processors.trashed_messages_count',
+                'viewer.context_processors.can_add_mushroom',
+                'viewer.context_processors.new_comments_recipe_count',
             ],
         },
     },
@@ -185,3 +193,8 @@ REST_FRAMEWORK = {
 }
 
 CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']
+
+GRAPH_MODELS = {
+  'all_applications': True,
+  'graph_models': True,
+}

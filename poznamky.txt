@@ -1,4 +1,5 @@
 Example of naming commits
+
 Prefix:
 feature - adding a new functionality as part of a task
 fix - bug fix as part of added functionality
@@ -8,13 +9,17 @@ test - adding unit tests as part of the functionality
 
 
 registrovaní uživatelé:
-username:                       password:
-MushroomHunter                  P4s$w0rd1!
-NatureLover22                   Gr33nThum8&
-ForestExplorer                  W1ldF0r3st@
-ShroomMaster                    FungiL0v3r$
-MycoFanatic                     M1c0Fan@t1c
-FungiFreak                      FunGuy123!
+username:                       password:               Jméno:
+MushroomHunter                  P4s$w0rd1!              Pavel
+NatureLover22                   Gr33nThum8&             Marcel
+ForestExplorer                  W1ldF0r3st@             Jan Novák
+ShroomMaster                    FungiL0v3r$             Jiří
+MycoFanatic                     M1c0Fan@t1c             Kateřina
+FungiFreak                      FunGuy123!              Alena
+FungiEnthusiast                 Z6y#L9p@T1w             Václav
+FungiFanatic                    N8tur3L0v3r!            Tomáš
+MushroomQueen                   H4rVesT!ng              Petra
+NatureWalker                    G3n@L8mush              Šimon
 
 
 Záloha (po upravě v databázi, zalohu přidat do gitu):
