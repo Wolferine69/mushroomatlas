@@ -64,7 +64,7 @@ class RecipeListView(ListView):
     template_name = 'recipes_list.html'
     context_object_name = 'recipes'
 
-    def recipes_list(request):
+    def recipes_list(self, request):
         recipes = Recipe.objects.all().select_related('user')
         return render(request, 'recipes_list.html', {'recipes': recipes})
 
