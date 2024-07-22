@@ -15,7 +15,7 @@
         {% for message in sent_messages %}
             <li>
                 <input type="checkbox" name="message_ids" value="{{ message.id }}">
-                <a href="{% url 'message_detail' message.id %}?origin=outbox">
+                <a href="{% url 'message_detail' message.id %}?origin=outbox{% if user_id %}&user_id={{ user_id }}{% endif %}">
                     <strong>{{ message.timestamp }} - Komu: {{ message.receiver.username }} - Předmět: {{ message.subject }}</strong>
                 </a>
                 <p>{{ message.content|truncatewords:10 }}</p>

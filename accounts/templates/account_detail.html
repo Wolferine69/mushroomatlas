@@ -10,47 +10,47 @@
 {% endif %}
 <p><strong>{{ account.user.first_name }} {{ account.user.last_name }}</strong></p>
 <p>{{ account.biography }}</p>
-<a href="{% url 'accounts_list' %}" class="btn btn-primary">Back to User List</a>
+<a href="{% url 'accounts_list' %}" class="btn btn-primary">Zpět na seznam uživatelů</a>
 
 <hr>
 
-<h3>Messages received from {{ account.user.username }}</h3>
+<h3>Přijaté zprávy od {{ account.user.username }}:</h3>
 <ul>
     {% for message in received_messages %}
         <li>
             <input type="checkbox" name="message_ids" value="{{ message.id }}">
             <a href="{% url 'message_detail' message.id %}">
                 {% if not message.is_read %}
-                    <mark><strong>{{ message.timestamp }} - From: {{ message.sender.username }} - Subject: {{ message.subject }}</strong></mark>
+                    <mark><strong>{{ message.timestamp }} - Od: {{ message.sender.username }} - Předmět: {{ message.subject }}</strong></mark>
                 {% else %}
-                    {{ message.timestamp }} - From: {{ message.sender.username }} - Subject: {{ message.subject }}
+                    {{ message.timestamp }} - Od: {{ message.sender.username }} - Předmět: {{ message.subject }}
                 {% endif %}
             </a>
             <p>{{ message.content|truncatewords:10 }}</p>
         </li>
     {% empty %}
-        <li>No messages from {{ account.user.username }}.</li>
+        <li>Žádné zprávy od {{ account.user.username }}.</li>
     {% endfor %}
 </ul>
 
 <hr>
 
-<h3>Messages sent to {{ account.user.username }}</h3>
+<h3>Odeslané zprávy od {{ account.user.username }}:</h3>
 <ul>
     {% for message in sent_messages %}
         <li>
             <input type="checkbox" name="message_ids" value="{{ message.id }}">
             <a href="{% url 'message_detail' message.id %}">
                 {% if not message.is_read %}
-                    <mark><strong>{{ message.timestamp }} - To: {{ message.receiver.username }} - Subject: {{ message.subject }}</strong></mark>
+                    <mark><strong>{{ message.timestamp }} - Komu: {{ message.receiver.username }} - Předmět: {{ message.subject }}</strong></mark>
                 {% else %}
-                    {{ message.timestamp }} - To: {{ message.receiver.username }} - Subject: {{ message.subject }}
+                    {{ message.timestamp }} - Komu: {{ message.receiver.username }} - Předmět: {{ message.subject }}
                 {% endif %}
             </a>
             <p>{{ message.content|truncatewords:10 }}</p>
         </li>
     {% empty %}
-        <li>No messages to {{ account.user.username }}.</li>
+        <li>Žádné zprávy pro {{ account.user.username }}.</li>
     {% endfor %}
 </ul>
 {% endblock %}

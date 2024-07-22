@@ -286,6 +286,8 @@ def forward_message(request, message_id, reply=False):
 def view_message_detail(request, message_id):
     message = get_object_or_404(Message, id=message_id)
     origin = request.GET.get('origin', 'inbox')
+    user_id = request.GET.get('user_id', None)
+
     if request.user not in [message.receiver, message.sender]:
         return redirect('view_inbox')
 
@@ -297,7 +299,8 @@ def view_message_detail(request, message_id):
         'unread_count': unread_count,
         'sent_count': sent_count,
         'trashed_count': trashed_count,
-        'origin': origin
+        'origin': origin,
+        'user_id': user_id
     })
 
 

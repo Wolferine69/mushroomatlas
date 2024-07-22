@@ -15,7 +15,7 @@
         {% for message in messages %}
             <li>
                 <input type="checkbox" name="message_ids" value="{{ message.id }}">
-                <a href="{% url 'message_detail' message.id %}?origin=inbox">
+                <a href="{% url 'message_detail' message.id %}?origin=inbox{% if user_id %}&user_id={{ user_id }}{% endif %}">
                     {% if not message.is_read %}
                         <mark><strong>{{ message.timestamp }} - Od: {{ message.sender.username }} - Předmět: {{ message.subject }}</strong></mark>
                     {% else %}
