@@ -8,7 +8,7 @@ from accounts.forms import RatingForm
 from accounts.models import Profile
 from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding, Comment, Message, Rating, CommentRecipe
 from .forms import MushroomForm, MushroomFilterForm, FindingForm, CommentForm, RecipeForm, MessageForm, \
-    CommentRecipeForm
+    CommentRecipeForm, RecipeFilterForm
 
 
 # Create your views here.
@@ -63,6 +63,23 @@ class RecipeListView(ListView):
     model = Recipe
     template_name = 'recipes_list.html'
     context_object_name = 'recipes'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = RecipeFilterForm(self.request.GET or None)
+        context['form'] = form
+        recipes = self.get_queryset()
+
+        if form.is_valid():
+            if form.cleaned_data['main_mushroom']:
+                recipes = recipes.filter(main_mushroom=form.cleaned_data['main_mushroom'])
+            if form.cleaned_data['min_rating']:
+                recipes = recipes.filter(rating__gte=form.cleaned_data['min_rating'])
+            if form.cleaned_data['user']:
+                recipes = recipes.filter(user=form.cleaned_data['user'])
+
+        context['recipes'] = recipes
+        return context
 
     def recipes_list(self, request):
         recipes = Recipe.objects.all().select_related('user')

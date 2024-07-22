@@ -6,10 +6,16 @@
 <div class="container mt-4">
     <form method="get" class="form-inline mb-4">
         <div class="form-group mr-2">
-            <!-- Vaše filtrovací pole -->
+            <label for="id_main_mushroom" class="mr-2">Hlavní houba:</label>
+            {{ form.main_mushroom|add_class:"form-control" }}
         </div>
         <div class="form-group mr-2">
-            <!-- Další filtrovací pole -->
+            <label for="id_min_rating" class="mr-2">Minimální hodnocení:</label>
+            {{ form.min_rating|add_class:"form-control" }}
+        </div>
+        <div class="form-group mr-2">
+            <label for="id_user" class="mr-2">Přidal uživatel:</label>
+            {{ form.user|add_class:"form-control" }}
         </div>
         <button type="submit" class="btn btn-primary">Filtrovat</button>
     </form>
@@ -34,7 +40,3 @@
     </div>
 </div>
 {% endblock %}
-
-
-
-
