@@ -148,9 +148,10 @@ def add_recipe(request):
     if request.method == 'POST':
         form = RecipeForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            recipe = form.save(commit=False)  # Neuložíme hned do databáze
+            recipe.user = request.user.profile  # Nastavíme uživatele podle přihlášeného uživatele
+            recipe.save()  # Uložíme recept do databáze
             return redirect('recipes_list')
-
     else:
         form = RecipeForm()
     return render(request, 'recipe_create.html', {'form': form})

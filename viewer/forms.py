@@ -75,7 +75,6 @@ class RecipeForm(forms.ModelForm):
             'image': 'Obrázek',
             'source': 'Zdroj obrázku',
             'main_mushroom': 'Hlavní houba',
-            'user': 'Přidal',
         }
 
 
