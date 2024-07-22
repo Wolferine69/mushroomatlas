@@ -123,7 +123,7 @@ class TipListView(ListView):
     template_name = 'tip_list.html'
     context_object_name = 'tips'
 
-    def tips_list(request):
+    def tips_list(self, request):
         tips = Tip.objects.all().select_related('user')
         return render(request, 'your_template.html', {'tips': tips})
 

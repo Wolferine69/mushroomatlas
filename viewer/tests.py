@@ -10,7 +10,6 @@ from viewer.models import Family, Mushroom, Finding, Recipe, Comment, Habitat
 class FamilyModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-
         Family.objects.create(
             name='test_name',
             name_latin='test_name_latin',
@@ -21,7 +20,6 @@ class FamilyModelTest(TestCase):
     def test_family_name_latin(self):
         family = Family.objects.get(id=1)
         self.assertEqual(family.name_latin, 'test_name_latin', msg="test_family_name_latin: PASSED")
-
 
     def test_family_str(self):
         family = Family.objects.get(id=1)
@@ -39,7 +37,6 @@ class FamilyModelTest(TestCase):
 class MushroomModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-
         cls.habitats = Habitat.objects.create(name='test_habitat')
 
         # Create a test family
@@ -54,7 +51,7 @@ class MushroomModelTest(TestCase):
         )
         cls.test_mushroom.habitats.set([cls.habitats])
 
-    def test_mushroom_name_cz(self): #TODO: find out why this test fails
+    def test_mushroom_name_cz(self):  #TODO: find out why this test fails
         mushroom = Mushroom.objects.get(id=1)
         self.assertEqual(mushroom.name_cz, 'test_name_cz')
 
@@ -79,7 +76,7 @@ class MushroomModelTest(TestCase):
         self.assertEqual(mushroom.__str__(), 'test_name_cz (test_name_latin) - Jedlá')
 
 
-class FindingModelTest(TestCase): #TODO: refactor
+class FindingModelTest(TestCase):  #TODO: refactor
 
     @classmethod
     def setUpTestData(cls):
@@ -130,7 +127,7 @@ class FindingModelTest(TestCase): #TODO: refactor
     #     self.assertEqual(finding.__str__(), f"Finding of {self.mushroom.name_cz} by {self.user.username}")
 
 
-class RecipeModelTest(TestCase): #TODO: refactor
+class RecipeModelTest(TestCase):  #TODO: refactor
     @classmethod
     def setUpTestData(cls):
         user = User.objects.create(username='test_user')
@@ -176,7 +173,7 @@ class RecipeModelTest(TestCase): #TODO: refactor
         self.assertEqual(recipe.__str__(), 'test_title')
 
 
-class CommentModelTest(TestCase): #TODO: refactor
+class CommentModelTest(TestCase):  #TODO: refactor
     @classmethod
     def setUpTestData(cls):
         user = User.objects.create(username='test_user')
