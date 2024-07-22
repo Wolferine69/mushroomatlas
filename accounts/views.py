@@ -86,8 +86,19 @@ class AccountDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.get_object().user  # Assuming Profile has a one-to-one relationship with User
-        context['sent_messages'] = Message.objects.filter(sender=user).order_by('-timestamp')
+        # The user whose profile is being viewed
+        profile_user = self.get_object().user
+        # The logged-in user
+        logged_in_user = self.request.user
+
+        # Messages received by the logged-in user from the profile user
+        context['received_messages'] = Message.objects.filter(
+            sender=profile_user, receiver=logged_in_user).order_by('-timestamp')
+
+        # Messages sent by the logged-in user to the profile user
+        context['sent_messages'] = Message.objects.filter(
+            sender=logged_in_user, receiver=profile_user).order_by('-timestamp')
+
         return context
 
 

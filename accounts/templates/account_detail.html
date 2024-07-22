@@ -2,49 +2,55 @@
 
 {% block content %}
 <h2><strong>{{ account.user.username }}</strong></h2>
-    {% if account.profile_picture %}
-<p><img src="{{ account.profile_picture.url }}" alt="{{ account.user.username }}"
-        class="img-fluid" style="max-width: 300px; max-height: 300px;"></p>
-    {% endif %}
+{% if account.profile_picture %}
+<p>
+    <img src="{{ account.profile_picture.url }}" alt="{{ account.user.username }}"
+         class="img-fluid" style="max-width: 300px; max-height: 300px;">
+</p>
+{% endif %}
 <p><strong>{{ account.user.first_name }} {{ account.user.last_name }}</strong></p>
-    <p>{{ account.biography }}</p>
-    <a href="{% url 'accounts_list' %}" class="btn btn-primary">Zpět na seznam uživatelů</a>
+<p>{{ account.biography }}</p>
+<a href="{% url 'accounts_list' %}" class="btn btn-primary">Back to User List</a>
 
-<h3>Odeslané zprávy</h3>
-<ul>
-    {% for message in sent_messages %}
-        <li>
-            <strong>Od:</strong> {{ message.receiver.username }}<br>
-            <strong>Datum odeslání:</strong> {{ message.timestamp }}<br>
-            <strong>Předmět:</strong> {{ message.subject }}<br>
-            <p>{{ message.content }}</p>
-            <a href="{% url 'send_message' receiver_username=message.receiver.username replied_to_id=message.id %}" class="btn btn-primary">Odpovědět</a>
-            <form method="post" action="{% url 'delete_message' message.id %}" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Smazat</button>
-            </form>
-        </li>
-    {% empty %}
-        <li>Nebyly odeslány žádné zprávy.</li>
-    {% endfor %}
-</ul>
+<hr>
 
-<h3>Přijaté zprávy</h3>
+<h3>Messages received from {{ account.user.username }}</h3>
 <ul>
     {% for message in received_messages %}
         <li>
-            <strong>Od:</strong> {{ message.sender.username }}<br>
-            <strong>Datum přijetí:</strong> {{ message.timestamp }}<br>
-            <strong>Předmět:</strong> {{ message.subject }}<br>
-            <p>{{ message.content }}</p>
-            <a href="{% url 'send_message' receiver_username=message.sender.username replied_to_id=message.id %}" class="btn btn-primary">Odpovědět</a>
-            <form method="post" action="{% url 'delete_message' message.id %}" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Smazat</button>
-            </form>
+            <input type="checkbox" name="message_ids" value="{{ message.id }}">
+            <a href="{% url 'message_detail' message.id %}">
+                {% if not message.is_read %}
+                    <mark><strong>{{ message.timestamp }} - From: {{ message.sender.username }} - Subject: {{ message.subject }}</strong></mark>
+                {% else %}
+                    {{ message.timestamp }} - From: {{ message.sender.username }} - Subject: {{ message.subject }}
+                {% endif %}
+            </a>
+            <p>{{ message.content|truncatewords:10 }}</p>
         </li>
     {% empty %}
-        <li>Nebyly přijaty žádné zprávy.</li>
+        <li>No messages from {{ account.user.username }}.</li>
+    {% endfor %}
+</ul>
+
+<hr>
+
+<h3>Messages sent to {{ account.user.username }}</h3>
+<ul>
+    {% for message in sent_messages %}
+        <li>
+            <input type="checkbox" name="message_ids" value="{{ message.id }}">
+            <a href="{% url 'message_detail' message.id %}">
+                {% if not message.is_read %}
+                    <mark><strong>{{ message.timestamp }} - To: {{ message.receiver.username }} - Subject: {{ message.subject }}</strong></mark>
+                {% else %}
+                    {{ message.timestamp }} - To: {{ message.receiver.username }} - Subject: {{ message.subject }}
+                {% endif %}
+            </a>
+            <p>{{ message.content|truncatewords:10 }}</p>
+        </li>
+    {% empty %}
+        <li>No messages to {{ account.user.username }}.</li>
     {% endfor %}
 </ul>
 {% endblock %}
