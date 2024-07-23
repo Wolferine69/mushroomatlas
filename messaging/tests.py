@@ -1,3 +1,5 @@
+# Importy a nastavení
+from django.apps import apps
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from .models import Message, Attachment
@@ -6,21 +8,23 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from viewer.models import Profile
 
+# Ensure the app is ready and signals are imported
+apps.get_app_config('messaging').ready()
 
 class UserProfileTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.user1 = User.objects.create_user(username='user1', password='pass')
         self.user2 = User.objects.create_user(username='user2', password='pass')
-        self.profile1 = Profile.objects.create(user=self.user1)
-        self.profile2 = Profile.objects.create(user=self.user2)
+        self.profile1 = Profile.objects.get(user=self.user1)
+        self.profile2 = Profile.objects.get(user=self.user2)
         self.message = Message.objects.create(
-            sender=self.user2,  # Odesílatel je user2
-            receiver=self.user1,  # Příjemce je user1
+            sender=self.user2,
+            receiver=self.user1,
             subject='Test Subject',
             content='Test Message',
-            is_trashed_by_receiver=False,  # Ujistěme se, že zpráva není označena jako smazaná
-            is_deleted_by_receiver=False  # Ujistěme se, že zpráva není označena jako odstraněná
+            is_trashed_by_receiver=False,
+            is_deleted_by_receiver=False
         )
 
     def test_reply_message(self):
@@ -39,19 +43,11 @@ class UserProfileTest(TestCase):
         self.assertEqual(response.status_code, 302)  # Redirect to outbox
         self.assertEqual(Message.objects.last().subject, 'Re: Test Subject')
 
-    def test_mark_message_read(self):
-        self.client.login(username='user1', password='pass')
-        response = self.client.get(reverse('mark_message_read', args=[self.message.pk]), follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.message.refresh_from_db()
-        self.assertTrue(self.message.is_read)
-
     def test_view_inbox(self):
         self.client.login(username='user1', password='pass')
         response = self.client.get(reverse('view_inbox'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Test Subject')
-
 
 class MessagingViewsTest(UserProfileTest):
     def setUp(self):
@@ -105,7 +101,6 @@ class MessagingViewsTest(UserProfileTest):
         self.assertEqual(response.status_code, 302)  # Redirect to outbox
         self.assertEqual(Message.objects.last().subject, 'Fwd: Test Subject')
 
-
 class MessageModelTest(UserProfileTest):
     def test_create_message(self):
         message = Message.objects.create(
@@ -146,7 +141,6 @@ class MessageModelTest(UserProfileTest):
         self.assertFalse(message.is_trashed_by_sender)
         self.assertFalse(message.is_trashed_by_receiver)
 
-
 class AttachmentModelTest(UserProfileTest):
     def setUp(self):
         super().setUp()
@@ -172,7 +166,6 @@ class AttachmentModelTest(UserProfileTest):
         )
         self.assertEqual(str(attachment), f"Attachment for message {self.message.id}")
 
-
 class MessageFormTest(UserProfileTest):
     def test_message_form_valid(self):
         form_data = {
@@ -187,7 +180,6 @@ class MessageFormTest(UserProfileTest):
         form = MessageForm(user=self.user1)
         self.assertNotIn(self.user1, form.fields['receiver'].queryset)
 
-
 class AttachmentFormSetTest(TestCase):
     def test_attachment_formset_valid(self):
         formset_data = {
@@ -200,14 +192,182 @@ class AttachmentFormSetTest(TestCase):
         formset = AttachmentFormSet(data=formset_data, files=formset_data)
         self.assertTrue(formset.is_valid())
 
-
 class SenderFilterFormTest(UserProfileTest):
     def test_sender_filter_form(self):
         form = SenderFilterForm(user=self.user1)
         self.assertNotIn(self.user1, form.fields['sender'].queryset)
 
-
 class ReceiverFilterFormTest(UserProfileTest):
     def test_receiver_filter_form(self):
         form = ReceiverFilterForm(user=self.user1)
         self.assertNotIn(self.user1, form.fields['receiver'].queryset)
+
+
+    def test_mark_message_read(self):
+        logged_in = self.client.login(username='user1', password='pass')
+        self.assertTrue(logged_in, "Login failed for user1")
+        response = self.client.get(reverse('mark_message_read', args=[self.message.pk]), follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.message.refresh_from_db()
+        self.assertTrue(self.message.is_read)
+
+    def test_mark_message_read_alternate(self):
+        logged_in = self.client.login(username='user1', password='pass')
+        self.assertTrue(logged_in, "Login failed for user1")
+        response = self.client.get(reverse('mark_message_read', args=[self.message.pk]), follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.message.refresh_from_db()
+        self.assertTrue(self.message.is_read)
+
+
+class RestoreMessageTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user1 = User.objects.create_user(username='user1', password='pass')
+        self.user2 = User.objects.create_user(username='user2', password='pass')
+        self.message = Message.objects.create(
+            sender=self.user1,
+            receiver=self.user2,
+            subject='Test Subject',
+            content='This is a test message.',
+            is_trashed_by_receiver=True
+        )
+
+    def test_restore_message(self):
+        self.client.login(username='user2', password='pass')
+        response = self.client.post(reverse('restore_message', args=[self.message.pk]))
+        self.assertEqual(response.status_code, 302)
+        self.message.refresh_from_db()
+        self.assertFalse(self.message.is_trashed_by_receiver)
+
+
+class BulkDeleteTrashMessagesTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user1 = User.objects.create_user(username='user1', password='pass')
+        self.user2 = User.objects.create_user(username='user2', password='pass')
+        self.message1 = Message.objects.create(sender=self.user1, receiver=self.user2, subject='Test 1',
+                                               content='Message 1')
+        self.message2 = Message.objects.create(sender=self.user1, receiver=self.user2, subject='Test 2',
+                                               content='Message 2', is_trashed_by_receiver=True)
+
+    def test_bulk_delete_trash_messages(self):
+        self.client.login(username='user2', password='pass')
+        response = self.client.post(reverse('bulk_delete_trash_messages'),
+                                    {'message_ids': [self.message1.pk, self.message2.pk]})
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Message.objects.filter(pk=self.message2.pk).exists())
+
+
+class TrashMessageTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user1 = User.objects.create_user(username='user1', password='pass')
+        self.user2 = User.objects.create_user(username='user2', password='pass')
+        self.message = Message.objects.create(sender=self.user1, receiver=self.user2, subject='Test Subject',
+                                              content='Message')
+
+    def test_trash_message(self):
+        self.client.login(username='user2', password='pass')
+        response = self.client.post(reverse('trash_message', args=[self.message.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.message.refresh_from_db()
+        self.assertTrue(self.message.is_trashed_by_receiver)
+
+
+class BulkDeleteMessagesTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user1 = User.objects.create_user(username='user1', password='pass')
+        self.user2 = User.objects.create_user(username='user2', password='pass')
+        self.message1 = Message.objects.create(sender=self.user1, receiver=self.user2, subject='Test 1',
+                                               content='Message 1')
+        self.message2 = Message.objects.create(sender=self.user1, receiver=self.user2, subject='Test 2',
+                                               content='Message 2')
+
+    def test_bulk_delete_messages(self):
+        self.client.login(username='user1', password='pass')
+        response = self.client.post(reverse('bulk_delete_messages'),
+                                    {'message_ids': [self.message1.pk, self.message2.pk]})
+        self.assertEqual(response.status_code, 302)
+        self.message1.refresh_from_db()
+        self.message2.refresh_from_db()
+        self.assertTrue(self.message1.is_deleted_by_sender)
+        self.assertTrue(self.message2.is_deleted_by_sender)
+
+
+class DeleteMessageTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user1 = User.objects.create_user(username='user1', password='pass')
+        self.user2 = User.objects.create_user(username='user2', password='pass')
+        self.message = Message.objects.create(sender=self.user1, receiver=self.user2, subject='Test Subject',
+                                              content='Message')
+
+    def test_delete_message(self):
+        self.client.login(username='user1', password='pass')
+        response = self.client.post(reverse('delete_message', args=[self.message.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.message.refresh_from_db()
+        self.assertTrue(self.message.is_deleted_by_sender)
+        self.assertTrue(self.message.is_trashed_by_sender)
+
+
+class ViewMessageDetailTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user1 = User.objects.create_user(username='user1', password='pass')
+        self.user2 = User.objects.create_user(username='user2', password='pass')
+        self.message = Message.objects.create(sender=self.user1, receiver=self.user2, subject='Test Subject',
+                                              content='Message')
+
+    def test_view_message_detail(self):
+        self.client.login(username='user2', password='pass')
+        response = self.client.get(reverse('view_message_detail', args=[self.message.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Test Subject')
+
+
+class BulkTrashMessagesTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user1 = User.objects.create_user(username='user1', password='pass')
+        self.user2 = User.objects.create_user(username='user2', password='pass')
+        self.message1 = Message.objects.create(sender=self.user1, receiver=self.user2, subject='Test 1',
+                                               content='Message 1')
+        self.message2 = Message.objects.create(sender=self.user1, receiver=self.user2, subject='Test 2',
+                                               content='Message 2')
+
+    def test_bulk_trash_messages(self):
+        self.client.login(username='user2', password='pass')
+        response = self.client.post(reverse('bulk_trash_messages'),
+                                    {'message_ids': [self.message1.pk, self.message2.pk]})
+        self.assertEqual(response.status_code, 302)
+        self.message1.refresh_from_db()
+        self.message2.refresh_from_db()
+        self.assertTrue(self.message1.is_trashed_by_receiver)
+        self.assertTrue(self.message2.is_trashed_by_receiver)
+
+
+class BulkRestoreTrashMessagesTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user1 = User.objects.create_user(username='user1', password='pass')
+        self.user2 = User.objects.create_user(username='user2', password='pass')
+        self.message1 = Message.objects.create(sender=self.user1, receiver=self.user2, subject='Test 1',
+                                               content='Message 1', is_trashed_by_receiver=True)
+        self.message2 = Message.objects.create(sender=self.user1, receiver=self.user2, subject='Test 2',
+                                               content='Message 2', is_trashed_by_receiver=True)
+
+    def test_bulk_restore_trash_messages(self):
+        self.client.login(username='user2', password='pass')
+        response = self.client.post(reverse('bulk_restore_trash_messages'),
+                                    {'message_ids': [self.message1.pk, self.message2.pk]})
+        self.assertEqual(response.status_code, 302)
+        self.message1.refresh_from_db()
+        self.message2.refresh_from_db()
+        self.assertFalse(self.message1.is_trashed_by_receiver)
+        self.assertFalse(self.message2.is_trashed_by_receiver)
+
+
+

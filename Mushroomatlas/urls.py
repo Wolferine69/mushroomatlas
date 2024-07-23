@@ -23,7 +23,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 from accounts.views import SubmittableLoginView, RegistrationView, SubmittablePasswordChangeView, AccountsListView, \
     AccountDetailView, ProfileUpdateView
 from api.views import Mushrooms, Families, Recipes, Findings, Habitats, Profiles
-from messaging.views import trash_message
+from messaging.views import trash_message, handle_trash_actions
 from viewer.views import (home,
                           MushroomListView, MushroomDetailView,
                           FamilyListView, FamilyDetailView, RecipeListView, RecipeDetailView, TipListView,
@@ -84,6 +84,7 @@ urlpatterns = [
     path('trash_message/<int:pk>/', trash_message, name='trash_message'),
     path('bulk_trash_messages/', messaging_views.bulk_trash_messages, name='bulk_trash_messages'),
     path('trash/bulk_restore/', messaging_views.bulk_trash_messages, name='bulk_restore_trash_messages'),
+    path('handle_trash_actions/', handle_trash_actions, name='handle_trash_actions'),
     path('message/<int:pk>/trash/', messaging_views.trash_message, name='trash_message'),
     path('message/<int:pk>/restore/', messaging_views.restore_message, name='restore_message'),
     path('message/<int:pk>/delete/', messaging_views.delete_message, name='delete_message'),

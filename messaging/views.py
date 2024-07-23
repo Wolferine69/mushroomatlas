@@ -1,4 +1,6 @@
-# views.py
+import logging
+logger = logging.getLogger(__name__)
+
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -224,6 +226,7 @@ def view_trash(request):
 @login_required
 def mark_message_read(request, message_id):
     message = get_object_or_404(Message, id=message_id)
+    logger.debug(f"Current user: {request.user}, message receiver: {message.receiver}")
     if request.user == message.receiver:
         message.is_read = True
         message.save()
@@ -235,7 +238,6 @@ def mark_message_read(request, message_id):
         ).count()
         return JsonResponse({'success': True, 'new_messages_count': new_messages_count})
     return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=403)
-
 
 @login_required
 def forward_message(request, message_id, reply=False):
@@ -345,21 +347,67 @@ def bulk_trash_messages(request):
     return redirect('view_inbox')
 
 
+@require_POST
+@login_required
 def bulk_restore_trash_messages(request):
     if request.method == 'POST':
         message_ids = request.POST.getlist('message_ids')
-        print(f"Přijaté ID zpráv pro obnovení: {message_ids}")  # Debugovací řádek
         for message_id in message_ids:
             try:
                 message = Message.objects.get(id=message_id)
-                print(f"Původní stav zprávy {message_id} - is_trashed_by_sender: {message.is_trashed_by_sender}, is_trashed_by_receiver: {message.is_trashed_by_receiver}")
-                message.is_trashed_by_sender = False
-                message.is_trashed_by_receiver = False
+                if request.user == message.sender:
+                    message.is_trashed_by_sender = False
+                if request.user == message.receiver:
+                    message.is_trashed_by_receiver = False
                 message.save()
-                print(f"Nový stav zprávy {message_id} - is_trashed_by_sender: {message.is_trashed_by_sender}, is_trashed_by_receiver: {message.is_trashed_by_receiver}")
             except Message.DoesNotExist:
-                print(f"Zpráva s ID {message_id} neexistuje")  # Debugovací řádek
+                continue
 
         messages.success(request, 'Vybrané zprávy byly obnoveny.')
+    return redirect('view_trash')
+
+
+@require_POST
+@login_required
+def handle_trash_actions(request):
+    print("handle_trash_actions called")
+    action = request.POST.get('action')
+    message_ids = request.POST.getlist('message_ids')
+
+    print(f"Action received: {action}")
+    print(f"Message IDs received: {message_ids}")
+
+    if action and message_ids:
+        if action == 'delete':
+            print("Deleting messages")
+            messages_to_delete = Message.objects.filter(id__in=message_ids)
+            for message in messages_to_delete:
+                if message.sender == request.user:
+                    print(f"Marking message {message.id} as deleted by sender")
+                    message.is_deleted_by_sender = True
+                if message.receiver == request.user:
+                    print(f"Marking message {message.id} as deleted by receiver")
+                    message.is_deleted_by_receiver = True
+                if message.is_deleted_by_sender and message.is_deleted_by_receiver:
+                    print(f"Deleting message {message.id} from database")
+                    message.delete()
+                else:
+                    print(f"Saving message {message.id} state changes")
+                    message.save()
+            messages.success(request, 'Vybrané zprávy byly smazány.')
+        elif action == 'restore':
+            print("Restoring messages")
+            messages_to_restore = Message.objects.filter(id__in=message_ids)
+            for message in messages_to_restore:
+                if message.sender == request.user:
+                    print(f"Marking message {message.id} as not trashed by sender")
+                    message.is_trashed_by_sender = False
+                if message.receiver == request.user:
+                    print(f"Marking message {message.id} as not trashed by receiver")
+                    message.is_trashed_by_receiver = False
+                print(f"Saving message {message.id} state changes")
+                message.save()
+            messages.success(request, 'Vybrané zprávy byly obnoveny.')
+
     return redirect('view_trash')
 
