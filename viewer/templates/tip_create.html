@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}<strong>Přidat nové tipy a triky</strong>{% endblock %}
+
+{% block content %}
+    <h2><strong>Přidat nové tipy a triky</strong></h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input id="id_submit" type="submit" class="btn btn-primary" value="Přidat">
+    </form>
+{% endblock %}

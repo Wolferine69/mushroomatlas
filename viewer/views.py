@@ -7,8 +7,8 @@ from django.views.generic import ListView, DetailView, CreateView, TemplateView
 from accounts.forms import RatingForm
 from accounts.models import Profile
 from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding, Comment, Message, Rating, CommentRecipe
-from .forms import MushroomForm, MushroomFilterForm, FindingForm, CommentForm, RecipeForm, MessageForm, \
-    CommentRecipeForm, RecipeFilterForm
+from .forms import (MushroomForm, MushroomFilterForm, FindingForm, CommentForm, RecipeForm, MessageForm,
+                    CommentRecipeForm, RecipeFilterForm, TipForm)
 
 
 # Create your views here.
@@ -172,6 +172,20 @@ def add_recipe(request):
     else:
         form = RecipeForm()
     return render(request, 'recipe_create.html', {'form': form})
+
+
+@login_required
+def add_tip(request):
+    if request.method == 'POST':
+        form = TipForm(request.POST, request.FILES)
+        if form.is_valid():
+            tip = form.save(commit=False)  # Neuložíme hned do databáze
+            tip.user = request.user.profile  # Nastavíme uživatele podle přihlášeného uživatele
+            tip.save()  # Uložíme tip do databáze
+            return redirect('tip_list')
+    else:
+        form = TipForm()
+    return render(request, 'tip_create.html', {'form': form})
 
 
 class FindingsMapView(ListView):

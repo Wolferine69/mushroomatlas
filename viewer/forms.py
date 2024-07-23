@@ -1,5 +1,5 @@
 from django import forms
-from .models import Habitat, Finding, Comment, Recipe, Family, CommentRecipe, Profile
+from .models import Habitat, Finding, Comment, Recipe, Family, CommentRecipe, Profile, Tip
 
 from viewer.models import Mushroom, Message
 
@@ -103,3 +103,18 @@ class RecipeFilterForm(forms.Form):
     min_rating = forms.DecimalField(required=False, min_value=0, max_value=5, decimal_places=1,
                                     label='Minimální hodnocení')
     user = forms.ModelChoiceField(queryset=Profile.objects.all(), required=False, label='Přidal uživatel')
+
+
+class TipForm(forms.ModelForm):
+    class Meta:
+        model = Tip
+        fields = ['title', 'text']
+        labels = {
+            'title': 'Název tipu/triku',
+            'text': 'Text',
+            'user': Profile.objects.first(),
+        }
+        widgets = {
+            'text': forms.Textarea(attrs={'placeholder': 'Napiš nám svůj tip...'}),
+            'new': forms.HiddenInput(),
+        }

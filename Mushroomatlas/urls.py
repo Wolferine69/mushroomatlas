@@ -30,6 +30,7 @@ from viewer.views import (home,
                           FamilyListView, FamilyDetailView, RecipeListView, RecipeDetailView, TipListView,
                           TipDetailView, add_mushroom, FindingsMapView, AddFindingView, AddCommentView, add_recipe,
                           CommentsListView, mark_comment_read, CommentsRecipeListView, mark_comment_recipe_read,
+                          add_tip,
                           )
 from messaging import views as messaging_views
 
@@ -59,6 +60,7 @@ urlpatterns = [
 
     path('tip/', TipListView.as_view(), name='tip_list'),
     path('tip/<int:pk>/', TipDetailView.as_view(), name='tip_detail'),
+    path('add_tip/', add_tip, name='add_tip'),
 
     path('findings_map/', FindingsMapView.as_view(), name='findings_map'),
     path('findings_map/<int:pk>/', FindingsMapView.as_view(), name='findings_map_with_pk'),

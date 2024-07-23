@@ -111,6 +111,8 @@ class Tip(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='tip', null=True, blank=True)
     title = models.CharField(max_length=500)
     content = models.TextField()
+    text = models.TextField(null=True, blank=True)
+    # created_at = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(upload_to='recipe_images/', null=True, blank=True)
 
     class Meta:
