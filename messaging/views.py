@@ -1,5 +1,5 @@
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('messaging')
 
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
@@ -85,18 +85,56 @@ def restore_message(request, pk):
 @require_POST
 @login_required
 def bulk_delete_trash_messages(request):
+    logger.debug("bulk_delete_trash_messages called")
     message_ids = request.POST.getlist('message_ids')
+    logger.debug(f"Message IDs received for deletion: {message_ids}")
+
     if message_ids:
-        messages = Message.objects.filter(id__in=message_ids)
-        for message in messages:
+        messages_to_delete = Message.objects.filter(id__in=message_ids)
+        for message in messages_to_delete:
             if message.sender == request.user:
+                logger.debug(f"Marking message {message.id} as deleted by sender")
                 message.is_deleted_by_sender = True
             if message.receiver == request.user:
+                logger.debug(f"Marking message {message.id} as deleted by receiver")
                 message.is_deleted_by_receiver = True
             if message.is_deleted_by_sender and message.is_deleted_by_receiver:
+                logger.debug(f"Deleting message {message.id} from database")
                 message.delete()
             else:
+                logger.debug(f"Saving message {message.id} state changes")
                 message.save()
+        messages.success(request, 'Vybrané zprávy byly smazány.')
+    else:
+        logger.debug("No message IDs received for deletion")
+    return redirect('view_trash')
+
+
+@require_POST
+@login_required
+def bulk_restore_trash_messages(request):
+    logger.debug("bulk_restore_trash_messages called")
+    message_ids = request.POST.getlist('message_ids')
+    logger.debug(f"Message IDs received for restoration: {message_ids}")
+
+    if message_ids:
+        for message_id in message_ids:
+            try:
+                message = Message.objects.get(id=message_id)
+                if request.user == message.sender:
+                    logger.debug(f"Marking message {message.id} as not trashed by sender")
+                    message.is_trashed_by_sender = False
+                if request.user == message.receiver:
+                    logger.debug(f"Marking message {message.id} as not trashed by receiver")
+                    message.is_trashed_by_receiver = False
+                logger.debug(f"Saving message {message.id} state changes")
+                message.save()
+            except Message.DoesNotExist:
+                logger.debug(f"Message with ID {message_id} does not exist")
+                continue
+        messages.success(request, 'Vybrané zprávy byly obnoveny.')
+    else:
+        logger.debug("No message IDs received for restoration")
     return redirect('view_trash')
 
 
@@ -347,64 +385,71 @@ def bulk_trash_messages(request):
 
 @require_POST
 @login_required
-def bulk_restore_trash_messages(request):
-    if request.method == 'POST':
-        message_ids = request.POST.getlist('message_ids')
-        for message_id in message_ids:
-            try:
-                message = Message.objects.get(id=message_id)
-                if request.user == message.sender:
-                    message.is_trashed_by_sender = False
-                if request.user == message.receiver:
-                    message.is_trashed_by_receiver = False
-                message.save()
-            except Message.DoesNotExist:
-                continue
+def bulk_delete_trash_messages(request):
+    logger.debug("bulk_delete_trash_messages called")
+    message_ids = request.POST.getlist('message_ids')
+    logger.debug(f"Message IDs received for deletion: {message_ids}")
 
-        messages.success(request, 'Vybrané zprávy byly obnoveny.')
+    if message_ids:
+        messages_to_delete = Message.objects.filter(id__in=message_ids)
+        for message in messages_to_delete:
+            if message.sender == request.user:
+                logger.debug(f"Marking message {message.id} as deleted by sender")
+                message.is_deleted_by_sender = True
+            if message.receiver == request.user:
+                logger.debug(f"Marking message {message.id} as deleted by receiver")
+                message.is_deleted_by_receiver = True
+            if message.is_deleted_by_sender and message.is_deleted_by_receiver:
+                logger.debug(f"Deleting message {message.id} from database")
+                message.delete()
+            else:
+                logger.debug(f"Saving message {message.id} state changes")
+                message.save()
     return redirect('view_trash')
+
 
 
 @require_POST
 @login_required
 def handle_trash_actions(request):
-    print("handle_trash_actions called")
+    logger.debug("handle_trash_actions called")
     action = request.POST.get('action')
     message_ids = request.POST.getlist('message_ids')
 
-    print(f"Action received: {action}")
-    print(f"Message IDs received: {message_ids}")
+    logger.debug(f"Action received: {action}")
+    logger.debug(f"Message IDs received: {message_ids}")
 
     if action and message_ids:
         if action == 'delete':
-            print("Deleting messages")
+            logger.debug("Deleting messages")
             messages_to_delete = Message.objects.filter(id__in=message_ids)
             for message in messages_to_delete:
                 if message.sender == request.user:
-                    print(f"Marking message {message.id} as deleted by sender")
+                    logger.debug(f"Marking message {message.id} as deleted by sender")
                     message.is_deleted_by_sender = True
                 if message.receiver == request.user:
-                    print(f"Marking message {message.id} as deleted by receiver")
+                    logger.debug(f"Marking message {message.id} as deleted by receiver")
                     message.is_deleted_by_receiver = True
                 if message.is_deleted_by_sender and message.is_deleted_by_receiver:
-                    print(f"Deleting message {message.id} from database")
+                    logger.debug(f"Deleting message {message.id} from database")
                     message.delete()
                 else:
-                    print(f"Saving message {message.id} state changes")
+                    logger.debug(f"Saving message {message.id} state changes")
                     message.save()
             messages.success(request, 'Vybrané zprávy byly smazány.')
         elif action == 'restore':
-            print("Restoring messages")
+            logger.debug("Restoring messages")
             messages_to_restore = Message.objects.filter(id__in=message_ids)
             for message in messages_to_restore:
                 if message.sender == request.user:
-                    print(f"Marking message {message.id} as not trashed by sender")
+                    logger.debug(f"Marking message {message.id} as not trashed by sender")
                     message.is_trashed_by_sender = False
                 if message.receiver == request.user:
-                    print(f"Marking message {message.id} as not trashed by receiver")
+                    logger.debug(f"Marking message {message.id} as not trashed by receiver")
                     message.is_trashed_by_receiver = False
-                print(f"Saving message {message.id} state changes")
+                logger.debug(f"Saving message {message.id} state changes")
                 message.save()
             messages.success(request, 'Vybrané zprávy byly obnoveny.')
-
+    else:
+        logger.debug("No action or message IDs received")
     return redirect('view_trash')

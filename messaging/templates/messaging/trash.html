@@ -6,7 +6,7 @@
     <button type="submit" class="btn btn-primary">Filtrovat</button>
     <a href="{% url 'view_trash' %}" class="btn btn-secondary">Zrušit filtr</a>
 </form>
-<form method="post" action="{% url 'handle_trash_actions' %}">
+<form id="trashForm" method="post" action="{% url 'handle_trash_actions' %}">
     {% csrf_token %}
     <ul>
         {% for message in trashed_messages %}
@@ -28,24 +28,33 @@
 
 <script type="text/javascript">
     function submitForm(action) {
+        console.log("Setting action: " + action);
         document.getElementById('action').value = action;
         console.log("Form action set to: " + action);
-        console.log("Submitting form with message IDs:");
+
         var checkboxes = document.querySelectorAll('input[name="message_ids"]:checked');
+        console.log("Submitting form with message IDs:");
         checkboxes.forEach((checkbox) => {
             console.log(" - " + checkbox.value);
         });
 
-        // Přidejte kontrolu, zda formulář skutečně existuje a je správně vybrán
-        var form = document.forms[1];
+        var form = document.getElementById('trashForm');
         if (form) {
             console.log("Form found, submitting...");
             form.submit();
         } else {
             console.log("Form not found!");
         }
-        console.log("Form submitted");
     }
-</script>
 
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Document loaded, adding event listeners...");
+        document.querySelectorAll('button.btn-danger, button.btn-success').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                console.log("Button clicked:", event.target);
+                submitForm(event.target.classList.contains('btn-danger') ? 'delete' : 'restore');
+            });
+        });
+    });
+</script>
 {% endblock %}
