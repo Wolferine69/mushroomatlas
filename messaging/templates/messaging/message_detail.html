@@ -58,5 +58,25 @@ function deleteMessage(messageId) {
         console.error('There was a problem with the fetch operation:', error);
     });
 }
+
+// Označení zprávy jako přečtené
+window.onload = function() {
+    fetch(`/mark_message_read/{{ message.id }}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+        }
+    }).then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Aktualizace počtu nepřečtených zpráv
+            document.getElementById('new_messages_count').textContent = data.new_messages_count;
+        } else {
+            console.error('Error:', data.error);
+        }
+    }).catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+    });
+};
 </script>
 {% endblock %}

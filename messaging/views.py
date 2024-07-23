@@ -218,11 +218,19 @@ def view_trash(request):
 
 
 @login_required
-def mark_message_read(request, pk):
-    message = get_object_or_404(Message, pk=pk)
-    message.is_read = True
-    message.save()
-    return HttpResponse(status=200)
+def mark_message_read(request, message_id):
+    message = get_object_or_404(Message, id=message_id)
+    if request.user == message.receiver:
+        message.is_read = True
+        message.save()
+        new_messages_count = Message.objects.filter(
+            receiver=request.user,
+            is_read=False,
+            is_trashed_by_receiver=False,
+            is_deleted_by_receiver=False
+        ).count()
+        return JsonResponse({'success': True, 'new_messages_count': new_messages_count})
+    return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=403)
 
 
 @login_required

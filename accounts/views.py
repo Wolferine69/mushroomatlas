@@ -71,6 +71,9 @@ class AccountsListView(LoginRequiredMixin, ListView):
     model = Profile
     template_name = 'accounts_list.html'
     context_object_name = 'accounts'
+    def get_queryset(self):
+        # Získáme všechny profily kromě profilu přihlášeného uživatele
+        return Profile.objects.exclude(user=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
