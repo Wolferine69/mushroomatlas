@@ -28,17 +28,17 @@
     {% if message.is_trashed_by_sender or message.is_trashed_by_receiver %}
         <a href="{% url 'restore_message' message.pk %}" class="btn btn-primary">Obnovit</a>
     {% endif %}
-    <form id="delete-message-form" method="post" action="{% url 'delete_message' message.id %}" style="display:inline;">
+    <form id="delete-message-form" method="post" action="{% url 'trash_message' message.id %}" style="display:inline;">
         {% csrf_token %}
-        <button type="button" class="btn btn-danger" onclick="deleteMessage('{{ message.id }}')">Smazat</button>
+        <button type="button" class="btn btn-danger" onclick="trashMessage('{{ message.id }}')">Smazat</button>
     </form>
 </div>
 
 <script>
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-function deleteMessage(messageId) {
-    fetch(`/delete_message/${messageId}/`, {
+function trashMessage(messageId) {
+    fetch(`/trash_message/${messageId}/`, {
         method: 'POST',
         headers: {
             'X-CSRFToken': csrftoken,

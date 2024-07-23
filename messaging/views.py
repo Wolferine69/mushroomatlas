@@ -98,17 +98,21 @@ def bulk_delete_trash_messages(request):
     return redirect('view_trash')
 
 
+@require_POST
 @login_required
 def trash_message(request, pk):
     message = get_object_or_404(Message, pk=pk)
-    if message.sender == request.user:
-        message.is_trashed_by_sender = True
-        message.is_deleted_by_sender = False
-    elif message.receiver == request.user:
+    if request.user == message.receiver:
         message.is_trashed_by_receiver = True
-        message.is_deleted_by_receiver = False
-    message.save()
-    return redirect('view_trash')
+    elif request.user == message.sender:
+        message.is_trashed_by_sender = True
+
+    if message.is_trashed_by_sender and message.is_trashed_by_receiver:
+        message.delete()
+    else:
+        message.save()
+
+    return JsonResponse({'success': True, 'redirect_url': '/inbox/'})
 
 
 @login_required
