@@ -29,9 +29,9 @@
     {% if message.is_trashed_by_sender or message.is_trashed_by_receiver %}
         <a href="{% url 'restore_message' message.pk %}" class="btn btn-primary">Obnovit</a>
     {% endif %}
-    <form id="delete-message-form" method="post" action="{% if origin == 'trash' %}{% url 'delete_message' message.id %}{% else %}{% url 'trash_message' message.id %}{% endif %}" style="display:inline;">
+    <form id="trash-message-form" method="post" action="{% url 'trash_message' message.id %}" style="display:inline;">
         {% csrf_token %}
-        <button type="button" class="btn btn-danger" onclick="trashOrDeleteMessage('{{ message.id }}', '{{ origin }}')">Smazat</button>
+        <button type="button" class="btn btn-danger" onclick="trashMessage('{{ message.id }}')">Smazat</button>
         <input type="hidden" name="origin" value="{{ origin }}">
     </form>
 </div>
@@ -39,9 +39,9 @@
 <script>
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-function trashOrDeleteMessage(messageId, origin) {
-    console.log(`trashOrDeleteMessage called with messageId: ${messageId}, origin: ${origin}`);
-    const url = `/delete_message/${messageId}/`;
+function trashMessage(messageId) {
+    console.log(`trashMessage called with messageId: ${messageId}`);
+    const url = `/trash_message/${messageId}/`;
     console.log(`Fetching URL: ${url}`);
 
     fetch(url, {
@@ -90,6 +90,4 @@ window.onload = function() {
     });
 };
 </script>
-
-
 {% endblock %}

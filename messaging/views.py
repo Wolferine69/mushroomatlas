@@ -141,18 +141,23 @@ def bulk_restore_trash_messages(request):
 @require_POST
 @login_required
 def trash_message(request, pk):
+    logger.debug("trash_message called")
     message = get_object_or_404(Message, pk=pk)
+    logger.debug(f"Message ID: {message.id}, Sender: {message.sender}, Receiver: {message.receiver}")
+
     if request.user == message.receiver:
         message.is_trashed_by_receiver = True
+        logger.debug("Message marked as trashed by receiver")
     elif request.user == message.sender:
         message.is_trashed_by_sender = True
+        logger.debug("Message marked as trashed by sender")
 
-    if message.is_trashed_by_sender and message.is_trashed_by_receiver:
-        message.delete()
-    else:
-        message.save()
+    message.save()
+    logger.debug("Message state saved")
 
     return JsonResponse({'success': True, 'redirect_url': '/inbox/'})
+
+
 
 
 @login_required
@@ -197,8 +202,6 @@ def delete_message(request, pk):
     logger.debug(f"Redirecting to: {redirect_url}")
 
     return JsonResponse({'success': True, 'redirect_url': redirect_url})
-
-
 
 
 @login_required
