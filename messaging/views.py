@@ -133,23 +133,21 @@ def bulk_delete_messages(request):
 
 
 @login_required
+@require_POST
 def delete_message(request, pk):
     message = get_object_or_404(Message, pk=pk)
-    if request.method == 'POST' or request.method == 'DELETE':
-        if message.sender == request.user:
-            message.is_deleted_by_sender = True
-            message.is_trashed_by_sender = True
-        elif message.receiver == request.user:
-            message.is_deleted_by_receiver = True
-            message.is_trashed_by_receiver = True
+    if message.sender == request.user:
+        message.is_deleted_by_sender = True
+        message.is_trashed_by_sender = True
+    elif message.receiver == request.user:
+        message.is_deleted_by_receiver = True
+        message.is_trashed_by_receiver = True
 
-        if message.is_deleted_by_sender and message.is_deleted_by_receiver:
-            message.delete()
-        else:
-            message.save()
-        return (JsonResponse
-                ({'success': True, 'redirect_url': '/outbox/' if message.sender == request.user else '/inbox/'}))
-    return JsonResponse({'error': 'Invalid request method'}, status=400)
+    if message.is_deleted_by_sender and message.is_deleted_by_receiver:
+        message.delete()
+    else:
+        message.save()
+    return JsonResponse({'success': True, 'redirect_url': '/outbox/' if message.sender == request.user else '/inbox/'})
 
 
 @login_required

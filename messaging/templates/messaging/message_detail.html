@@ -8,11 +8,11 @@
 
 {% if message.attachments.exists %}
     <p><strong style="font-size: 1.5em;">Přílohy</strong></p>
-<ul>
-    {% for attachment in message.attachments.all %}
-        <li><strong>Příloha:</strong> <a href="{{ attachment.file.url }}">{{ attachment.file.name }}</a></li>
-    {% endfor %}
-</ul>
+    <ul>
+        {% for attachment in message.attachments.all %}
+            <li><strong>Příloha:</strong> <a href="{{ attachment.file.url }}">{{ attachment.file.name }}</a></li>
+        {% endfor %}
+    </ul>
 {% endif %}
 
 <div class="btn-group">
@@ -22,23 +22,27 @@
         <a href="{% url 'view_inbox' %}" class="btn btn-secondary">Zpět do přijatých zpráv</a>
     {% elif origin == 'outbox' %}
         <a href="{% url 'view_outbox' %}" class="btn btn-secondary">Zpět do odeslaných zpráv</a>
+    {% elif origin == 'trash' %}
+        <a href="{% url 'view_trash' %}" class="btn btn-secondary">Zpět do koše</a>
     {% endif %}
-    <a href="{% url 'reply_message' message.id %}" class="btn btn-primary">Odpovědět</a>
     <a href="{% url 'forward_message' message.id %}" class="btn btn-secondary">Přeposlat</a>
     {% if message.is_trashed_by_sender or message.is_trashed_by_receiver %}
         <a href="{% url 'restore_message' message.pk %}" class="btn btn-primary">Obnovit</a>
     {% endif %}
-    <form id="delete-message-form" method="post" action="{% url 'trash_message' message.id %}" style="display:inline;">
+    <form id="delete-message-form" method="post" action="{% if origin == 'trash' %}{% url 'delete_message' message.id %}{% else %}{% url 'trash_message' message.id %}{% endif %}" style="display:inline;">
         {% csrf_token %}
-        <button type="button" class="btn btn-danger" onclick="trashMessage('{{ message.id }}')">Smazat</button>
+        <button type="button" class="btn btn-danger" onclick="trashOrDeleteMessage('{{ message.id }}', '{{ origin }}')">Smazat</button>
+        <input type="hidden" name="origin" value="{{ origin }}">
     </form>
 </div>
 
 <script>
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-function trashMessage(messageId) {
-    fetch(`/trash_message/${messageId}/`, {
+function trashOrDeleteMessage(messageId, origin) {
+    const url = origin === 'trash' ? `/delete_message/${messageId}/` : `/trash_message/${messageId}/`;
+
+    fetch(url, {
         method: 'POST',
         headers: {
             'X-CSRFToken': csrftoken,
