@@ -334,11 +334,11 @@ def bulk_trash_messages(request):
         messages = Message.objects.filter(id__in=message_ids)
         for message in messages:
             if message.sender == request.user:
-                message.is_trashed_by_sender = False
+                message.is_trashed_by_sender = True
             if message.receiver == request.user:
-                message.is_trashed_by_receiver = False
+                message.is_trashed_by_receiver = True
             message.save()
-    return redirect('view_trash')
+    return redirect('view_inbox')
 
 
 def bulk_restore_trash_messages(request):
