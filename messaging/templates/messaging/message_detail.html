@@ -40,7 +40,9 @@
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
 function trashOrDeleteMessage(messageId, origin) {
-    const url = origin === 'trash' ? `/delete_message/${messageId}/` : `/trash_message/${messageId}/`;
+    console.log(`trashOrDeleteMessage called with messageId: ${messageId}, origin: ${origin}`);
+    const url = `/delete_message/${messageId}/`;
+    console.log(`Fetching URL: ${url}`);
 
     fetch(url, {
         method: 'POST',
@@ -49,22 +51,27 @@ function trashOrDeleteMessage(messageId, origin) {
         }
     }).then(response => {
         if (response.ok) {
+            console.log('Response OK, returning JSON');
             return response.json();
         }
         throw new Error('Network response was not ok.');
     }).then(data => {
         if (data.success) {
+            console.log('Operation successful, redirecting to:', data.redirect_url);
             window.location.href = data.redirect_url;
         } else {
             console.error('Error:', data.error);
+            alert('Nastala chyba při mazání zprávy: ' + data.error);
         }
     }).catch(error => {
         console.error('There was a problem with the fetch operation:', error);
+        alert('Nastala chyba při mazání zprávy. Zkuste to prosím znovu.');
     });
 }
 
 // Označení zprávy jako přečtené
 window.onload = function() {
+    console.log('Page loaded, marking message as read');
     fetch(`/mark_message_read/{{ message.id }}/`, {
         method: 'POST',
         headers: {
@@ -83,4 +90,6 @@ window.onload = function() {
     });
 };
 </script>
+
+
 {% endblock %}

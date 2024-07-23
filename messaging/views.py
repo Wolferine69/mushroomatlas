@@ -170,22 +170,35 @@ def bulk_delete_messages(request):
     return redirect('view_outbox')
 
 
-@login_required
 @require_POST
+@login_required
 def delete_message(request, pk):
+    logger.debug("delete_message called")
     message = get_object_or_404(Message, pk=pk)
+    logger.debug(f"Message ID: {message.id}, Sender: {message.sender}, Receiver: {message.receiver}")
+
+    # Delete message for the current user
     if message.sender == request.user:
         message.is_deleted_by_sender = True
-        message.is_trashed_by_sender = True
-    elif message.receiver == request.user:
+        logger.debug("Message marked as deleted by sender")
+    if message.receiver == request.user:
         message.is_deleted_by_receiver = True
-        message.is_trashed_by_receiver = True
+        logger.debug("Message marked as deleted by receiver")
 
+    # Check if the message should be permanently deleted
     if message.is_deleted_by_sender and message.is_deleted_by_receiver:
+        logger.debug("Message is marked as deleted by both sender and receiver, deleting from database")
         message.delete()
     else:
         message.save()
-    return JsonResponse({'success': True, 'redirect_url': '/outbox/' if message.sender == request.user else '/inbox/'})
+        logger.debug("Message state saved")
+
+    redirect_url = '/outbox/' if message.sender == request.user else '/inbox/'
+    logger.debug(f"Redirecting to: {redirect_url}")
+
+    return JsonResponse({'success': True, 'redirect_url': redirect_url})
+
+
 
 
 @login_required
