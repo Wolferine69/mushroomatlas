@@ -410,4 +410,3 @@ def handle_trash_actions(request):
             messages.success(request, 'Vybrané zprávy byly obnoveny.')
 
     return redirect('view_trash')
-

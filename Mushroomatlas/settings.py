@@ -164,29 +164,21 @@ LOGGING = {
     'disable_existing_loggers': False,
     'handlers': {
         'console': {
-            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-        },
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'debug.log'),
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG',
-            'propagate': True,
+            'handlers': ['console'],
+            'level': 'INFO',  # Změňte na INFO nebo vyšší
         },
-        'messaging': {
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG',
-            'propagate': True,
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'ERROR',  # Změňte na ERROR nebo vyšší
+            'propagate': False,
         },
     },
 }
-
 
 
 
