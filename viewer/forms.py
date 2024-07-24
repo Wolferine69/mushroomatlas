@@ -1,11 +1,15 @@
 from django import forms
 from .models import Habitat, Finding, Comment, Recipe, Family, CommentRecipe, Profile, Tip
-
 from viewer.models import Mushroom, Message
 
 
 class MushroomForm(forms.ModelForm):
-    """Meta class to specify the model and fields to include in the form"""
+    """
+    Form for creating and updating Mushroom instances.
+
+    This form includes fields for the Czech name, Latin name, description, edibility,
+    habitats, image, and family.
+    """
 
     class Meta:
         model = Mushroom
@@ -23,6 +27,11 @@ class MushroomForm(forms.ModelForm):
 
 
 class MushroomFilterForm(forms.Form):
+    """
+    Form for filtering mushrooms.
+
+    This form includes fields for filtering mushrooms by edibility, habitat, and family.
+    """
     EDIBILITY_CHOICES = [
         ('', 'Jakékoliv'),
         ('jedla', 'Jedlá'),
@@ -36,6 +45,12 @@ class MushroomFilterForm(forms.Form):
 
 
 class FindingForm(forms.ModelForm):
+    """
+    Form for creating and updating Finding instances.
+
+    This form includes fields for the mushroom, description, date found, image, latitude, and longitude.
+    """
+
     class Meta:
         model = Finding
         fields = ['mushroom', 'description', 'date_found', 'image', 'latitude', 'longitude']
@@ -55,6 +70,12 @@ class FindingForm(forms.ModelForm):
 
 
 class CommentForm(forms.ModelForm):
+    """
+    Form for creating and updating Comment instances.
+
+    This form includes a field for the comment text.
+    """
+
     class Meta:
         model = Comment
         fields = ['text']
@@ -65,6 +86,12 @@ class CommentForm(forms.ModelForm):
 
 
 class RecipeForm(forms.ModelForm):
+    """
+    Form for creating and updating Recipe instances.
+
+    This form includes fields for the title, ingredients, instructions, image, main mushroom, and source.
+    """
+
     class Meta:
         model = Recipe
         fields = ['title', 'ingredients', 'instructions', 'image', 'main_mushroom', 'source']
@@ -79,12 +106,24 @@ class RecipeForm(forms.ModelForm):
 
 
 class MessageForm(forms.ModelForm):
+    """
+    Form for creating and updating Message instances.
+
+    This form includes fields for the receiver and content of the message.
+    """
+
     class Meta:
         model = Message
         fields = ['receiver', 'content']
 
 
 class CommentRecipeForm(forms.ModelForm):
+    """
+    Form for creating and updating CommentRecipe instances.
+
+    This form includes fields for the comment text and an optional image.
+    """
+
     class Meta:
         model = CommentRecipe
         fields = ['text', 'image']
@@ -99,6 +138,11 @@ class CommentRecipeForm(forms.ModelForm):
 
 
 class RecipeFilterForm(forms.Form):
+    """
+    Form for filtering recipes.
+
+    This form includes fields for filtering recipes by main mushroom, minimum rating, and user.
+    """
     main_mushroom = forms.ModelChoiceField(queryset=Mushroom.objects.all(), required=False, label='Hlavní houba')
     min_rating = forms.DecimalField(required=False, min_value=0, max_value=5, decimal_places=1,
                                     label='Minimální hodnocení')
@@ -106,6 +150,12 @@ class RecipeFilterForm(forms.Form):
 
 
 class TipForm(forms.ModelForm):
+    """
+    Form for creating and updating Tip instances.
+
+    This form includes fields for the title and text of the tip.
+    """
+
     class Meta:
         model = Tip
         fields = ['title', 'text']

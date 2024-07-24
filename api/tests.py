@@ -3,11 +3,20 @@ import requests
 
 
 class TestAPI(unittest.TestCase):
+    """
+    Test suite for the API endpoints.
+
+    This class contains various test cases to ensure the API endpoints are functioning correctly.
+    """
 
     def setUp(self):
-        # Base URL of the API
+        """
+        Set up the test client and authentication token.
+
+        This method is run before each test. It initializes the base URL, login URL, user credentials,
+        and obtains an authentication token for use in subsequent tests.
+        """
         self.base_url = "http://127.0.0.1:8000"
-        # URL for obtaining the authentication token
         self.login_url = f"{self.base_url}/api/token/"
         self.username = "FungiFreak"
         self.password = "FunGuy123!"
@@ -19,7 +28,14 @@ class TestAPI(unittest.TestCase):
         }
 
     def get_token(self):
-        # Obtain the authentication token
+        """
+        Obtain the authentication token.
+
+        Sends a POST request to the login URL with the user credentials to get the authentication token.
+
+        Returns:
+            str: The authentication token.
+        """
         login_data = {
             "username": self.username,
             "password": self.password
@@ -32,13 +48,23 @@ class TestAPI(unittest.TestCase):
         return token
 
     def test_get_mushrooms(self):
-        # Test for fetching the list of mushrooms
+        """
+        Test for fetching the list of mushrooms.
+
+        Sends a GET request to the mushrooms endpoint and checks if the response status is 200 OK
+        and the response contains data.
+        """
         response = self.client.get(f"{self.base_url}/api/mushrooms/", headers=self.headers)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.json())
 
     def test_post_mushroom(self):
-        # Test for creating a new mushroom entry
+        """
+        Test for creating a new mushroom entry.
+
+        Sends a POST request to the mushrooms endpoint with a new mushroom payload and checks if
+        the response status is 201 Created and the response contains the correct data.
+        """
         habitats_response = self.client.get(f"{self.base_url}/api/habitats/", headers=self.headers)
         self.assertEqual(habitats_response.status_code, 200)
         habitats_data = habitats_response.json()
@@ -58,13 +84,23 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(response.json()["name_cz"], "Testovací houba")
 
     def test_get_families(self):
-        # Test for fetching the list of families
+        """
+        Test for fetching the list of families.
+
+        Sends a GET request to the families endpoint and checks if the response status is 200 OK
+        and the response contains data.
+        """
         response = self.client.get(f"{self.base_url}/api/families/", headers=self.headers)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.json())
 
     def test_post_family(self):
-        # Test for creating a new family entry
+        """
+        Test for creating a new family entry.
+
+        Sends a POST request to the families endpoint with a new family payload and checks if
+        the response status is 201 Created and the response contains the correct data.
+        """
         payload = {
             "name": "Testovací rodina",
             "name_latin": "Familia testus",
@@ -75,13 +111,23 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(response.json()["name"], "Testovací rodina")
 
     def test_get_recipes(self):
-        # Test for fetching the list of recipes
+        """
+        Test for fetching the list of recipes.
+
+        Sends a GET request to the recipes endpoint and checks if the response status is 200 OK
+        and the response contains data.
+        """
         response = self.client.get(f"{self.base_url}/api/recipes/", headers=self.headers)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.json())
 
     def test_post_recipe(self):
-        # Test for creating a new recipe entry
+        """
+        Test for creating a new recipe entry.
+
+        Sends a POST request to the recipes endpoint with a new recipe payload and checks if
+        the response status is 201 Created and the response contains the correct data.
+        """
         profile_id = self.get_profile_id(user_id=1)
         payload = {
             "user": profile_id,
@@ -97,7 +143,15 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(response.json()["title"], "Testovací recept")
 
     def get_profile_id(self, user_id):
-        # Helper function to fetch the profile ID for a given user ID
+        """
+        Helper function to fetch the profile ID for a given user ID.
+
+        Sends a GET request to the profiles endpoint and searches for the profile associated with
+        the given user ID.
+
+        Returns:
+            int: The profile ID.
+        """
         response = self.client.get(f"{self.base_url}/api/profiles/", headers=self.headers)
         self.assertEqual(response.status_code, 200)
         profiles = response.json()
@@ -106,13 +160,23 @@ class TestAPI(unittest.TestCase):
         return profile['id']
 
     def test_get_findings(self):
-        # Test for fetching the list of findings
+        """
+        Test for fetching the list of findings.
+
+        Sends a GET request to the findings endpoint and checks if the response status is 200 OK
+        and the response contains data.
+        """
         response = self.client.get(f"{self.base_url}/api/findings/", headers=self.headers)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.json())
 
     def test_post_finding(self):
-        # Test for creating a new finding entry
+        """
+        Test for creating a new finding entry.
+
+        Sends a POST request to the findings endpoint with a new finding payload and checks if
+        the response status is 201 Created and the response contains the correct data.
+        """
         mushrooms_response = self.client.get(f"{self.base_url}/api/mushrooms/", headers=self.headers)
         self.assertEqual(mushrooms_response.status_code, 200)
         mushrooms_data = mushrooms_response.json()
@@ -133,13 +197,23 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(response.json()["description"], "Test finding description")
 
     def test_get_habitats(self):
-        # Test for fetching the list of habitats
+        """
+        Test for fetching the list of habitats.
+
+        Sends a GET request to the habitats endpoint and checks if the response status is 200 OK
+        and the response contains data.
+        """
         response = self.client.get(f"{self.base_url}/api/habitats/", headers=self.headers)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.json())
 
     def test_post_habitat(self):
-        # Test for creating a new habitat entry
+        """
+        Test for creating a new habitat entry.
+
+        Sends a POST request to the habitats endpoint with a new habitat payload and checks if
+        the response status is 201 Created and the response contains the correct data.
+        """
         payload = {
             "name": "Testovací habitat"
         }

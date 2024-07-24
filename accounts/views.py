@@ -15,29 +15,45 @@ from accounts.forms import UserProfileUpdateForm
 from accounts.models import Profile
 
 
-# Create your views here.
 class SubmittableLoginView(LoginView):
+    """
+    A view for logging in users that also counts unread messages.
+
+    Attributes:
+        template_name (str): Template used for the login page.
+    """
     template_name = 'login.html'
 
     def form_valid(self, form):
-        # Call the parent's form_valid method to log the user in
-        response = super().form_valid(form)
+        """
+        If the form is valid, log the user in and store the count of unread messages in the session.
 
-        # Get the count of unread messages for the logged-in user
+        Args:
+            form (Form): The form instance.
+
+        Returns:
+            HttpResponse: The response to be sent.
+        """
+        response = super().form_valid(form)
         new_messages_count = Message.objects.filter(
             receiver=self.request.user,
             is_read=False,
             is_trashed_by_receiver=False,
             is_deleted_by_receiver=False
         ).count()
-
-        # Store the new messages count in the session
         self.request.session['new_messages_count'] = new_messages_count
-
         return response
 
 
 class RegistrationForm(UserCreationForm):
+    """
+    A form for user registration that includes additional fields for profile picture and biography.
+
+    Fields:
+        profile_picture (ImageField): A field for uploading a profile picture.
+        biography (CharField): A text field for the user's biography.
+    """
+
     class Meta(UserCreationForm.Meta):
         fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
 
@@ -46,6 +62,15 @@ class RegistrationForm(UserCreationForm):
 
     @atomic
     def save(self, commit=True):
+        """
+        Save the user and create a related Profile instance.
+
+        Args:
+            commit (bool): Whether to save the user and profile to the database.
+
+        Returns:
+            User: The created user instance.
+        """
         self.instance.is_active = True
         user = super().save(commit)
         biography = self.cleaned_data['biography']
@@ -57,25 +82,63 @@ class RegistrationForm(UserCreationForm):
 
 
 class RegistrationView(CreateView):
+    """
+    A view for user registration.
+
+    Attributes:
+        template_name (str): Template used for the registration page.
+        form_class (Form): The form class used for registration.
+        success_url (str): URL to redirect to after successful registration.
+    """
     template_name = 'registration.html'
     form_class = RegistrationForm
     success_url = reverse_lazy('home')
 
 
 class SubmittablePasswordChangeView(PasswordChangeView):
+    """
+    A view for changing passwords.
+
+    Attributes:
+        template_name (str): Template used for the password change page.
+        success_url (str): URL to redirect to after successful password change.
+    """
     template_name = 'password.html'
     success_url = reverse_lazy('home')
 
 
 class AccountsListView(LoginRequiredMixin, ListView):
+    """
+    A view to list all user profiles except the currently logged-in user.
+
+    Attributes:
+        model (Model): The model to use for the list view.
+        template_name (str): Template used for the accounts list page.
+        context_object_name (str): The context variable name for the list of profiles.
+    """
     model = Profile
     template_name = 'accounts_list.html'
     context_object_name = 'accounts'
+
     def get_queryset(self):
-        # Získáme všechny profily kromě profilu přihlášeného uživatele
+        """
+        Get the list of profiles excluding the profile of the currently logged-in user.
+
+        Returns:
+            QuerySet: The list of profiles.
+        """
         return Profile.objects.exclude(user=self.request.user)
 
     def get_context_data(self, **kwargs):
+        """
+        Add additional context data to the view.
+
+        Args:
+            **kwargs: Additional context variables.
+
+        Returns:
+            dict: The context data.
+        """
         context = super().get_context_data(**kwargs)
         context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
             'viewer.add_mushroom')
@@ -83,22 +146,34 @@ class AccountsListView(LoginRequiredMixin, ListView):
 
 
 class AccountDetailView(LoginRequiredMixin, DetailView):
+    """
+    A view to display the details of a user's profile.
+
+    Attributes:
+        model (Model): The model to use for the detail view.
+        template_name (str): Template used for the account detail page.
+        context_object_name (str): The context variable name for the profile.
+    """
     model = Profile
     template_name = 'account_detail.html'
     context_object_name = 'account'
 
     def get_context_data(self, **kwargs):
+        """
+        Add additional context data to the view, including messages sent and received.
+
+        Args:
+            **kwargs: Additional context variables.
+
+        Returns:
+            dict: The context data.
+        """
         context = super().get_context_data(**kwargs)
-        # The user whose profile is being viewed
         profile_user = self.get_object().user
-        # The logged-in user
         logged_in_user = self.request.user
 
-        # Messages received by the logged-in user from the profile user
         context['received_messages'] = Message.objects.filter(
             sender=profile_user, receiver=logged_in_user).order_by('-timestamp')
-
-        # Messages sent by the logged-in user to the profile user
         context['sent_messages'] = Message.objects.filter(
             sender=logged_in_user, receiver=profile_user).order_by('-timestamp')
 
@@ -106,6 +181,16 @@ class AccountDetailView(LoginRequiredMixin, DetailView):
 
 
 class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    """
+    A view to update the profile of the currently logged-in user.
+
+    Attributes:
+        model (Model): The model to use for the update view.
+        form_class (Form): The form class used for updating the profile.
+        template_name (str): Template used for the profile update page.
+        success_url (str): URL to redirect to after successful profile update.
+        success_message (str): Message to display after successful profile update.
+    """
     model = Profile
     form_class = UserProfileUpdateForm
     template_name = 'profile_update.html'
@@ -113,9 +198,24 @@ class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     success_message = "Váš profil byl úspěšně aktualizován!"
 
     def get_object(self):
+        """
+        Get the profile of the currently logged-in user.
+
+        Returns:
+            User: The logged-in user's profile.
+        """
         return get_object_or_404(User, pk=self.request.user.pk)
 
     def get_context_data(self, **kwargs):
+        """
+        Add additional context data to the view.
+
+        Args:
+            **kwargs: Additional context variables.
+
+        Returns:
+            dict: The context data.
+        """
         context = super().get_context_data(**kwargs)
         context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
             'viewer.add_mushroom')

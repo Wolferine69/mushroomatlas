@@ -1,12 +1,8 @@
 from decimal import Decimal
-
 from django.contrib.auth.models import User
 from django.db import models
-
 from accounts.models import Profile
 
-
-# Create your models here.
 class Family(models.Model):
     """Model representing a mushroom family."""
     name = models.CharField(max_length=100)
@@ -20,14 +16,12 @@ class Family(models.Model):
     def __str__(self):
         return self.name
 
-
 class Habitat(models.Model):
-    """Model representing a habitat of a mushroom"""
+    """Model representing a habitat of a mushroom."""
     name = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
-
 
 class Mushroom(models.Model):
     """Model representing a mushroom."""
@@ -39,7 +33,7 @@ class Mushroom(models.Model):
     name_cz = models.CharField(max_length=100)
     name_latin = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
-    edibility = models.CharField(max_length=10, choices=EDIBILITY_CHOICES, default='inedible', )
+    edibility = models.CharField(max_length=10, choices=EDIBILITY_CHOICES, default='inedible')
     habitats = models.ManyToManyField(Habitat, related_name='mushrooms')
     image = models.ImageField(upload_to='mushroom_images/', null=True, blank=True)
     family = models.ForeignKey(Family, on_delete=models.CASCADE, related_name='mushrooms', null=True, blank=True)
@@ -49,7 +43,6 @@ class Mushroom(models.Model):
 
     def __str__(self):
         return f"{self.name_cz} ({self.name_latin}) - {self.get_edibility_display()}"
-
 
 class Finding(models.Model):
     """Model representing a finding of a mushroom."""
@@ -63,7 +56,6 @@ class Finding(models.Model):
 
     def __str__(self):
         return f"Finding of {self.mushroom.name_cz} by {self.user.user.username}"
-
 
 class Recipe(models.Model):
     """Model representing a mushroom recipe."""
@@ -83,21 +75,22 @@ class Recipe(models.Model):
         return self.title
 
     def update_average_rating(self):
+        """Updates the average rating of the recipe based on user ratings."""
         ratings = Rating.objects.filter(recipe=self)
         if ratings.exists():
             total_rating = sum(rating.hodnoceni for rating in ratings)
             average_rating = total_rating / ratings.count()
-            self.rating = round(Decimal(average_rating), 1)  # zaokrouhlení na jedno desetinné místo
+            self.rating = round(Decimal(average_rating), 1)  # round to one decimal place
         else:
             self.rating = Decimal('0.0')
         self.save()
 
     def num_ratings(self):
+        """Returns the number of ratings for the recipe."""
         return Rating.objects.filter(recipe=self).count()
 
-
 class Rating(models.Model):
-    """Model representing a rating of recipe"""
+    """Model representing a rating of a recipe."""
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='hodnoceni')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     hodnoceni = models.IntegerField(default=1, choices=((1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')))
@@ -105,14 +98,12 @@ class Rating(models.Model):
     def __str__(self):
         return f"{self.recipe.title} - {self.user.username}"
 
-
 class Tip(models.Model):
-    """Model representing a tip or trick"""
+    """Model representing a tip or trick."""
     user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='tip', null=True, blank=True)
     title = models.CharField(max_length=500)
     content = models.TextField()
     text = models.TextField(null=True, blank=True)
-    # created_at = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(upload_to='recipe_images/', null=True, blank=True)
 
     class Meta:
@@ -120,7 +111,6 @@ class Tip(models.Model):
 
     def __str__(self):
         return self.title
-
 
 class Comment(models.Model):
     """Model representing a comment on a finding."""
@@ -136,8 +126,8 @@ class Comment(models.Model):
     def __str__(self):
         return f"Comment by {self.user.user.username} on {self.finding}"
 
-
 class Message(models.Model):
+    """Model representing a message."""
     sender = models.ForeignKey(User, related_name='sent_messages', on_delete=models.CASCADE)
     receiver = models.ForeignKey(User, related_name='received_messages', on_delete=models.CASCADE)
     content = models.TextField()
@@ -145,7 +135,6 @@ class Message(models.Model):
 
     def __str__(self):
         return f"Message from {self.sender} to {self.receiver} at {self.timestamp}"
-
 
 class CommentRecipe(models.Model):
     """Model representing a comment on a recipe."""

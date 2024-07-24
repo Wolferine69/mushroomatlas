@@ -1,18 +1,22 @@
 import os
-
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.views.decorators.http import require_POST
-
 from .forms import MessageForm, AttachmentFormSet, SenderFilterForm, ReceiverFilterForm
 from .models import Message, Attachment
 from django.db.models import Q
 
+
 @login_required
 def send_message(request, receiver_username=None, replied_to_id=None):
+    """
+    View to send a message.
+
+    This view handles the creation of a new message, including attachments.
+    """
     receiver = None
     replied_to = None
     initial_subject = ""
@@ -67,6 +71,11 @@ def send_message(request, receiver_username=None, replied_to_id=None):
 
 @login_required
 def restore_message(request, pk):
+    """
+    View to restore a trashed message.
+
+    This view handles the restoration of a message from the trash.
+    """
     message = get_object_or_404(Message, pk=pk)
     if message.sender == request.user:
         message.is_trashed_by_sender = False
@@ -83,6 +92,11 @@ def restore_message(request, pk):
 @require_POST
 @login_required
 def bulk_delete_trash_messages(request):
+    """
+    View to bulk delete trashed messages.
+
+    This view handles the permanent deletion of multiple trashed messages.
+    """
     message_ids = request.POST.getlist('message_ids')
 
     if message_ids:
@@ -103,6 +117,11 @@ def bulk_delete_trash_messages(request):
 @require_POST
 @login_required
 def bulk_restore_trash_messages(request):
+    """
+    View to bulk restore trashed messages.
+
+    This view handles the restoration of multiple trashed messages.
+    """
     message_ids = request.POST.getlist('message_ids')
 
     if message_ids:
@@ -123,6 +142,11 @@ def bulk_restore_trash_messages(request):
 @require_POST
 @login_required
 def trash_message(request, pk):
+    """
+    View to move a message to trash.
+
+    This view handles the trashing of a single message.
+    """
     message = get_object_or_404(Message, pk=pk)
     origin = request.POST.get('origin', 'inbox')
 
@@ -160,6 +184,11 @@ def trash_message(request, pk):
 
 @login_required
 def bulk_delete_messages(request):
+    """
+    View to bulk delete messages.
+
+    This view handles the deletion of multiple messages.
+    """
     if request.method == 'POST':
         message_ids = request.POST.getlist('message_ids')
         if message_ids:
@@ -176,6 +205,11 @@ def bulk_delete_messages(request):
 @require_POST
 @login_required
 def delete_message(request, pk):
+    """
+    View to delete a message.
+
+    This view handles the deletion of a single message.
+    """
     message = get_object_or_404(Message, pk=pk)
 
     if message.sender == request.user:
@@ -195,6 +229,11 @@ def delete_message(request, pk):
 
 @login_required
 def view_inbox(request):
+    """
+    View to display the inbox.
+
+    This view displays the list of received messages.
+    """
     form = SenderFilterForm(request.GET, user=request.user)
     messages = Message.objects.filter(receiver=request.user, is_trashed_by_receiver=False,
                                       is_deleted_by_receiver=False).order_by('-timestamp')
@@ -219,6 +258,11 @@ def view_inbox(request):
 
 @login_required
 def view_outbox(request):
+    """
+    View to display the outbox.
+
+    This view displays the list of sent messages.
+    """
     form = ReceiverFilterForm(request.GET, user=request.user)
     messages = Message.objects.filter(sender=request.user, is_trashed_by_sender=False,
                                       is_deleted_by_sender=False).order_by('-timestamp')
@@ -241,6 +285,11 @@ def view_outbox(request):
 
 @login_required
 def view_trash(request):
+    """
+    View to display the trash.
+
+    This view displays the list of trashed messages.
+    """
     form_sender = SenderFilterForm(request.GET)
     trashed_messages = Message.objects.filter(
         Q(receiver=request.user, is_trashed_by_receiver=True, is_deleted_by_receiver=False) |
@@ -266,6 +315,11 @@ def view_trash(request):
 
 @login_required
 def mark_message_read(request, message_id):
+    """
+    View to mark a message as read.
+
+    This view handles the marking of a message as read.
+    """
     message = get_object_or_404(Message, id=message_id)
     if request.user == message.receiver:
         message.is_read = True
@@ -279,8 +333,14 @@ def mark_message_read(request, message_id):
         return JsonResponse({'success': True, 'new_messages_count': new_messages_count})
     return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=403)
 
+
 @login_required
 def forward_message(request, message_id, reply=False):
+    """
+    View to forward a message.
+
+    This view handles the forwarding of a message.
+    """
     original_message = get_object_or_404(Message, id=message_id)
     receiver = None
 
@@ -339,6 +399,11 @@ def forward_message(request, message_id, reply=False):
 
 @login_required
 def view_message_detail(request, message_id):
+    """
+    View to display message details.
+
+    This view displays the details of a single message.
+    """
     message = get_object_or_404(Message, id=message_id)
     origin = request.GET.get('origin', 'inbox')
     user_id = request.GET.get('user_id', None)
@@ -360,6 +425,11 @@ def view_message_detail(request, message_id):
 
 
 def get_message_counts(user):
+    """
+    Helper function to get message counts for a user.
+
+    This function returns the counts of received, unread, sent, and trashed messages for a user.
+    """
     received_count = Message.objects.filter(receiver=user, is_trashed_by_receiver=False,
                                             is_deleted_by_receiver=False).count()
     unread_count = Message.objects.filter(receiver=user, is_trashed_by_receiver=False, is_deleted_by_receiver=False,
@@ -375,6 +445,11 @@ def get_message_counts(user):
 @require_POST
 @login_required
 def bulk_trash_messages(request):
+    """
+    View to bulk trash messages.
+
+    This view handles the trashing of multiple messages.
+    """
     message_ids = request.POST.getlist('message_ids')
     if message_ids:
         messages = Message.objects.filter(id__in=message_ids)
@@ -390,6 +465,11 @@ def bulk_trash_messages(request):
 @require_POST
 @login_required
 def handle_trash_actions(request):
+    """
+    View to handle trash actions.
+
+    This view handles the actions for trashing or restoring multiple messages.
+    """
     action = request.POST.get('action')
     message_ids = request.POST.getlist('message_ids')
 

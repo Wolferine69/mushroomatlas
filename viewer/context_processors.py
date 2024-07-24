@@ -4,6 +4,15 @@ from django.db.models import Q
 
 
 def new_comments_count(request):
+    """
+    Context processor to count new comments on user's findings.
+
+    Args:
+        request (HttpRequest): The request object.
+
+    Returns:
+        dict: A dictionary containing the count of new comments on user's findings.
+    """
     if request.user.is_authenticated:
         user_findings = Finding.objects.filter(user=request.user.profile)
         new_comments = Comment.objects.filter(finding__in=user_findings, new=True).count()
@@ -16,6 +25,15 @@ def new_comments_count(request):
 
 
 def new_comments_recipe_count(request):
+    """
+    Context processor to count new comments on user's recipes.
+
+    Args:
+        request (HttpRequest): The request object.
+
+    Returns:
+        dict: A dictionary containing the count of new comments on user's recipes.
+    """
     if request.user.is_authenticated:
         user_recipes = Recipe.objects.filter(user=request.user.profile)
         new_comments_recipe = CommentRecipe.objects.filter(recipe__in=user_recipes, new=True).count()
@@ -28,6 +46,15 @@ def new_comments_recipe_count(request):
 
 
 def new_messages_count(request):
+    """
+    Context processor to count new messages for the user.
+
+    Args:
+        request (HttpRequest): The request object.
+
+    Returns:
+        dict: A dictionary containing the count of new messages for the user.
+    """
     if request.user.is_authenticated:
         new_messages = Message.objects.filter(
             receiver=request.user,
@@ -44,6 +71,15 @@ def new_messages_count(request):
 
 
 def sent_messages_count(request):
+    """
+    Context processor to count sent messages by the user.
+
+    Args:
+        request (HttpRequest): The request object.
+
+    Returns:
+        dict: A dictionary containing the count of sent messages by the user.
+    """
     if request.user.is_authenticated:
         sent_messages = Message.objects.filter(
             sender=request.user,
@@ -59,6 +95,15 @@ def sent_messages_count(request):
 
 
 def trashed_messages_count(request):
+    """
+    Context processor to count trashed messages for the user.
+
+    Args:
+        request (HttpRequest): The request object.
+
+    Returns:
+        dict: A dictionary containing the count of trashed messages for the user.
+    """
     if request.user.is_authenticated:
         trashed_messages = Message.objects.filter(
             Q(receiver=request.user, is_trashed_by_receiver=True, is_deleted_by_receiver=False) |
@@ -73,6 +118,15 @@ def trashed_messages_count(request):
 
 
 def can_add_mushroom(request):
+    """
+    Context processor to check if the user has permission to add a mushroom.
+
+    Args:
+        request (HttpRequest): The request object.
+
+    Returns:
+        dict: A dictionary indicating if the user can add a mushroom.
+    """
     if request.user.is_authenticated:
         return {
             'can_add_mushroom': request.user.has_perm('viewer.add_mushroom')
