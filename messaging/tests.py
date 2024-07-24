@@ -11,6 +11,7 @@ from viewer.models import Profile
 # Ensure the app is ready and signals are imported
 apps.get_app_config('messaging').ready()
 
+
 class UserProfileTest(TestCase):
     def setUp(self):
         self.client = Client()
@@ -48,6 +49,7 @@ class UserProfileTest(TestCase):
         response = self.client.get(reverse('view_inbox'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Test Subject')
+
 
 class MessagingViewsTest(UserProfileTest):
     def setUp(self):
@@ -101,6 +103,7 @@ class MessagingViewsTest(UserProfileTest):
         self.assertEqual(response.status_code, 302)  # Redirect to outbox
         self.assertEqual(Message.objects.last().subject, 'Fwd: Test Subject')
 
+
 class MessageModelTest(UserProfileTest):
     def test_create_message(self):
         message = Message.objects.create(
@@ -141,6 +144,7 @@ class MessageModelTest(UserProfileTest):
         self.assertFalse(message.is_trashed_by_sender)
         self.assertFalse(message.is_trashed_by_receiver)
 
+
 class AttachmentModelTest(UserProfileTest):
     def setUp(self):
         super().setUp()
@@ -166,6 +170,7 @@ class AttachmentModelTest(UserProfileTest):
         )
         self.assertEqual(str(attachment), f"Attachment for message {self.message.id}")
 
+
 class MessageFormTest(UserProfileTest):
     def test_message_form_valid(self):
         form_data = {
@@ -180,6 +185,7 @@ class MessageFormTest(UserProfileTest):
         form = MessageForm(user=self.user1)
         self.assertNotIn(self.user1, form.fields['receiver'].queryset)
 
+
 class AttachmentFormSetTest(TestCase):
     def test_attachment_formset_valid(self):
         formset_data = {
@@ -192,10 +198,12 @@ class AttachmentFormSetTest(TestCase):
         formset = AttachmentFormSet(data=formset_data, files=formset_data)
         self.assertTrue(formset.is_valid())
 
+
 class SenderFilterFormTest(UserProfileTest):
     def test_sender_filter_form(self):
         form = SenderFilterForm(user=self.user1)
         self.assertNotIn(self.user1, form.fields['sender'].queryset)
+
 
 class ReceiverFilterFormTest(UserProfileTest):
     def test_receiver_filter_form(self):
@@ -218,6 +226,7 @@ class ReceiverFilterFormTest(UserProfileTest):
         self.message.refresh_from_db()
         self.assertTrue(self.message.is_read)
 
+
 class RestoreMessageTest(TestCase):
     def setUp(self):
         self.client = Client()
@@ -238,6 +247,7 @@ class RestoreMessageTest(TestCase):
         self.message.refresh_from_db()
         self.assertFalse(self.message.is_trashed_by_receiver)
 
+
 class TrashMessageTest(TestCase):
     def setUp(self):
         self.client = Client()
@@ -252,6 +262,7 @@ class TrashMessageTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.message.refresh_from_db()
         self.assertTrue(self.message.is_trashed_by_receiver)
+
 
 class BulkDeleteMessagesTest(TestCase):
     def setUp(self):
@@ -272,6 +283,7 @@ class BulkDeleteMessagesTest(TestCase):
         self.message2.refresh_from_db()
         self.assertTrue(self.message1.is_deleted_by_sender)
         self.assertTrue(self.message2.is_deleted_by_sender)
+
 
 class BulkTrashMessagesTest(TestCase):
     def setUp(self):
