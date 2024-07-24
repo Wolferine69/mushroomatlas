@@ -1,5 +1,7 @@
-# views.py
-from django.http import JsonResponse, HttpResponse
+import os
+
+from django.contrib import messages
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -8,7 +10,6 @@ from django.views.decorators.http import require_POST
 from .forms import MessageForm, AttachmentFormSet, SenderFilterForm, ReceiverFilterForm
 from .models import Message, Attachment
 from django.db.models import Q
-
 
 @login_required
 def send_message(request, receiver_username=None, replied_to_id=None):
@@ -83,9 +84,10 @@ def restore_message(request, pk):
 @login_required
 def bulk_delete_trash_messages(request):
     message_ids = request.POST.getlist('message_ids')
+
     if message_ids:
-        messages = Message.objects.filter(id__in=message_ids)
-        for message in messages:
+        messages_to_delete = Message.objects.filter(id__in=message_ids)
+        for message in messages_to_delete:
             if message.sender == request.user:
                 message.is_deleted_by_sender = True
             if message.receiver == request.user:
@@ -94,20 +96,66 @@ def bulk_delete_trash_messages(request):
                 message.delete()
             else:
                 message.save()
+        messages.success(request, 'Vybrané zprávy byly smazány.')
     return redirect('view_trash')
 
 
+@require_POST
+@login_required
+def bulk_restore_trash_messages(request):
+    message_ids = request.POST.getlist('message_ids')
+
+    if message_ids:
+        for message_id in message_ids:
+            try:
+                message = Message.objects.get(id=message_id)
+                if request.user == message.sender:
+                    message.is_trashed_by_sender = False
+                if request.user == message.receiver:
+                    message.is_trashed_by_receiver = False
+                message.save()
+            except Message.DoesNotExist:
+                continue
+        messages.success(request, 'Vybrané zprávy byly obnoveny.')
+    return redirect('view_trash')
+
+
+@require_POST
 @login_required
 def trash_message(request, pk):
     message = get_object_or_404(Message, pk=pk)
-    if message.sender == request.user:
-        message.is_trashed_by_sender = True
-        message.is_deleted_by_sender = False
-    elif message.receiver == request.user:
+    origin = request.POST.get('origin', 'inbox')
+
+    if request.user == message.receiver:
         message.is_trashed_by_receiver = True
-        message.is_deleted_by_receiver = False
+    elif request.user == message.sender:
+        message.is_trashed_by_sender = True
+
     message.save()
-    return redirect('view_trash')
+
+    if origin in ['trash', 'outbox']:
+        attachments = message.attachments.all()
+        if attachments.exists():
+            for attachment in attachments:
+                file_path = attachment.file.path
+                if os.path.exists(file_path):
+                    try:
+                        attachment.file.delete(save=False)
+                    except Exception as e:
+                        pass
+                try:
+                    attachment.delete()
+                except Exception as e:
+                    pass
+        try:
+            message.delete()
+        except Exception as e:
+            pass
+        redirect_url = '/trash/'
+    else:
+        redirect_url = '/inbox/' if message.receiver == request.user else '/outbox/'
+
+    return JsonResponse({'success': True, 'redirect_url': redirect_url})
 
 
 @login_required
@@ -125,24 +173,24 @@ def bulk_delete_messages(request):
     return redirect('view_outbox')
 
 
+@require_POST
 @login_required
 def delete_message(request, pk):
     message = get_object_or_404(Message, pk=pk)
-    if request.method == 'POST' or request.method == 'DELETE':
-        if message.sender == request.user:
-            message.is_deleted_by_sender = True
-            message.is_trashed_by_sender = True
-        elif message.receiver == request.user:
-            message.is_deleted_by_receiver = True
-            message.is_trashed_by_receiver = True
 
-        if message.is_deleted_by_sender and message.is_deleted_by_receiver:
-            message.delete()
-        else:
-            message.save()
-        return (JsonResponse
-                ({'success': True, 'redirect_url': '/outbox/' if message.sender == request.user else '/inbox/'}))
-    return JsonResponse({'error': 'Invalid request method'}, status=400)
+    if message.sender == request.user:
+        message.is_deleted_by_sender = True
+    if message.receiver == request.user:
+        message.is_deleted_by_receiver = True
+
+    if message.is_deleted_by_sender and message.is_deleted_by_receiver:
+        message.delete()
+    else:
+        message.save()
+
+    redirect_url = '/outbox/' if message.sender == request.user else '/inbox/'
+
+    return JsonResponse({'success': True, 'redirect_url': redirect_url})
 
 
 @login_required
@@ -217,12 +265,19 @@ def view_trash(request):
 
 
 @login_required
-def mark_message_read(request, pk):
-    message = get_object_or_404(Message, pk=pk)
-    message.is_read = True
-    message.save()
-    return HttpResponse(status=200)
-
+def mark_message_read(request, message_id):
+    message = get_object_or_404(Message, id=message_id)
+    if request.user == message.receiver:
+        message.is_read = True
+        message.save()
+        new_messages_count = Message.objects.filter(
+            receiver=request.user,
+            is_read=False,
+            is_trashed_by_receiver=False,
+            is_deleted_by_receiver=False
+        ).count()
+        return JsonResponse({'success': True, 'new_messages_count': new_messages_count})
+    return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=403)
 
 @login_required
 def forward_message(request, message_id, reply=False):
@@ -285,6 +340,9 @@ def forward_message(request, message_id, reply=False):
 @login_required
 def view_message_detail(request, message_id):
     message = get_object_or_404(Message, id=message_id)
+    origin = request.GET.get('origin', 'inbox')
+    user_id = request.GET.get('user_id', None)
+
     if request.user not in [message.receiver, message.sender]:
         return redirect('view_inbox')
 
@@ -296,6 +354,8 @@ def view_message_detail(request, message_id):
         'unread_count': unread_count,
         'sent_count': sent_count,
         'trashed_count': trashed_count,
+        'origin': origin,
+        'user_id': user_id
     })
 
 
@@ -312,18 +372,47 @@ def get_message_counts(user):
     return received_count, unread_count, sent_count, trashed_count
 
 
+@require_POST
 @login_required
 def bulk_trash_messages(request):
-    if request.method == 'POST':
-        message_ids = request.POST.getlist('message_ids')
-        if message_ids:
-            messages = Message.objects.filter(id__in=message_ids)
-            for message in messages:
+    message_ids = request.POST.getlist('message_ids')
+    if message_ids:
+        messages = Message.objects.filter(id__in=message_ids)
+        for message in messages:
+            if message.sender == request.user:
+                message.is_trashed_by_sender = True
+            if message.receiver == request.user:
+                message.is_trashed_by_receiver = True
+            message.save()
+    return redirect('view_inbox')
+
+
+@require_POST
+@login_required
+def handle_trash_actions(request):
+    action = request.POST.get('action')
+    message_ids = request.POST.getlist('message_ids')
+
+    if action and message_ids:
+        if action == 'delete':
+            messages_to_delete = Message.objects.filter(id__in=message_ids)
+            for message in messages_to_delete:
                 if message.sender == request.user:
-                    message.is_trashed_by_sender = True
-                    message.is_deleted_by_sender = False
-                elif message.receiver == request.user:
-                    message.is_trashed_by_receiver = True
-                    message.is_deleted_by_receiver = False
+                    message.is_deleted_by_sender = True
+                if message.receiver == request.user:
+                    message.is_deleted_by_receiver = True
+                if message.is_deleted_by_sender and message.is_deleted_by_receiver:
+                    message.delete()
+                else:
+                    message.save()
+            messages.success(request, 'Vybrané zprávy byly smazány.')
+        elif action == 'restore':
+            messages_to_restore = Message.objects.filter(id__in=message_ids)
+            for message in messages_to_restore:
+                if message.sender == request.user:
+                    message.is_trashed_by_sender = False
+                if message.receiver == request.user:
+                    message.is_trashed_by_receiver = False
                 message.save()
+            messages.success(request, 'Vybrané zprávy byly obnoveny.')
     return redirect('view_trash')

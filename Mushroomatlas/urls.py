@@ -20,11 +20,10 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.authtoken.views import obtain_auth_token
 
-
 from accounts.views import SubmittableLoginView, RegistrationView, SubmittablePasswordChangeView, AccountsListView, \
     AccountDetailView, ProfileUpdateView
 from api.views import Mushrooms, Families, Recipes, Findings, Habitats, Profiles
-from messaging.views import bulk_trash_messages
+from messaging.views import trash_message, handle_trash_actions
 from viewer.views import (home,
                           MushroomListView, MushroomDetailView,
                           FamilyListView, FamilyDetailView, RecipeListView, RecipeDetailView, TipListView,
@@ -84,16 +83,19 @@ urlpatterns = [
     path('inbox/', messaging_views.view_inbox, name='view_inbox'),
     path('outbox/', messaging_views.view_outbox, name='view_outbox'),
     path('trash/', messaging_views.view_trash, name='view_trash'),
+    path('trash_message/<int:pk>/', trash_message, name='trash_message'),
+    path('bulk_trash_messages/', messaging_views.bulk_trash_messages, name='bulk_trash_messages'),
+    path('trash/bulk_restore/', messaging_views.bulk_trash_messages, name='bulk_restore_trash_messages'),
+    path('handle_trash_actions/', handle_trash_actions, name='handle_trash_actions'),
     path('message/<int:pk>/trash/', messaging_views.trash_message, name='trash_message'),
     path('message/<int:pk>/restore/', messaging_views.restore_message, name='restore_message'),
     path('message/<int:pk>/delete/', messaging_views.delete_message, name='delete_message'),
     path('delete_message/<int:pk>/', messaging_views.delete_message, name='delete_message'),
-    path('mark_message_read/<int:pk>/', messaging_views.mark_message_read, name='mark_message_read'),
+    path('mark_message_read/<int:message_id>/', messaging_views.mark_message_read,name='mark_message_read'),
     path('forward_message/<int:message_id>/', messaging_views.forward_message, name='forward_message'),
     path('message/<int:message_id>/', messaging_views.view_message_detail, name='message_detail'),
     path('reply_message/<int:message_id>/', messaging_views.forward_message, {'reply': True}, name='reply_message'),
-    path('bulk_trash_messages/', bulk_trash_messages, name='bulk_trash_messages'),
-    path('bulk_delete_trash_messages/', messaging_views.bulk_delete_trash_messages,name='bulk_delete_trash_messages'),
+    path('bulk_delete_trash_messages/', messaging_views.bulk_delete_trash_messages, name='bulk_delete_trash_messages'),
     path('bulk_delete_messages/', messaging_views.bulk_delete_messages, name='bulk_delete_messages'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

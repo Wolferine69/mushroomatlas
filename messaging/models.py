@@ -25,3 +25,7 @@ class Attachment(models.Model):
 
     def __str__(self):
         return f"Attachment for message {self.message.id}"
+
+    def delete(self, *args, **kwargs):
+        self.file.delete(save=False)
+        super().delete(*args, **kwargs)

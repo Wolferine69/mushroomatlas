@@ -6,13 +6,13 @@
     <button type="submit" class="btn btn-primary">Filtrovat</button>
     <a href="{% url 'view_trash' %}" class="btn btn-secondary">Zrušit filtr</a>
 </form>
-<form method="post" action="{% url 'bulk_delete_trash_messages' %}">
+<form id="trashForm" method="post" action="{% url 'handle_trash_actions' %}">
     {% csrf_token %}
     <ul>
         {% for message in trashed_messages %}
             <li>
                 <input type="checkbox" name="message_ids" value="{{ message.id }}">
-                <a href="{% url 'message_detail' message.id %}">
+                <a href="{% url 'message_detail' message.id %}?origin=trash">
                     <strong>{{ message.timestamp }} - Od: {{ message.sender.username }} - Předmět: {{ message.subject }}</strong>
                 </a>
                 <p>{{ message.content|truncatewords:10 }}</p>
@@ -21,6 +21,15 @@
             <li>Žádné zprávy v koši.</li>
         {% endfor %}
     </ul>
-    <button type="submit" class="btn btn-danger">Smazat vybrané</button>
+    <input type="hidden" name="action" id="action" value="">
+    <button type="button" class="btn btn-danger" onclick="submitForm('delete')">Smazat vybrané</button>
+    <button type="button" class="btn btn-success" onclick="submitForm('restore')">Obnovit vybrané</button>
 </form>
+
+<script type="text/javascript">
+    function submitForm(action) {
+        document.getElementById('action').value = action;
+        document.getElementById('trashForm').submit();
+    }
+</script>
 {% endblock %}
