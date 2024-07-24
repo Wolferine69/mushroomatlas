@@ -1,5 +1,6 @@
 import logging
 logger = logging.getLogger('messaging')
+import os
 
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
@@ -138,26 +139,62 @@ def bulk_restore_trash_messages(request):
     return redirect('view_trash')
 
 
+
 @require_POST
 @login_required
 def trash_message(request, pk):
     logger.debug("trash_message called")
     message = get_object_or_404(Message, pk=pk)
-    logger.debug(f"Message ID: {message.id}, Sender: {message.sender}, Receiver: {message.receiver}")
+    origin = request.POST.get('origin', 'inbox')
+    logger.debug(f"Origin: {origin}")
 
     if request.user == message.receiver:
         message.is_trashed_by_receiver = True
-        logger.debug("Message marked as trashed by receiver")
+        logger.debug(f"Message {message.id} marked as trashed by receiver")
     elif request.user == message.sender:
         message.is_trashed_by_sender = True
-        logger.debug("Message marked as trashed by sender")
+        logger.debug(f"Message {message.id} marked as trashed by sender")
 
     message.save()
-    logger.debug("Message state saved")
+    logger.debug(f"Message {message.id} state saved")
 
-    return JsonResponse({'success': True, 'redirect_url': '/inbox/'})
+    if origin in ['trash', 'outbox']:
+        logger.debug(f"Checking if message {message.id} should be deleted")
+        # Explicitní kontrola existence příloh
+        attachments = message.attachments.all()
+        logger.debug(f"Attachments queryset: {attachments}")
+        if attachments.exists():
+            logger.debug(f"Found {attachments.count()} attachments for message {message.id}")
+            for attachment in attachments:
+                file_path = attachment.file.path
+                logger.debug(f"Deleting attachment file {attachment.file.name} for message {message.id}")
+                if os.path.exists(file_path):
+                    logger.debug(f"File {file_path} exists, attempting to delete")
+                    try:
+                        attachment.file.delete(save=False)
+                        logger.debug(f"Attachment file {attachment.file.name} deleted")
+                    except Exception as e:
+                        logger.error(f"Failed to delete attachment file {attachment.file.name}: {e}")
+                else:
+                    logger.debug(f"File {file_path} does not exist")
+                try:
+                    attachment.delete()
+                    logger.debug(f"Attachment {attachment.id} deleted")
+                except Exception as e:
+                    logger.error(f"Failed to delete attachment {attachment.id}: {e}")
+        else:
+            logger.debug(f"No attachments found for message {message.id}")
+        try:
+            message.delete()
+            logger.debug(f"Message {message.id} deleted from database")
+        except Exception as e:
+            logger.error(f"Failed to delete message {message.id}: {e}")
+        redirect_url = '/trash/'
+    else:
+        redirect_url = '/inbox/' if message.receiver == request.user else '/outbox/'
 
-
+    logger.debug(f"Redirect URL: {redirect_url}")
+    return JsonResponse({'success': True, 'redirect_url': redirect_url})
 
 
 @login_required
@@ -347,6 +384,7 @@ def forward_message(request, message_id, reply=False):
         'original_message': original_message,
         'reply': reply
     })
+
 
 
 @login_required

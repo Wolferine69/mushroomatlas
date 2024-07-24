@@ -12,7 +12,7 @@
         {% for message in trashed_messages %}
             <li>
                 <input type="checkbox" name="message_ids" value="{{ message.id }}">
-                <a href="{% url 'message_detail' message.id %}">
+                <a href="{% url 'message_detail' message.id %}?origin=trash">
                     <strong>{{ message.timestamp }} - Od: {{ message.sender.username }} - Předmět: {{ message.subject }}</strong>
                 </a>
                 <p>{{ message.content|truncatewords:10 }}</p>

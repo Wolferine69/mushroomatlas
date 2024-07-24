@@ -48,7 +48,8 @@ function trashMessage(messageId) {
         method: 'POST',
         headers: {
             'X-CSRFToken': csrftoken,
-        }
+        },
+        body: new URLSearchParams(new FormData(document.getElementById('trash-message-form')))
     }).then(response => {
         if (response.ok) {
             console.log('Response OK, returning JSON');
