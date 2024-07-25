@@ -91,11 +91,11 @@
                     {% endif %}
                 </nav>
             <div class="hidden lg:block">
-                <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="fixed right-6 top-3 text-white bg-emerald-600 hover:bg-emerald-400 focus:ring-4 focus:outline-none focus:ring-emerald-300
+                <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="fixed right-2 top-3 text-white bg-emerald-600 hover:bg-emerald-400 focus:ring-4 focus:outline-none focus:ring-emerald-300
                  font-medium rounded-lg text-sm px-5 py-2.5 inline-flex text-center items-center
                   dark:bg-teal-700 dark:hover:bg-emerald-400 dark:focus:ring-emerald-300"
                         type="button">{% if user.is_authenticated %}
-                            {% if user.first_name %} Vítej, {{ user.first_name }}! {% else %} Vítej, {{ user.username }}! {% endif %} {% else %} <span class="animate-pulse">Nejste prihlašeni.</span> {% endif %} <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                            {% if user.first_name %} Vítej, {{ user.first_name }}! {% else %} Vítej, {{ user.username }}! {% endif %} {% else %} <span class="animate-pulse">Nejste prihlašeni.</span> {% endif %} <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 2">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
                                 </svg>
                                     </button>
@@ -137,26 +137,48 @@
 
         </section>
             <section id="mobile-menu" class="absolute top-0 bg-gradient-to-t from-teal-800 to-black w-full text-3xl flex-col justify-content-center origin-top
-              hidden min-h-screen">
-                <button class="text-txl self-end px-6 hover:animate-pulse">
+                hidden min-h-screen">
+                <button class="text-txl self-end px-2 hover:animate-pulse">
                     &times;
                 </button>
 
                 <nav class="flex flex-col min-h-screen items-center py-4" aria-label="mobile">
-                    <a href="{% url 'mushroom_list' %}" id="link" class="w-full text-center py-6 hover:animate-pulse">Atlas Hub</a>
-                    <a href="{%  url 'family_list' %}" id="link" class="w-full text-center py-6 hover:animate-pulse">Řády</a>
-                    <a href="{% url 'recipes_list' %}" id="link" class="w-full text-center py-6 hover:animate-pulse">Recepty</a>
-                    <a href="{% url 'tip_list' %}" id="link" class="w-full text-center py-6 hover:animate-pulse">Tipy</a>
-                    <a href="{% url 'findings_map' %}" id="link" class="w-full text-center py-6 hover:animate-pulse">Mapa nálezů</a>
+
                     {% if user.is_authenticated %}
-                        <a href="{%  url 'add_mushroom' %}" class= "w-full text-center py-6 hover:animate-pulse">Přidat houbu</a>
-                        <a href="{%  url 'accounts_list' %}" class= "w-full text-center py-6 hover:animate-pulse">Seznam uživatelů</a>
-                         <form method="post" action="{% url 'logout' %}">
+                        <a href="{% url 'mushroom_list' %}" id="link" class="w-full text-center py-4 hover:animate-pulse">Atlas Hub</a>
+                        <a href="{%  url 'family_list' %}" id="link" class="w-full text-center py-4 hover:animate-pulse">Řády</a>
+                        <a href="{% url 'recipes_list' %}" id="link" class="w-full text-center py-4 hover:animate-pulse">Recepty</a>
+                        <a href="{% url 'tip_list' %}" id="link" class="w-full text-center py-4 hover:animate-pulse">Tipy</a>
+                        <a href="{% url 'findings_map' %}" id="link" class="w-full text-center py-4  hover:animate-pulse">Mapa nálezů</a>
+                        <a href="{%  url 'add_mushroom' %}" class= "w-full text-center py-4 hover:animate-pulse">Přidat houbu</a>
+                        <a href="{%  url 'accounts_list' %}" class= "w-full text-center py-4 hover:animate-pulse">Seznam uživatelů</a>
+
+                        <a class="block px-4 py-4 hover:bg-green-500 dark:hover:bg-green-800 dark:hover:text-white" href="{% url 'profile_update' %}">Profil</a>
+                            {% if new_comments_count > 0 %}
+                                <span class="bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-600 dark:text-green-300"> {{ new_comments_count }} </span>
+                                {% endif %}
+                                <a class="block px-4 py-4 hover:bg-green-500 dark:hover:bg-green-800 dark:hover:text-white" href="{% url 'comments' %}">Komentáře k nálezům</a>
+
+                                {% if new_comments_recipe_count > 0 %}
+                                    <span class="bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-600 dark:text-green-300"> {{ new_comments_recipe_count }} </span>
+                                {% endif %}
+                                <a class="block px-4 py-4 hover:bg-green-500 dark:hover:bg-green-800 dark:hover:text-white" href="{% url 'comments_recipe' %}">Komentáře k receptům</a>
+
+                                {% if new_messages_count > 0 %}
+                                    <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-green-600 dark:text-green-300"> {{ new_messages_count }} </span>
+                                {% endif %}
+                                <a class="block px-4 py-4 hover:bg-green-500 dark:hover:bg-green-800 dark:hover:text-white" href="{% url 'view_inbox' %}">Zprávy</a>
+                        <form method="post" action="{% url 'logout' %}">
                                     {% csrf_token %}
-                                    <button type="submit" class= "w-full text-center py-6 hover:animate-pulse">Odhlásit se</button>
+                                    <button type="submit" class= "w-full text-center py-4 hover:animate-pulse">Odhlásit se</button>
                                 </form>
 
                     {% else %}
+                        <a href="{% url 'mushroom_list' %}" id="link" class="w-full text-center py-6 hover:animate-pulse">Atlas Hub</a>
+                        <a href="{%  url 'family_list' %}" id="link" class="w-full text-center py-6 hover:animate-pulse">Řády</a>
+                        <a href="{% url 'recipes_list' %}" id="link" class="w-full text-center py-6 hover:animate-pulse">Recepty</a>
+                        <a href="{% url 'tip_list' %}" id="link" class="w-full text-center py-6 hover:animate-pulse">Tipy</a>
+                        <a href="{% url 'findings_map' %}" id="link" class="w-full text-center py-6  hover:animate-pulse">Mapa nálezů</a>
                         <a href="{%  url 'login' %}" class= "w-full text-center py-6 hover:animate-pulse">přihlásit se</a>
                         <a href="{%  url 'registration' %}" class= "w-full text-center py-6 hover:animate-pulse">Registrovat</a>
 

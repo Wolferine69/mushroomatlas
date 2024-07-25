@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<ul>
+<ul class="flex flex-col items-center justify-center p-12 md:bg-emerald-950 max-h-3xl shadow-4xl rounded-lg">
+    <p class="text-xl text-emerald-300 mb-6"><strong>Tvoje Komentáře:</strong></p>
     {% for comment in comments_recipe %}
-        <li>
+        <li class="p-2 border-2 border-emerald-600 rounded-lg m-2 bg-emerald-700">
             <a href="{% url 'mark_comment_recipe_read' comment.id %}">
                 {% if comment.new %}
                     <mark><strong>{{ comment.user }} | {{ comment.recipe.title }} | {{ comment.created_at }}</strong></mark>
@@ -12,6 +13,9 @@
                 {% endif %}
             </a>
         </li>
+    {% empty %}
+        <p class="text-xl text-emerald-300">Zatím žádné komentáře.</p>
     {% endfor %}
 </ul>
+
 {% endblock %}
