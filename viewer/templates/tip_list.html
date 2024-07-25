@@ -4,7 +4,7 @@
 <section class="flex flex-col items-center justify-center
                   shadow-2xl bg-emerald-950 p-4 rounded-lg">
     <article class="">
-        <h1 class="mb-3 underline text-xl">Tipy a triky</h1>
+        <h1 class="mb-3 text-xl">Tipy a triky</h1>
     </article>
     <ul class="flex flex-col items-center justify-center ">
         {% for tip in tips %}
@@ -13,17 +13,14 @@
         </li>
         {% endfor %}
     </ul>
+    {% if user.is_authenticated %}
+        <a class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4
+         focus:ring-green-300 font-medium rounded-lg text-sm
+         px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700
+         dark:focus:ring-green-800 mt-6" href="{% url 'add_tip' %}">Přidej tip či trik</a>
+    {% endif %}
 </section>
 
-<h1>Tipy a triky</h1>
-<ul>
-    {% for tip in tips %}
-    <li>
-        <a href="{% url 'tip_detail' pk=tip.pk %}">{{ tip.title }}</a> - Přidal: {{ tip.user.user.username }}
-    </li>
-    {% endfor %}
-</ul>
-        {% if user.is_authenticated %}
-        <a class="btn btn-primary" href="{% url 'add_tip' %}">Přidej tip či trik</a>
-    {% endif %}
+
+
 {% endblock %}

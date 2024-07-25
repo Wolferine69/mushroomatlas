@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<ul class="flex flex-col items-center justify-center p-12 md:bg-emerald-950 max-h-3xl shadow-4xl rounded-lg">
+<section class="flex flex-col bg-emerald-950 items-center justify-center p-12 md: max-h-3xl shadow-4xl rounded-lg">
+    <ul class="flex flex-col items-center justify-center p-12 md:bg-emerald-950 max-h-3xl shadow-4xl rounded-lg">
     <p class="text-xl text-emerald-300 mb-6"><strong>Tvoje Komentáře:</strong></p>
     {% for comment in comments %}
         <li class="p-2 border-2 border-emerald-600 rounded-lg m-2 bg-emerald-700 hover:bg-emerald-600">
@@ -16,5 +17,6 @@
     {% empty %}
         <p class="text-xl text-emerald-300">Zatím žádné komentáře.</p>
     {% endfor %}
-</ul>
+    </ul>
+</section>
 {% endblock %}
