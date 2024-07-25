@@ -46,14 +46,6 @@ class SubmittableLoginView(LoginView):
 
 
 class RegistrationForm(UserCreationForm):
-    """
-    A form for user registration that includes additional fields for profile picture and biography.
-
-    Fields:
-        profile_picture (ImageField): A field for uploading a profile picture.
-        biography (CharField): A text field for the user's biography.
-    """
-
     class Meta(UserCreationForm.Meta):
         fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
 
@@ -62,34 +54,26 @@ class RegistrationForm(UserCreationForm):
 
     @atomic
     def save(self, commit=True):
-        """
-        Save the user and create a related Profile instance.
-
-        Args:
-            commit (bool): Whether to save the user and profile to the database.
-
-        Returns:
-            User: The created user instance.
-        """
         self.instance.is_active = True
         user = super().save(commit)
-        biography = self.cleaned_data['biography']
-        profile_picture = self.cleaned_data['profile_picture']
-        profile = Profile(user=user, biography=biography, profile_picture=profile_picture)
-        if commit:
-            profile.save()
+
+        # Zkontrolujte, zda již profil pro tohoto uživatele existuje
+        profile, created = Profile.objects.get_or_create(user=user, defaults={
+            'biography': self.cleaned_data['biography'],
+            'profile_picture': self.cleaned_data['profile_picture']
+        })
+
+        if not created:
+            # Pokud profil již existuje, aktualizujte ho
+            profile.biography = self.cleaned_data['biography']
+            profile.profile_picture = self.cleaned_data['profile_picture']
+            if commit:
+                profile.save()
+
         return user
 
 
 class RegistrationView(CreateView):
-    """
-    A view for user registration.
-
-    Attributes:
-        template_name (str): Template used for the registration page.
-        form_class (Form): The form class used for registration.
-        success_url (str): URL to redirect to after successful registration.
-    """
     template_name = 'registration.html'
     form_class = RegistrationForm
     success_url = reverse_lazy('home')
