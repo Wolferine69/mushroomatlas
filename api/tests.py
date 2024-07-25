@@ -1,226 +1,191 @@
-import unittest
-import requests
+import json
+from django.test import TestCase
+from django.urls import reverse
+from rest_framework import status
+from viewer.models import Mushroom, Family, Recipe, Finding, Habitat
+from accounts.models import Profile
+from rest_framework.authtoken.models import Token
+from django.contrib.auth.models import User
+from rest_framework.test import APIClient
 
-
-class TestAPI(unittest.TestCase):
-    """
-    Test suite for the API endpoints.
-
-    This class contains various test cases to ensure the API endpoints are functioning correctly.
-    """
-
+class APITestCase(TestCase):
     def setUp(self):
         """
-        Set up the test client and authentication token.
+        Set up the test environment.
 
-        This method is run before each test. It initializes the base URL, login URL, user credentials,
-        and obtains an authentication token for use in subsequent tests.
+        This method creates a test user, a profile for the user, and some initial data for
+        the Mushroom, Family, Habitat, Recipe, and Finding models to be used in the test cases.
         """
-        self.base_url = "http://127.0.0.1:8000"
-        self.login_url = f"{self.base_url}/api/token/"
-        self.username = "FungiFreak"
-        self.password = "FunGuy123!"
-        self.client = requests.Session()
-        self.token = self.get_token()
-        self.headers = {
-            'Authorization': f'Token {self.token}',
-            'Content-Type': 'application/json'
+        self.client = APIClient()
+
+        # Create a user for testing
+        self.user = User.objects.create_user(username='MushroomHunter', password='P4s$w0rd1!', first_name='Pavel')
+
+        # Create or get a profile for the user
+        self.profile, created = Profile.objects.get_or_create(user=self.user, defaults={'biography': 'Pavelův profil'})
+
+        # Use this user for testing
+        self.token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create data for POST tests
+        self.family = Family.objects.create(name='Test Family', name_latin='Familia Testus')
+        self.habitat = Habitat.objects.create(name='Forest')
+
+        self.mushroom_data = {
+            'name_cz': 'Test Mushroom',
+            'name_latin': 'Mushroomus Testus',
+            'description': 'A test mushroom description',
+            'edibility': 'jedla',
+            'family': self.family.id,
+            'habitats': [self.habitat.id]
         }
-
-    def get_token(self):
-        """
-        Obtain the authentication token.
-
-        Sends a POST request to the login URL with the user credentials to get the authentication token.
-
-        Returns:
-            str: The authentication token.
-        """
-        login_data = {
-            "username": self.username,
-            "password": self.password
+        self.family_data = {
+            'name': 'New Family',
+            'name_latin': 'Familia Novus',
+            'description': 'A new family description'
         }
-        response = self.client.post(self.login_url, json=login_data)
-        self.assertEqual(response.status_code, 200)
-        json_response = response.json()
-        token = json_response.get("token")
-        self.assertIsNotNone(token, f"No token found in response: {response.text}")
-        return token
+        self.recipe_data = {
+            'user': self.profile.id,
+            'title': 'Test Recipe',
+            'ingredients': 'Ingredients list',
+            'instructions': 'Test instructions',
+            'main_mushroom': None
+        }
+        self.finding_data = {
+            'user': self.profile.id,
+            'mushroom': None,  # Will be filled in later
+            'description': 'Test finding',
+            'date_found': '2023-07-01',
+            'latitude': 49.123,
+            'longitude': 16.123
+        }
+        self.habitat_data = {
+            'name': 'New Habitat'
+        }
+        self.profile_data = {
+            'user': self.user.id,
+            'biography': 'New Test Biography'
+        }
 
     def test_get_mushrooms(self):
         """
-        Test for fetching the list of mushrooms.
+        Test retrieving the list of mushrooms.
 
-        Sends a GET request to the mushrooms endpoint and checks if the response status is 200 OK
-        and the response contains data.
+        This test sends a GET request to the mushroom list endpoint and checks if the response status is 200 OK.
         """
-        response = self.client.get(f"{self.base_url}/api/mushrooms/", headers=self.headers)
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNotNone(response.json())
+        response = self.client.get(reverse('mushroom-list-create'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_post_mushroom(self):
         """
-        Test for creating a new mushroom entry.
+        Test creating a new mushroom.
 
-        Sends a POST request to the mushrooms endpoint with a new mushroom payload and checks if
-        the response status is 201 Created and the response contains the correct data.
+        This test sends a POST request with mushroom data to the mushroom list endpoint and checks if
+        the response status is 201 Created and if the mushroom is created correctly.
         """
-        habitats_response = self.client.get(f"{self.base_url}/api/habitats/", headers=self.headers)
-        self.assertEqual(habitats_response.status_code, 200)
-        habitats_data = habitats_response.json()
-        self.assertTrue(habitats_data, "No habitats found")
-        habitat_id = habitats_data[0]['id']
-        payload = {
-            "name_cz": "Testovací houba",
-            "name_latin": "Testus fungus",
-            "description": "A test mushroom for unit tests",
-            "edibility": "jedla",
-            "habitats": [habitat_id],
-            "image": None,
-            "family": None
-        }
-        response = self.client.post(f"{self.base_url}/api/mushrooms/", headers=self.headers, json=payload)
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json()["name_cz"], "Testovací houba")
+        response = self.client.post(reverse('mushroom-list-create'), data=json.dumps(self.mushroom_data),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Mushroom.objects.count(), 1)
+        self.assertEqual(Mushroom.objects.get().name_cz, 'Test Mushroom')
 
     def test_get_families(self):
         """
-        Test for fetching the list of families.
+        Test retrieving the list of families.
 
-        Sends a GET request to the families endpoint and checks if the response status is 200 OK
-        and the response contains data.
+        This test sends a GET request to the family list endpoint and checks if the response status is 200 OK.
         """
-        response = self.client.get(f"{self.base_url}/api/families/", headers=self.headers)
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNotNone(response.json())
+        response = self.client.get(reverse('family-list-create'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_post_family(self):
         """
-        Test for creating a new family entry.
+        Test creating a new family.
 
-        Sends a POST request to the families endpoint with a new family payload and checks if
-        the response status is 201 Created and the response contains the correct data.
+        This test sends a POST request with family data to the family list endpoint and checks if
+        the response status is 201 Created and if the family is created correctly.
         """
-        payload = {
-            "name": "Testovací rodina",
-            "name_latin": "Familia testus",
-            "description": "A test family for unit tests"
-        }
-        response = self.client.post(f"{self.base_url}/api/families/", headers=self.headers, json=payload)
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json()["name"], "Testovací rodina")
+        response = self.client.post(reverse('family-list-create'), data=json.dumps(self.family_data),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Family.objects.count(), 2)
+        self.assertEqual(Family.objects.get(name='New Family').name_latin, 'Familia Novus')
 
     def test_get_recipes(self):
         """
-        Test for fetching the list of recipes.
+        Test retrieving the list of recipes.
 
-        Sends a GET request to the recipes endpoint and checks if the response status is 200 OK
-        and the response contains data.
+        This test sends a GET request to the recipe list endpoint and checks if the response status is 200 OK.
         """
-        response = self.client.get(f"{self.base_url}/api/recipes/", headers=self.headers)
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNotNone(response.json())
+        response = self.client.get(reverse('recipe-list-create'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_post_recipe(self):
         """
-        Test for creating a new recipe entry.
+        Test creating a new recipe.
 
-        Sends a POST request to the recipes endpoint with a new recipe payload and checks if
-        the response status is 201 Created and the response contains the correct data.
+        This test sends a POST request with recipe data to the recipe list endpoint and checks if
+        the response status is 201 Created and if the recipe is created correctly.
         """
-        profile_id = self.get_profile_id(user_id=1)
-        payload = {
-            "user": profile_id,
-            "title": "Testovací recept",
-            "ingredients": "Ingredience test",
-            "instructions": "Instrukce test",
-            "image": None,
-            "main_mushroom": None,
-            "source": "Test source"
-        }
-        response = self.client.post(f"{self.base_url}/api/recipes/", headers=self.headers, json=payload)
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json()["title"], "Testovací recept")
-
-    def get_profile_id(self, user_id):
-        """
-        Helper function to fetch the profile ID for a given user ID.
-
-        Sends a GET request to the profiles endpoint and searches for the profile associated with
-        the given user ID.
-
-        Returns:
-            int: The profile ID.
-        """
-        response = self.client.get(f"{self.base_url}/api/profiles/", headers=self.headers)
-        self.assertEqual(response.status_code, 200)
-        profiles = response.json()
-        profile = next((p for p in profiles if p['user'] == user_id), None)
-        self.assertIsNotNone(profile, f"No profile found for user ID {user_id}")
-        return profile['id']
+        response = self.client.post(reverse('recipe-list-create'), data=json.dumps(self.recipe_data),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Recipe.objects.count(), 1)
+        self.assertEqual(Recipe.objects.get().title, 'Test Recipe')
 
     def test_get_findings(self):
         """
-        Test for fetching the list of findings.
+        Test retrieving the list of findings.
 
-        Sends a GET request to the findings endpoint and checks if the response status is 200 OK
-        and the response contains data.
+        This test sends a GET request to the finding list endpoint and checks if the response status is 200 OK.
         """
-        response = self.client.get(f"{self.base_url}/api/findings/", headers=self.headers)
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNotNone(response.json())
+        response = self.client.get(reverse('finding-list-create'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_post_finding(self):
         """
-        Test for creating a new finding entry.
+        Test creating a new finding.
 
-        Sends a POST request to the findings endpoint with a new finding payload and checks if
-        the response status is 201 Created and the response contains the correct data.
+        This test sends a POST request with finding data to the finding list endpoint and checks if
+        the response status is 201 Created and if the finding is created correctly.
         """
-        mushrooms_response = self.client.get(f"{self.base_url}/api/mushrooms/", headers=self.headers)
-        self.assertEqual(mushrooms_response.status_code, 200)
-        mushrooms_data = mushrooms_response.json()
-        self.assertTrue(mushrooms_data, "No mushrooms found")
-        mushroom_id = mushrooms_data[0]['id']
-        profile_id = self.get_profile_id(user_id=1)
-        payload = {
-            "user": profile_id,
-            "mushroom": mushroom_id,
-            "description": "Test finding description",
-            "date_found": "2024-07-04",
-            "latitude": 50.0755,
-            "longitude": 14.4378,
-            "image": None
-        }
-        response = self.client.post(f"{self.base_url}/api/findings/", headers=self.headers, json=payload)
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json()["description"], "Test finding description")
+        mushroom = Mushroom.objects.create(name_cz='Existing Mushroom', name_latin='Mushroomus Existus',
+                                           family=self.family)
+        self.finding_data['mushroom'] = mushroom.id
+        response = self.client.post(reverse('finding-list-create'), data=json.dumps(self.finding_data),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Finding.objects.count(), 1)
+        self.assertEqual(Finding.objects.get().description, 'Test finding')
 
     def test_get_habitats(self):
         """
-        Test for fetching the list of habitats.
+        Test retrieving the list of habitats.
 
-        Sends a GET request to the habitats endpoint and checks if the response status is 200 OK
-        and the response contains data.
+        This test sends a GET request to the habitat list endpoint and checks if the response status is 200 OK.
         """
-        response = self.client.get(f"{self.base_url}/api/habitats/", headers=self.headers)
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNotNone(response.json())
+        response = self.client.get(reverse('habitat-list-create'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_post_habitat(self):
         """
-        Test for creating a new habitat entry.
+        Test creating a new habitat.
 
-        Sends a POST request to the habitats endpoint with a new habitat payload and checks if
-        the response status is 201 Created and the response contains the correct data.
+        This test sends a POST request with habitat data to the habitat list endpoint and checks if
+        the response status is 201 Created and if the habitat is created correctly.
         """
-        payload = {
-            "name": "Testovací habitat"
-        }
-        response = self.client.post(f"{self.base_url}/api/habitats/", headers=self.headers, json=payload)
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json()["name"], "Testovací habitat")
+        response = self.client.post(reverse('habitat-list-create'), data=json.dumps(self.habitat_data),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Habitat.objects.count(), 2)
+        self.assertEqual(Habitat.objects.get(name='New Habitat').name, 'New Habitat')
 
+    def test_get_profiles(self):
+        """
+        Test retrieving the list of profiles.
 
-if __name__ == '__main__':
-    unittest.main()
+        This test sends a GET request to the profile list endpoint and checks if the response status is 200 OK.
+        """
+        response = self.client.get(reverse('profile-list'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

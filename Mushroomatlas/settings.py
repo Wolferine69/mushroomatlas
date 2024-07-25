@@ -166,7 +166,7 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
 # Logging configuration
-import os
+
 #
 # LOGGING = {
 #     'version': 1,
