@@ -220,3 +220,4 @@ class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         context['can_add_mushroom'] = self.request.user.is_authenticated and self.request.user.has_perm(
             'viewer.add_mushroom')
         return context
+

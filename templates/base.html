@@ -1,120 +1,204 @@
+{% load static tailwind_tags %}
 <!DOCTYPE html>
-{% load static %}
-<html lang="{% if LANGUAGE_CODE %}{{ LANGUAGE_CODE }}{% else %}en{% endif %}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Mushroomatlas - Your hub for mushrooms, findings, recipes, comments, and families.">
-    <title>Mushroomatlas</title>
-    <!-- Bootstrap CSS CDN -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .img-fixed {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-    </style>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <style>
-        #map {
-            height: 500px;
-            width: 700px;
-        }
-    </style>
-</head>
-<body>
-    <header role="banner" class="bg-light">
-        <div class="container">
-            <h1>Atlas Hub</h1>
-            <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'mushroom_list' %}">Atlas hub</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'family_list' %}">Řády</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'recipes_list' %}">Recepty</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'tip_list' %}">Tipy a triky</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'findings_map' %}">Mapa nálezů</a>
-                        </li>
-                        {% if can_add_mushroom %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'add_mushroom' %}">Přidej houbu</a>
-                            </li>
-                        {% endif %}
+<html lang="en">
+	<head>
+    <title>AtlasHub</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		{% tailwind_css %}
+        <link href="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+                 integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+                 crossorigin=""/>
+
+         <script defer>
+                {#JS to handle mobile menu#}
+                const initApp = () => {
+                    const hamburgerBtn = document.getElementById('hamburger-button')
+                    const mobileMenu = document.getElementById('mobile-menu')
+                    const link = document.getElementById('link')
+
+
+                    const toggleMenu = () => {
+                        mobileMenu.classList.toggle('hidden')
+                        mobileMenu.classList.toggle('flex')
+                    }
+
+
+                    hamburgerBtn.addEventListener('click', toggleMenu)
+                    mobileMenu.addEventListener('click', toggleMenu)
+                    link.addEventListener('click', toggleMenu)
+
+                }
+
+                document.addEventListener('DOMContentLoaded', initApp)
+            </script>
+	</head>
+
+                 <style>
+                     {#css insert needed due to the problem with external CDN stylesheet, required for the input fields to be rendered properly#}
+                    [type='text'],input:where(:not([type])),[type='email'],[type='url'],[type='password'],[type='number'],
+                    [type='date'],[type='datetime-local'],[type='month'],[type='search'],[type='tel'],[type='time'],[type='week'],
+                    [multiple],textarea,select {
+                      -webkit-appearance: none;
+                         -moz-appearance: none;
+                              appearance: none;
+                      background-color: #3f503f;
+                      border-color: #40a37a;
+                      border-width: 2px;
+                      border-radius: 0px;
+                      padding-top: 0.5rem;
+                      padding-right: 0.75rem;
+                      padding-bottom: 0.5rem;
+                      padding-left: 0.75rem;
+                      font-size: 1rem;
+                      line-height: 1.5rem;
+                      --tw-shadow: 0 0 #0000;
+                    }
+                 </style>
+
+	<body class="min-h-screen bg-slate-50 dark:bg-black bg-gradient-to-b from-emerald-950 to-black dark:text-white">
+    <header class="bg-teal-700 text-white sticky top-0 z-10">
+        <section class="max-w-4xl mx-auto p-4 flex justify-between items-center">
+            <h1 class="text-3xl font-medium">
+
+                {% if user.is_authenticated %}
+                <a href="{%  url 'home' %}" class="block">🍄</a>
+                {% else %}
+                <a href="{%  url 'home' %}">🍄MushroomAtlas</a>
+
+                {% endif %}
+            </h1>
+
+            <div>
+                    <button id="hamburger-button" class="text-3xl lg:hidden cursor-pointer">
+                        &#9776;
+                    </button>
+
+            </div>
+                <nav class="hidden lg:block space-x-8 text-xl" aria-label="main">
+                    <a href="{%  url 'mushroom_list' %}" class= hover:animate-pulse>Atlas Hub</a>
+                    <a href="{%  url 'family_list' %}" class= hover:animate-pulse>Řády</a>
+                    <a href="{%  url 'recipes_list' %}" class= hover:animate-pulse>Recepty</a>
+                    <a href="{%  url 'tip_list' %}" class= hover:animate-pulse>Tipy</a>
+                    <a href="{%  url 'findings_map' %}" class= hover:animate-pulse>Mapa nálezů</a>
+                    {% if user.is_authenticated %}
+                        <a href="{%  url 'add_mushroom' %}" class= "hover:animate-pulse mt-2">Přidat houbu</a>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                        <a href="{%  url 'accounts_list' %}" class= "hover:animate-pulse mt-2">Uživatelé</a>
+                    {% endif %}
+                </nav>
+            <div class="hidden lg:block">
+                <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="fixed right-2 top-3 text-white bg-emerald-600 hover:bg-emerald-400 focus:ring-4 focus:outline-none focus:ring-emerald-300
+                 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex text-center items-center
+                  dark:bg-teal-700 dark:hover:bg-emerald-400 dark:focus:ring-emerald-300"
+                        type="button">{% if user.is_authenticated %}
+                            {% if user.first_name %} Vítej, {{ user.first_name }}! {% else %} Vítej, {{ user.username }}! {% endif %} {% else %} <span class="animate-pulse">Nejste prihlašeni.</span>
+                            {% endif %} <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 2">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                                </svg>
+                                    </button>
+                <div id="dropdown" class="z-10 hidden divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-green-900">
+                    <ul class="py-2 text-sm text-white dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                         {% if user.is_authenticated %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'accounts_list' %}">Seznam uživatelů</a>
-                            </li>
+                            <a class="block px-4 py-2 hover:bg-green-500 dark:hover:bg-green-800 dark:hover:text-white" href="{% url 'profile_update' %}">Profil</a>
+                            {% if new_comments_count > 0 %}
+                                <span class="bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-600 dark:text-green-300"> {{ new_comments_count }} </span>
+                                {% endif %}
+                                <a class="block px-4 py-2 hover:bg-green-500 dark:hover:bg-green-800 dark:hover:text-white" href="{% url 'comments' %}">Komentáře k nálezům</a>
+
+                                {% if new_comments_recipe_count > 0 %}
+                                    <span class="bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-600 dark:text-green-300"> {{ new_comments_recipe_count }} </span>
+                                {% endif %}
+                                <a class="block px-4 py-2 hover:bg-green-500 dark:hover:bg-green-800 dark:hover:text-white" href="{% url 'comments_recipe' %}">Komentáře k receptům</a>
+
+                                {% if new_messages_count > 0 %}
+                                    <span class="ml-1 bg-green-100 text-green-800 text-xs font-medium me-2 px-2 py-0.5 rounded-full dark:bg-green-600 dark:text-green-300"> {{ new_messages_count }} </span>
+                                {% endif %}
+                                <a class="block px-4 py-2 hover:bg-green-500 dark:hover:bg-green-800 dark:hover:text-white" href="{% url 'view_inbox' %}">Zprávy</a>
+
+                                <a href="{%  url 'password_change' %}" class="block px-4 py-2 hover:bg-green-500 dark:hover:bg-green-800 dark:hover:text-white">změna hesla</a>
+                                <form method="post" action="{% url 'logout' %}" class="block px-4 py-2 hover:bg-green-500 dark:hover:bg-green-800 dark:hover:text-white">
+                                    {% csrf_token %}
+                                    <button type="submit" >odhlásit se</button>
+                                </form>
+                        {% else %}
+                            <li>
+                            <a href="{%  url 'login' %}" class="block px-4 py-2 hover:bg-green-500 dark:hover:bg-green-800 dark:hover:text-white">přihlásit se</a>
+                        </li>
+                            <li>
+                           <a href="{%  url 'registration' %}" class="block px-4 py-2 hover:bg-green-500 dark:hover:bg-green-800 dark:hover:text-white">registrovat se</a>
+                        </li>
                         {% endif %}
                     </ul>
                 </div>
-                <div class="navbar-nav ml-auto">
-                    <div class="nav-item dropdown">
-                        {% if user.is_authenticated %}
-                            <a class="nav-link active dropdown-toggle" href="#" data-toggle="dropdown">
-                                {% if user.first_name %}
-                                    Ahoj, {{ user.first_name }}!
-                                {% else %}
-                                    Ahoj, {{ user.username }}!
-                                {% endif %}
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <form method="post" action="{% url 'logout' %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="dropdown-item text-right">Logout</button>
-                                </form>
-                                <a class="dropdown-item text-right" href="{% url 'password_change' %}">Změna hesla</a>
-                                <a class="dropdown-item text-right" href="{% url 'profile_update' %}">Profil</a>
-                                <a class="dropdown-item text-right" href="{% url 'comments' %}">Komentáře k nálezům</a>
-                                {% if new_comments_count > 0 %}
-                                    <span class="badge badge-pill badge-primary">{{ new_comments_count }} nových</span>
-                                {% endif %}
-                                <a class="dropdown-item text-right" href="{% url 'comments_recipe' %}">Komentáře k receptům</a>
-                                {% if new_comments_recipe_count > 0 %}
-                                    <span class="badge badge-pill badge-primary">{{ new_comments_recipe_count }} nových</span>
-                                {% endif %}
-                                <a class="dropdown-item text-right" href="{% url 'view_inbox' %}">Zprávy</a>
-                                {% if new_messages_count > 0 %}
-                                    <span class="badge badge-pill badge-primary">{{ new_messages_count }} nových</span>
-                                {% endif %}
-                            </div>
-                        {% else %}
-                            <a class="nav-link active dropdown-toggle" href="#" data-toggle="dropdown">
-                                Nejsi přihlášený.
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item text-right" href="{% url 'login' %}">Login</a>
-                                <a class="dropdown-item text-right" href="{% url 'registration' %}">Registrace</a>
-                            </div>
+            </div>
+
+        </section>
+            <section id="mobile-menu" class="absolute top-0 bg-gradient-to-t from-teal-800 to-black w-full text-3xl flex-col justify-content-center origin-top
+                hidden min-h-screen">
+                <button class="text-txl self-end px-2 hover:animate-pulse">
+                    &times;
+                </button>
+
+                <nav class="flex flex-col min-h-screen items-center py-4" aria-label="mobile">
+
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'mushroom_list' %}" id="link" class="w-full text-center py-4 hover:animate-pulse">Atlas Hub</a>
+                        <a href="{%  url 'family_list' %}" id="link" class="w-full text-center py-4 hover:animate-pulse">Řády</a>
+                        <a href="{% url 'recipes_list' %}" id="link" class="w-full text-center py-4 hover:animate-pulse">Recepty</a>
+                        <a href="{% url 'tip_list' %}" id="link" class="w-full text-center py-4 hover:animate-pulse">Tipy</a>
+                        <a href="{% url 'findings_map' %}" id="link" class="w-full text-center py-4  hover:animate-pulse">Mapa nálezů</a>
+                        <a href="{%  url 'add_mushroom' %}" class= "w-full text-center py-4 hover:animate-pulse">Přidat houbu</a>
+                        <a href="{%  url 'accounts_list' %}" class= "w-full text-center py-4 hover:animate-pulse">Seznam uživatelů</a>
+
+                        <a class="w-full text-center py-4 hover:animate-pulse" href="{% url 'profile_update' %}">Profil</a>
+                        {% if new_comments_count > 0 %}
+                            <span class="inline bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-600 dark:text-green-300"> {{ new_comments_count }} </span>
                         {% endif %}
-                    </div>
-                </div>
-            </nav>
-        </div>
+                        <a class="w-full text-center py-4 hover:animate-pulse" href="{% url 'comments' %}">Komentáře k nálezům</a>
+
+                        {% if new_comments_recipe_count > 0 %}
+                            <span class="bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-600 dark:text-green-300"> {{ new_comments_recipe_count }} </span>
+                        {% endif %}
+                        <a class="w-full text-center py-4 hover:animate-pulse" href="{% url 'comments_recipe' %}">Komentáře k receptům</a>
+
+                        {% if new_messages_count > 0 %}
+                            <span class="inline bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-green-600 dark:text-green-300"> {{ new_messages_count }} </span>
+                        {% endif %}
+                        <a class="inline w-full text-center py-4 hover:animate-pulse" href="{% url 'view_inbox' %}">Zprávy</a>
+                        <form method="post" action="{% url 'logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class= "w-full text-center py-4 hover:animate-pulse">Odhlásit se</button>
+                                </form>
+
+                    {% else %}
+                        <a href="{% url 'mushroom_list' %}" id="link" class="w-full text-center py-6 hover:animate-pulse">Atlas Hub</a>
+                        <a href="{%  url 'family_list' %}" id="link" class="w-full text-center py-6 hover:animate-pulse">Řády</a>
+                        <a href="{% url 'recipes_list' %}" id="link" class="w-full text-center py-6 hover:animate-pulse">Recepty</a>
+                        <a href="{% url 'tip_list' %}" id="link" class="w-full text-center py-6 hover:animate-pulse">Tipy</a>
+                        <a href="{% url 'findings_map' %}" id="link" class="w-full text-center py-6  hover:animate-pulse">Mapa nálezů</a>
+                        <a href="{%  url 'login' %}" class= "w-full text-center py-6 hover:animate-pulse">přihlásit se</a>
+                        <a href="{%  url 'registration' %}" class= "w-full text-center py-6 hover:animate-pulse">Registrovat</a>
+
+                    {% endif %}
+                </nav>
+
+            </section>
+
     </header>
-    <main role="main" class="container">
+    <main class=" max-w-4xl mx-auto">
         {% block content %}
         {% endblock %}
     </main>
-    <footer role="contentinfo" class="bg-light text-center py-3">
-        <img src="{% static "houby.png" %}" alt="picture of mushrooms">
-        <p>&copy; 2024 Mushroomatlas. All rights reserved.</p>
-    </footer>
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
+
+
+     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.js"></script>
+    </body>
+
 </html>

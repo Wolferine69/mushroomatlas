@@ -1,12 +1,19 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2><strong> {{ family.name }}</strong> </h2>
-<p><strong> Popis:</strong>  {{ family.description }}</p>
-<h3><strong> Houby v daném řádu:</strong></h3>
-<ul>
-    {% for mushroom in family.mushrooms.all %}
-    <li><a href="{% url 'mushroom_detail' mushroom.id %}">{{ mushroom.name_cz }} ({{ mushroom.name_latin }})</a></li>
-    {% endfor %}
-</ul>
+<section class="flex flex-col items-center justify-center p-12 md:bg-emerald-950 max-h-3xl shadow-4xl rounded-lg">
+    <article class="p-4 my-2 bg-emerald-900 rounded-lg flex flex-col items-center border-2 border-emerald-700">
+        <h2> <strong> {{ family.name }} </strong> </h2>
+        <p> <strong> Popis: </strong> {{ family.description }} </p>
+    </article>
+    <article class="p-4 my-2 bg-emerald-900 rounded-lg flex flex-col items-center border-2 border-emerald-700">
+        <h3> <strong> Houby v daném řádu: </strong> </h3>
+        <ul>
+        {% for mushroom in family.mushrooms.all %}
+        <li class="underline"><a href="{% url 'mushroom_detail' mushroom.id %}">{{ mushroom.name_cz }} ({{ mushroom.name_latin }})</a></li>
+        {% endfor %}
+        </ul>
+    </article>
+</section>
+
 {% endblock %}

@@ -1,26 +1,52 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2><strong>{{ mushroom.name_cz }}</strong></h2>
-<p><strong> Popis:</strong>  {{ mushroom.description }}</p>
-<p><strong> Jedlost:</strong>  {{ mushroom.get_edibility_display }}</p>
-<p><strong> Místo výskytu:</strong>
-{% if mushroom.habitats.exists %}
-    {% for habitat in mushroom.habitats.all %}
-        {{ habitat.name }}{% if not forloop.last %}, {% endif %}
-    {% endfor %}
-{% else %}
-    <span>Nejsou k dispozici žádná data o místech výskytu.</span>
-{% endif %}
-</p>
-{% if mushroom.image %}
-<p><img src="{{ mushroom.image.url }}" alt="{{ mushroom.name_cz }}"></p>
-{% endif %}
-<p><strong> Řád:</strong>  <a href="{% url 'family_detail' mushroom.family.id %}">{{ mushroom.family.name }}</a></p>
-<p><strong>Recepty:</strong>
-<ul>
-    {% for recipe in mushroom.recipes.all %}
-        <li><a href="{% url 'recipe_detail' pk=recipe.pk %}">{{ recipe.title }}</a></li>
-    {% endfor %}
-</ul>
+
+<section class="flex flex-col items-center justify-center p-12 md:bg-emerald-950 max-h-3xl shadow-4xl rounded-lg">
+    <article class="py-2 px-4 bg-emerald-900 rounded-lg flex flex-col items-center
+     justify-center border-emerald-700 border-2">
+        <h2 class="text-2xl"><strong>{{ mushroom.name_cz }}</strong></h2>
+            <p><strong> Popis:</strong>  {{ mushroom.description }}</p>
+            <div class="flex flex-col items-center justify-center py-3">
+                <p><strong> Místo výskytu:</strong>
+                 {% if mushroom.habitats.exists %}
+                    {% for habitat in mushroom.habitats.all %}
+                        {{ habitat.name }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                 {% else %}
+                        <span>Nejsou k dispozici žádná data o místech výskytu.</span>
+                 {% endif %}
+                </p>
+                    </div>
+
+                    <p><strong> Jedlost:</strong>
+                        {% if mushroom.get_edibility_display == 'Jedovatá' %}
+                            <span class="text-red-500 text-lg animate-pulse"> {{ mushroom.get_edibility_display }}</span>
+                        {% elif mushroom.get_edibility_display == 'Nejedlá' %}
+                            <span class="text-orange-400 text-lg"> {{ mushroom.get_edibility_display }}</span>
+                        {% else %}
+                            <span class="text-lg text-lime-500"> {{ mushroom.get_edibility_display }}</span>
+                        {% endif %}
+                    </p>
+    </article>
+
+
+    <article class="p-3 bg-emerald-900 rounded-lg flex flex-col
+     items-center mt-3 justify-center border-emerald-700 border-2">
+    {% if mushroom.image %}
+    <p><img src="{{ mushroom.image.url }}" alt="{{ mushroom.name_cz }}" class="md:max-h-2xl md:max-w-full"></p>
+    {% endif %}
+    <p ><strong> Řád:</strong>  <a href="{% url 'family_detail' mushroom.family.id %}" class="underline">{{ mushroom.family.name }}</a></p>
+    <p><strong>Recepty:</strong>
+    {% if mushroom.recipes.exists%}
+        <ul>
+        {% for recipe in mushroom.recipes.all %}
+            <li class='underline'><a href="{% url 'recipe_detail' pk=recipe.pk %}">{{ recipe.title }}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <span>Nejsou k dispozici žádné recepty.</span>
+    {% endif %}
+    </article>
+</section>
 {% endblock %}

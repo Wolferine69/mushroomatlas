@@ -42,10 +42,28 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     "api.apps.ApiConfig",
+    'tailwind',
+    'theme',
+    'django_browser_reload',
+    'crispy_forms',
+    'crispy_tailwind',
     'backupbase',
     'messaging',
     'django_extensions',
 ]
+
+TAILWIND_APP_NAME = 'theme'
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
+NPM_BIN_PATH = 'C:/Users/simon/AppData/Roaming/npm/npm.cmd'
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
+
+CRISPY_TEMPLATE_PACK = "tailwind"
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -55,6 +73,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_browser_reload.middleware.BrowserReloadMiddleware',
 ]
 
 ROOT_URLCONF = 'Mushroomatlas.urls'

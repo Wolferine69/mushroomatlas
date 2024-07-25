@@ -3,10 +3,15 @@
 {% block title %}<strong>Přidat nové tipy a triky</strong>{% endblock %}
 
 {% block content %}
+    <section class="flex flex-col items-center justify-center p-12 md:bg-emerald-950 max-h-3xl shadow-4xl rounded-lg">
     <h2><strong>Přidat nové tipy a triky</strong></h2>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <input id="id_submit" type="submit" class="btn btn-primary" value="Přidat">
+        <input id="id_submit" type="submit" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4
+         focus:ring-green-300 font-medium rounded-lg text-sm
+         px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700
+         dark:focus:ring-green-800 mt-4" value="Přidat">
     </form>
+    </section>
 {% endblock %}

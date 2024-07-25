@@ -1,9 +1,19 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<ul>
+<ul class="grid grid-cols-1 m-6 gap-6 md:grid-cols-2 mt-4 lg:grid-cols-3">
     {% for account in accounts %}
-    <li><a href="{% url 'account_detail' account.id %}">{{ account.user.username }}</a></li>
+    <li class="flex flex-col items-center justify-center py-2 m-2 px-4 bg-emerald-900 rounded-lg hover:bg-emerald-800">
+        <a href="{% url 'account_detail' account.id %}">
+        {{ account.user.username }}
+            {% if account.profile_picture %}
+                <img src="{{ account.profile_picture.url }}" alt="{{ account.user.username }}" class="rounded-full">
+            {% else %}
+                <img src="/media/profile_pictures/default_profile.jpg" alt="{{ account.user.username }}" class="rounded-full">
+        {% endif %}
+        </a>
+    </li>
     {% endfor %}
+
 </ul>
 {% endblock %}

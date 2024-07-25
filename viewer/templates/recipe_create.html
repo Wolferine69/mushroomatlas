@@ -1,13 +1,45 @@
-{% extends 'base.html' %}
+{% extends 'form.html' %}
 
-{% block title %}<strong>Přidat nový recept</strong>{% endblock %}
+{% block title %}Přidat nový recept{% endblock %}
 
 {% block content %}
-    <h2><strong>Přidat nový recept</strong></h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input id="id_submit" type="submit" class="btn btn-primary" value="Přidat">
-    </form>
+    <section class="container p-4 bg-emerald-950 rounded-lg drop-shadow-xl">
+{#        <h2><strong>Přidat nový recept</strong></h2>#}
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <table>
+                <tr>
+                    <td><label for="{{ form.title.id_for_label }}"><strong>Název Receptu:</strong></label></td>
+                    <td>{{ form.title }}</td>
+                </tr>
+                <tr>
+                    <td><label for="{{ form.ingredients.id_for_label }}"><strong>Ingredience:</strong></label></td>
+                    <td>{{ form.ingredients }}</td>
+                </tr>
+                <tr>
+                    <td><label for="{{ form.instructions.id_for_label }}"><strong>Instrukce:</strong></label></td>
+                    <td>{{ form.instructions }}</td>
+                </tr>
+                <tr>
+                    <td><label for="{{ form.image.id_for_label }}"><strong>Obrázek:</strong></label></td>
+                    <td>{{ form.image }}</td>
+                </tr>
+                <tr>
+                    <td><label for="{{ form.main_mushroom.id_for_label }}"><strong>Hlavní houba:</strong></label></td>
+                    <td>{{ form.main_mushroom }}</td>
+                </tr>
+                <tr>
+                    <td><label for="{{ form.user.id_for_label }}"><strong>Přidal:</strong></label></td>
+                    <td>{{ form.user }}</td>
+                </tr>
+                <tr>
+                    <td><label for="{{ form.source.id_for_label }}"><strong>Zdroj obrázku:</strong></label></td>
+                    <td>{{ form.source }}</td>
+                </tr>
+            </table>
+{#            {{ form.as_div }}#}
+            <input id="id_submit" type="submit" class="btn btn-primary" value="Přidat">
+        </form>
+    </section>
 
 {% endblock %}

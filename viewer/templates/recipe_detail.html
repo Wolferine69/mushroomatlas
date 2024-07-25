@@ -16,71 +16,88 @@
     }
 </style>
 
-<h2><strong>{{ recipe.title }}</strong></h2>
-<p><strong>Ingredience: </strong> {{ recipe.ingredients }}</p>
-<p><strong>Instrukce: </strong> {{ recipe.instructions }}</p>
-{% if recipe.image %}
-    <div class="recipe-images">
-        <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="recipe-image">
-        {% for additional_image in recipe.additional_images.all %}
-            <img src="{{ additional_image.url }}" alt="{{ recipe.title }}" class="recipe-image">
-        {% endfor %}
-    </div>
-    <p><span style="font-size: small; font-style: italic;">Zdroj obrázků: </span> {{ recipe.source }}</p>
-{% endif %}
-<p><strong>Hlavní houba: </strong> <a href="{% url 'mushroom_detail' pk=recipe.main_mushroom.pk %}">{{ recipe.main_mushroom.name_cz }}</a></p>
-<p><strong>Přidal uživatel: </strong> <a href="{% url 'account_detail' pk=recipe.user.pk %}">{{ recipe.user.user.username }}</a></p>
+    <section class="flex flex-col items-center justify-center p-12 md:bg-emerald-950 max-h-3xl shadow-4xl rounded-lg">
+    <article class="p-4 my-2 bg-emerald-900 rounded-lg flex flex-col items-center border-2 border-emerald-700">
+        <h2><strong>{{ recipe.title }}</strong></h2>
+        <p><strong>Ingredience: </strong> {{ recipe.ingredients }}</p>
+        <p><strong>Instrukce: </strong> {{ recipe.instructions }}</p>
+    </article>
 
+    <article class="p-4 my-2 bg-emerald-900 rounded-lg flex flex-col items-center border-2 border-emerald-700">
+        {% if recipe.image %}
+            <div class="recipe-images">
+                <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="recipe-image rounded-xl">
+                {% for additional_image in recipe.additional_images.all %}
+                    <img src="{{ additional_image.url }}" alt="{{ recipe.title }}" class="recipe-image rounded-xl">
+                {% endfor %}
+            </div>
+            <p><span style="font-size: small; font-style: italic;">Zdroj obrázků: </span> {{ recipe.source }}</p>
+        {% endif %}
+
+        <p><strong>Hlavní houba: </strong> <a href="{% url 'mushroom_detail' pk=recipe.main_mushroom.pk %}">{{ recipe.main_mushroom.name_cz }}</a></p>
+        <p><strong>Přidal uživatel: </strong> <a href="{% url 'account_detail' pk=recipe.user.pk %}">{{ recipe.user.user.username }}</a></p>
+
+
+
+        <a href="{% url 'recipes_list' %}" class="underline">Zpět na seznam receptů</a>
+    </article>
+    <article class="p-4 my-2 bg-emerald-900 rounded-lg flex flex-col items-center border-2 border-emerald-700">
 <!-- Zobrazit aktuální hodnocení -->
-<p><strong>Celkové hodnocení: </strong> {{ recipe.rating }} <span style="font-size: small;">({{ recipe.num_ratings }} hodnocení)</span></p>
 
-<!-- Formulář pro přidání hodnocení -->
-{% if user.is_authenticated %}
-    {% if not has_rated %}
+        <p><strong>Celkové hodnocení: </strong> {{ recipe.rating }} <span style="font-size: small;">({{ recipe.num_ratings }} hodnocení)</span></p>
+
+        <!-- Formulář pro přidání hodnocení -->
+      {% if user.is_authenticated %}
+        {% if not has_rated %}
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
             <input type="hidden" name="rating" value="true">
-            <button type="submit" class="btn btn-primary">Odeslat hodnocení</button>
+            <button type="submit" class="text-white mt-2 bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br
+         focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg
+          dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2">Odeslat hodnocení</button>
         </form>
     {% else %}
         <p>Již jste tento recept ohodnotili.</p>
     {% endif %}
-{% else %}
-    <p>Pro přidání hodnocení se musíte <a href="{% url 'login' %}">přihlásit</a>.</p>
-{% endif %}
+    {% else %}
+        <p>Pro přidání hodnocení se musíte <a href="{% url 'login' %}">přihlásit</a>.</p>
+    {% endif %}
+    </article>
+    <article class="p-4 my-2 bg-emerald-900 rounded-lg flex flex-col items-center border-2 border-emerald-700">
+        <h2 class="mt-2 text-xl">Komentáře</h2>
+            {% if comments %}
+            <ul>
+                {% for comment in comments %}
+                    <li>
+                        <strong>{{ comment.user.user.username }}:</strong> {{ comment.text }} <br>
+                        <em>{{ comment.created_at }}</em>
+                        {% if comment.image %}
+                            <div>
+                                <img src="{{ comment.image.url }}" alt="Komentář obrázek" style="max-width: 300px; height: auto;">
+                            </div>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+                <p>Zatím žádné komentáře. Buďte první, kdo přidá komentář!</p>
+            {% endif %}
 
-<h2>Komentáře</h2>
-{% if comments %}
-    <ul>
-        {% for comment in comments %}
-            <li>
-                <strong>{{ comment.user.user.username }}:</strong> {{ comment.text }} <br>
-                <em>{{ comment.created_at }}</em>
-                {% if comment.image %}
-                    <div>
-                        <img src="{{ comment.image.url }}" alt="Komentář obrázek" style="max-width: 300px; height: auto;">
-                    </div>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>Zatím žádné komentáře. Buďte první, kdo přidá komentář!</p>
-{% endif %}
+        <!-- Formulář pro přidání komentáře -->
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'recipe_detail' recipe.pk %}" enctype="multipart/form-data" class="flex flex-col items-center">
+                    {% csrf_token %}
+                    {{ comment_form.as_p }}
+                    <button type="submit" class="text-white my-2 bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br
+                     focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg
+                      dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2">Odeslat komentář</button>
+                </form>
+            {% else %}
+                <p>Pro přidání komentáře se musíte <a href="{% url 'login' %}">přihlásit</a>.</p>
+            {% endif %}
 
-<!-- Formulář pro přidání komentáře -->
-{% if user.is_authenticated %}
-    <h3>Přidat komentář</h3>
-    <form method="post" action="{% url 'recipe_detail' recipe.pk %}" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ comment_form.as_p }}
-        <button type="submit" class="btn btn-primary">Odeslat komentář</button>
-    </form>
-{% else %}
-    <p>Pro přidání komentáře se musíte <a href="{% url 'login' %}">přihlásit</a>.</p>
-{% endif %}
-
-<a href="{% url 'recipes_list' %}" class="btn btn-secondary">Zpět na seznam receptů</a>
-
+                    <a href="{% url 'recipes_list' %}" class="underline">Zpět na seznam receptů</a>
+        </article>
+    </section>
 {% endblock %}

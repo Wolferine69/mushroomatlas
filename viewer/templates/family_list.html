@@ -1,9 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<ul>
-    {% for family in families %}
-    <li><a href="{% url 'family_detail' family.id %}">{{ family.name }}</a></li>
-    {% endfor %}
-</ul>
+
+    <section class="flex flex-col items-center justify-center
+                  shadow-2xl bg-emerald-950 p-4 rounded-lg">
+        <ul class="flex flex-col items-center justify-center ">
+            {% for family in families %}
+            <li class="py-2 m-2 px-4 bg-emerald-900 rounded-lg hover:bg-emerald-800"><a href="{% url 'family_detail' family.id %}">{{ family.name }}</a></li>
+            {% endfor %}
+        </ul>
+  </section>
+
 {% endblock %}

@@ -1,41 +1,64 @@
 {% extends 'base.html' %}
-{% load static %}
+
 {% load form_tags %}
 
+{% load tailwind_filters %}
+
 {% block content %}
-<div class="container mt-4">
-    <form method="get" class="form-inline mb-4">
-        <div class="form-group mr-2">
-            <label for="id_edibility" class="mr-2">Jedlost:</label>
+<section class="container">
+    <form method="get" class=" m-6 flex-row md:block sm:block lg:flex">
+        <div class="block mr-2">
+            <label for="id_edibility" class="block">Jedlost:</label>
             {{ form.edibility|add_class:"form-control" }}
         </div>
-        <div class="form-group mr-2">
-            <label for="id_habitat" class="mr-2">Biotop:</label>
+        <div class="flex-col mr-2 ">
+            <label for="id_habitat" class="block">Biotop:</label>
             {{ form.habitat|add_class:"form-control" }}
         </div>
-        <div class="form-group mr-2">
-            <label for="id_family" class="mr-2">Řád:</label>
+
+        <div class="text-left mr-2">
+            <label for="id_family" class="block">Řád:</label>
             {{ form.family|add_class:"form-control" }}
         </div>
-        <button type="submit" class="btn btn-primary">Filtrovat</button>
+        <button type="submit" class="text-white mt-2 bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br
+         focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg
+          dark:shadow-green-800/80 font-medium rounded-lg text-sm px-3 py-2 text-center me-2">Filtrovat</button>
     </form>
 
-    <div class="row">
+
+    <section class="grid grid-cols-1 m-6 gap-6 md:grid-cols-2 mt-4 lg:grid-cols-3">
         {% for mushroom in mushrooms %}
-        <div class="col-md-4 mb-4">
-            <div class="card">
+            <div class="flex flex-col items-center bg-emerald-900 p-4 rounded-md border-green-900 hover:bg-emerald-800 hover:dark:shadow-xl hover:dark:shadow-emerald-800/80">
+            <h5 class="text-xl mb-3">{{ mushroom.name_cz }} <br> ({{ mushroom.name_latin }})</h5>
+                <div>
                 {% if mushroom.image %}
-                <img src="{{ mushroom.image.url }}" class="card-img-top img-fluid img-fixed" alt="{{ mushroom.name_cz }}">
+                    <img src="{{ mushroom.image.url }}" alt="{{ mushroom.name_cz }}" class="object-cover h-64 w-64 rounded-xl">
                 {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ mushroom.name_cz }} ({{ mushroom.name_latin }})</h5>
-                    <p class="card-text">{{ mushroom.description|truncatewords:20 }}</p>
-                    <p class="card-text"><strong>Jedlost:</strong> {{ mushroom.get_edibility_display }}</p>
-                    <a href="{% url 'mushroom_detail' mushroom.id %}" class="btn btn-primary">Více informací</a>
                 </div>
+            <hr>
+            <div class="mt-4 ">
+                <a href="{% url 'mushroom_detail' mushroom.id %}">
+
+
+
+                        <p class="mt-4">{{ mushroom.description|truncatewords:20 }}</p>
+                        <p class="mt-4"><strong> Jedlost:</strong>
+                        {% if mushroom.get_edibility_display == 'Jedovatá' %}
+                            <span class="text-red-500 text-lg"> {{ mushroom.get_edibility_display }}</span>
+                        {% elif mushroom.get_edibility_display == 'Nejedlá' %}
+                            <span class="text-orange-400 text-lg"> {{ mushroom.get_edibility_display }}</span>
+                        {% else %}
+                            <span class="text-lg text-lime-500"> {{ mushroom.get_edibility_display }}</span>
+                        {% endif %}
+                    </p>
+
+            </a>
             </div>
-        </div>
+            </div>
+
+
         {% endfor %}
-    </div>
-</div>
+
+    </section>
+</section>
 {% endblock %}

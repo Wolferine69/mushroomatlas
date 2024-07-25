@@ -1,9 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
+
+    <div class="container p-4 bg-emerald-950 rounded-lg drop-shadow-xl">
     {% block form_title %}{% endblock %}
     <form method="POST">
     {% csrf_token %}
-    <table>{{ form.as_table}}</table>
+    <table>{{ form.as_table }}</table>
     <input id="id_submit" type="submit" value="Potvrdit">
     </form>
+
+    </div>
+
 {% endblock %}

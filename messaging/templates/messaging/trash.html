@@ -3,14 +3,20 @@
 {% block messages_content %}
 <form method="get" action="">
     {{ form_sender.as_p }}
-    <button type="submit" class="btn btn-primary">Filtrovat</button>
-    <a href="{% url 'view_trash' %}" class="btn btn-secondary">Zrušit filtr</a>
+    <button type="submit" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4
+         focus:ring-green-300 font-medium rounded-lg text-sm
+         px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700
+         dark:focus:ring-green-800 mt-2">Filtrovat</button>
+    <a href="{% url 'view_trash' %}" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4
+         focus:ring-green-300 font-medium rounded-lg text-sm
+         px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700
+         dark:focus:ring-green-800 mt-2">Zrušit filtr</a>
 </form>
 <form id="trashForm" method="post" action="{% url 'handle_trash_actions' %}">
     {% csrf_token %}
     <ul>
         {% for message in trashed_messages %}
-            <li>
+            <li class="p-2 border-2 border-emerald-600 rounded-lg m-2 bg-emerald-700">
                 <input type="checkbox" name="message_ids" value="{{ message.id }}">
                 <a href="{% url 'message_detail' message.id %}?origin=trash">
                     <strong>{{ message.timestamp }} - Od: {{ message.sender.username }} - Předmět: {{ message.subject }}</strong>
@@ -21,6 +27,9 @@
             <li>Žádné zprávy v koši.</li>
         {% endfor %}
     </ul>
+    <button type="submit" class="text-white mt-2 bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br
+         focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-green-500/50 dark:shadow-lg
+         dark:shadow-red-800/80 font-medium rounded-lg text-sm px-3 py-2 text-center me-2">Smazat vybrané</button>
     <input type="hidden" name="action" id="action" value="">
     <button type="button" class="btn btn-danger" onclick="submitForm('delete')">Smazat vybrané</button>
     <button type="button" class="btn btn-success" onclick="submitForm('restore')">Obnovit vybrané</button>
