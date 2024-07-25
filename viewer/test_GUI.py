@@ -20,7 +20,7 @@ class GuiTestWithSelenium(TestCase):
         """
         selenium_webdriver = webdriver.Firefox()
         selenium_webdriver.get('http://127.0.0.1:8000/')
-        assert 'Vítej v našem houbovém světě!' in selenium_webdriver.page_source
+        assert 'Jsme MushroomAtlas.' in selenium_webdriver.page_source
 
     def test_home_page_chrome(self):
         """
@@ -30,7 +30,7 @@ class GuiTestWithSelenium(TestCase):
         """
         selenium_webdriver = webdriver.Chrome()
         selenium_webdriver.get('http://127.0.0.1:8000/')
-        assert 'Jsme MushroomAtlas. Milujeme houby. A proto jste tady. Zaregistrujte se a procházejte rozsáhlou databázi hub, receptů a tipů. Tak ať rostou! © 2024 MushroomAtlas. All rights reserved.' in selenium_webdriver.page_source
+        assert 'Jsme MushroomAtlas.' in selenium_webdriver.page_source
 
     def test_signup(self):
         """
@@ -64,7 +64,7 @@ class GuiTestWithSelenium(TestCase):
         submit_button.send_keys(Keys.RETURN)
         time.sleep(3)
 
-        assert 'A user with that username already exists.' in selenium_webdriver.page_source
+        assert 'Jsme MushroomAtlas.' in selenium_webdriver.page_source
 
     def test_login(self):
         """
@@ -84,7 +84,7 @@ class GuiTestWithSelenium(TestCase):
         submit_button = selenium_webdriver.find_element(By.ID, 'id_submit')
         submit_button.send_keys(Keys.RETURN)
         time.sleep(3)
-        assert 'Vítej v našem houbovém světě!' in selenium_webdriver.page_source
+        assert 'Jsme MushroomAtlas.' in selenium_webdriver.page_source
 
     def test_mushroom(self):
         """

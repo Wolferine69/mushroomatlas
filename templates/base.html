@@ -12,7 +12,7 @@
                  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
                  crossorigin=""/>
 
-         <script defer>
+        <script defer>
                 {#JS to handle mobile menu#}
                 const initApp = () => {
                     const hamburgerBtn = document.getElementById('hamburger-button')
@@ -91,15 +91,17 @@
                     {% endif %}
                 </nav>
             <div class="hidden lg:block">
-                <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="fixed right-2 top-3 text-white bg-emerald-600 hover:bg-emerald-400 focus:ring-4 focus:outline-none focus:ring-emerald-300
-                 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex text-center items-center
-                  dark:bg-teal-700 dark:hover:bg-emerald-400 dark:focus:ring-emerald-300"
+                <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="fixed right-2 top-3 text-white
+                     bg-emerald-600 hover:bg-emerald-400 focus:ring-4 focus:outline-none focus:ring-emerald-300
+                     font-medium rounded-lg text-sm px-5 py-2.5 inline-flex text-center items-center
+                     dark:bg-teal-700 dark:hover:bg-emerald-400 dark:focus:ring-emerald-300"
                         type="button">{% if user.is_authenticated %}
                             {% if user.first_name %} Vítej, {{ user.first_name }}! {% else %} Vítej, {{ user.username }}! {% endif %} {% else %} <span class="animate-pulse">Nejste prihlašeni.</span>
-                            {% endif %} <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 2">
+                            {% endif %}
+                        <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 2">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-                                </svg>
-                                    </button>
+                        </svg>
+                </button>
                 <div id="dropdown" class="z-10 hidden divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-green-900">
                     <ul class="py-2 text-sm text-white dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                         {% if user.is_authenticated %}
@@ -114,10 +116,11 @@
                                 {% endif %}
                                 <a class="block px-4 py-2 hover:bg-green-500 dark:hover:bg-green-800 dark:hover:text-white" href="{% url 'comments_recipe' %}">Komentáře k receptům</a>
 
+
+                                <a class="inline-block px-4 py-2 hover:bg-green-500 dark:hover:bg-green-800 dark:hover:text-white" href="{% url 'view_inbox' %}">Zprávy</a>
                                 {% if new_messages_count > 0 %}
-                                    <span class="ml-1 bg-green-100 text-green-800 text-xs font-medium me-2 px-2 py-0.5 rounded-full dark:bg-green-600 dark:text-green-300"> {{ new_messages_count }} </span>
+                                    <span class="bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-600 dark:text-green-300"> {{ new_messages_count }} </span>
                                 {% endif %}
-                                <a class="block px-4 py-2 hover:bg-green-500 dark:hover:bg-green-800 dark:hover:text-white" href="{% url 'view_inbox' %}">Zprávy</a>
 
                                 <a href="{%  url 'password_change' %}" class="block px-4 py-2 hover:bg-green-500 dark:hover:bg-green-800 dark:hover:text-white">změna hesla</a>
                                 <form method="post" action="{% url 'logout' %}" class="block px-4 py-2 hover:bg-green-500 dark:hover:bg-green-800 dark:hover:text-white">
@@ -137,7 +140,8 @@
             </div>
 
         </section>
-            <section id="mobile-menu" class="absolute top-0 bg-gradient-to-t from-teal-800 to-black w-full text-3xl flex-col justify-content-center origin-top
+            <section id="mobile-menu" class="absolute top-0 bg-gradient-to-t from-teal-800 to-black w-full text-3xl
+                flex-col justify-content-center origin-top
                 hidden min-h-screen">
                 <button class="text-txl self-end px-2 hover:animate-pulse">
                     &times;
@@ -155,24 +159,28 @@
                         <a href="{%  url 'accounts_list' %}" class= "w-full text-center py-4 hover:animate-pulse">Seznam uživatelů</a>
 
                         <a class="w-full text-center py-4 hover:animate-pulse" href="{% url 'profile_update' %}">Profil</a>
-                        {% if new_comments_count > 0 %}
-                            <span class="inline bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-600 dark:text-green-300"> {{ new_comments_count }} </span>
-                        {% endif %}
+{#                        {% if new_comments_count > 0 %}#}
+{#                            <span class="inline bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded#}
+{#                             dark:bg-green-600 dark:text-green-300"> {{ new_comments_count }} </span>#}
+{#                        {% endif %}#}
                         <a class="w-full text-center py-4 hover:animate-pulse" href="{% url 'comments' %}">Komentáře k nálezům</a>
 
-                        {% if new_comments_recipe_count > 0 %}
-                            <span class="bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-600 dark:text-green-300"> {{ new_comments_recipe_count }} </span>
-                        {% endif %}
+{#                        {% if new_comments_recipe_count > 0 %}#}
+{#                            <span class="bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded#}
+{#                             dark:bg-green-600 dark:text-green-300"> {{ new_comments_recipe_count }} </span>#}
+{#                        {% endif %}#}
                         <a class="w-full text-center py-4 hover:animate-pulse" href="{% url 'comments_recipe' %}">Komentáře k receptům</a>
 
-                        {% if new_messages_count > 0 %}
-                            <span class="inline bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-green-600 dark:text-green-300"> {{ new_messages_count }} </span>
-                        {% endif %}
-                        <a class="inline w-full text-center py-4 hover:animate-pulse" href="{% url 'view_inbox' %}">Zprávy</a>
+{#                        {% if new_messages_count > 0 %}#}
+{#                            <span class="inline-block bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-green-600 dark:text-green-300"> {{ new_messages_count }} </span>#}
+{#                        {% endif %}#}
+                        <a class="w-full text-center py-4 hover:animate-pulse" href="{% url 'view_inbox' %}">Zprávy</a>
+
                         <form method="post" action="{% url 'logout' %}">
                                     {% csrf_token %}
                                     <button type="submit" class= "w-full text-center py-4 hover:animate-pulse">Odhlásit se</button>
                                 </form>
+{#                        commented out span elements represents badges, implementation to be refactored #}
 
                     {% else %}
                         <a href="{% url 'mushroom_list' %}" id="link" class="w-full text-center py-6 hover:animate-pulse">Atlas Hub</a>
