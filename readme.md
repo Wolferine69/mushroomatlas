@@ -10,7 +10,7 @@ Mushroomatlas je ukázková webová aplikace pro houbaře, která umožňuje už
 - Přidávání a prohlížení receptů s houbami
 - Přidávání komentářů k nálezům a receptům
 - Filtrování nálezů podle různých kritérií (druh houby, jedlost, aktuálnost)
-
+![img_1.png](img_1.png)
 ## Instalace
 
 1. Naklonujte repozitář:
