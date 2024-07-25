@@ -7,17 +7,29 @@ from django.views.generic import ListView, DetailView, CreateView, TemplateView
 from accounts.forms import RatingForm
 from accounts.models import Profile
 from .models import Mushroom, Family, Recipe, Tip, Habitat, Finding, Comment, Message, Rating, CommentRecipe
-from .forms import MushroomForm, MushroomFilterForm, FindingForm, CommentForm, RecipeForm, MessageForm, \
-    CommentRecipeForm, RecipeFilterForm
+from .forms import (MushroomForm, MushroomFilterForm, FindingForm, CommentForm, RecipeForm, MessageForm,
+                    CommentRecipeForm, RecipeFilterForm, TipForm)
 
 
 # Create your views here.
 def home(request):
+    """
+    View function for the home page.
+
+    This view renders the home page with the 'can_add_mushroom' context variable
+    indicating whether the user has permission to add a mushroom.
+    """
     can_add_mushroom = request.user.is_authenticated and request.user.has_perm('viewer.add_mushroom')
     return render(request, "home.html", {'can_add_mushroom': can_add_mushroom})
 
 
 class MushroomListView(ListView):
+    """
+    View class for listing mushrooms.
+
+    This view displays a list of mushrooms and includes a form for filtering the list
+    based on edibility, habitat, and family.
+    """
     model = Mushroom
     template_name = 'mushroom_list.html'
     context_object_name = 'mushrooms'
@@ -42,24 +54,45 @@ class MushroomListView(ListView):
 
 
 class MushroomDetailView(DetailView):
+    """
+    View class for displaying mushroom details.
+
+    This view displays the details of a specific mushroom.
+    """
     model = Mushroom
     template_name = 'mushroom_detail.html'
     context_object_name = 'mushroom'
 
 
 class FamilyListView(ListView):
+    """
+    View class for listing mushroom families.
+
+    This view displays a list of mushroom families.
+    """
     model = Family
     template_name = 'family_list.html'
     context_object_name = 'families'
 
 
 class FamilyDetailView(DetailView):
+    """
+    View class for displaying mushroom family details.
+
+    This view displays the details of a specific mushroom family.
+    """
     model = Family
     template_name = 'family_detail.html'
     context_object_name = 'family'
 
 
 class RecipeListView(ListView):
+    """
+    View class for listing recipes.
+
+    This view displays a list of recipes and includes a form for filtering the list
+    based on main mushroom, minimum rating, and user.
+    """
     model = Recipe
     template_name = 'recipes_list.html'
     context_object_name = 'recipes'
@@ -87,6 +120,11 @@ class RecipeListView(ListView):
 
 
 class RecipeDetailView(DetailView):
+    """
+    View class for displaying recipe details.
+
+    This view displays the details of a specific recipe and includes forms for rating and commenting.
+    """
     model = Recipe
     template_name = 'recipe_detail.html'
 
@@ -136,12 +174,22 @@ class RecipeDetailView(DetailView):
 
 
 class TipListView(ListView):
+    """
+    View class for listing tips.
+
+    This view displays a list of tips.
+    """
     model = Tip
     template_name = 'tip_list.html'
     context_object_name = 'tips'
 
 
 class TipDetailView(DetailView):
+    """
+    View class for displaying tip details.
+
+    This view displays the details of a specific tip.
+    """
     model = Tip
     template_name = 'tip_detail.html'
     context_object_name = 'tip'
@@ -149,6 +197,11 @@ class TipDetailView(DetailView):
 
 @login_required
 def add_mushroom(request):
+    """
+    View function for adding a mushroom.
+
+    This view handles the creation of a new mushroom entry.
+    """
     if request.method == 'POST':
         form = MushroomForm(request.POST, request.FILES)
         if form.is_valid():
@@ -162,6 +215,11 @@ def add_mushroom(request):
 
 @login_required
 def add_recipe(request):
+    """
+    View function for adding a recipe.
+
+    This view handles the creation of a new recipe entry.
+    """
     if request.method == 'POST':
         form = RecipeForm(request.POST, request.FILES)
         if form.is_valid():
@@ -174,7 +232,31 @@ def add_recipe(request):
     return render(request, 'recipe_create.html', {'form': form})
 
 
+@login_required
+def add_tip(request):
+    """
+    View function for adding a tip.
+
+    This view handles the creation of a new tip entry.
+    """
+    if request.method == 'POST':
+        form = TipForm(request.POST, request.FILES)
+        if form.is_valid():
+            tip = form.save(commit=False)  # Neuložíme hned do databáze
+            tip.user = request.user.profile  # Nastavíme uživatele podle přihlášeného uživatele
+            tip.save()  # Uložíme tip do databáze
+            return redirect('tip_list')
+    else:
+        form = TipForm()
+    return render(request, 'tip_create.html', {'form': form})
+
+
 class FindingsMapView(ListView):
+    """
+    View class for displaying the findings map.
+
+    This view displays a map of findings and includes all mushrooms and comments.
+    """
     model = Finding
     template_name = 'findings_map.html'
     context_object_name = 'findings'
@@ -198,6 +280,11 @@ class FindingsMapView(ListView):
 
 
 class AddFindingView(LoginRequiredMixin, CreateView):
+    """
+    View class for adding a finding.
+
+    This view handles the creation of a new finding entry.
+    """
     model = Finding
     form_class = FindingForm
     template_name = 'finding_create.html'
@@ -209,6 +296,11 @@ class AddFindingView(LoginRequiredMixin, CreateView):
 
 
 class AddCommentView(LoginRequiredMixin, CreateView):
+    """
+    View class for adding a comment.
+
+    This view handles the creation of a new comment entry.
+    """
     model = Comment
     form_class = CommentForm
     template_name = 'add_comment.html'
@@ -225,15 +317,31 @@ class AddCommentView(LoginRequiredMixin, CreateView):
 
 
 class MushroomAddPermissionRequiredMixin(UserPassesTestMixin):
+    """
+    Permission mixin for adding mushrooms.
+
+    This mixin checks if the user is authenticated and has permission to add a mushroom.
+    """
+
     def test_func(self):
         return self.request.user.is_authenticated and self.request.user.has_perm('viewer.add_mushroom')
 
 
 class HomePageView(MushroomAddPermissionRequiredMixin, TemplateView):
+    """
+    View class for the home page.
+
+    This view renders the base template with mushroom add permission check.
+    """
     template_name = 'base.html'
 
 
 class CommentsListView(LoginRequiredMixin, ListView):
+    """
+    View class for listing comments.
+
+    This view displays a list of comments related to the user's findings.
+    """
     model = Comment
     template_name = 'comments_list.html'
     context_object_name = 'comments'
@@ -243,29 +351,23 @@ class CommentsListView(LoginRequiredMixin, ListView):
         return Comment.objects.filter(finding__user=user_profile)
 
 
-"""
-@login_required
-def send_message(request):
-    if request.method == 'POST':
-        form = MessageForm(request.POST)
-        if form.is_valid():
-            message = form.save(commit=False)
-            message.sender = request.user
-            message.save()
-            return redirect('inbox')
-    else:
-        form = MessageForm()
-    return render(request, 'messaging/send_message.html', {'form': form})
-"""
-
-
 @login_required
 def inbox(request):
+    """
+    View function for the inbox.
+
+    This view displays a list of messages received by the user.
+    """
     messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
     return render(request, 'messaging/inbox.html', {'messages': messages})
 
 
 def mark_comment_read(request, comment_id):
+    """
+    View function to mark a comment as read.
+
+    This view marks a comment as read and redirects to the findings map with the comment's finding highlighted.
+    """
     comment = get_object_or_404(Comment, id=comment_id)
     comment.new = False
     comment.save()
@@ -273,6 +375,11 @@ def mark_comment_read(request, comment_id):
 
 
 class CommentsRecipeListView(LoginRequiredMixin, ListView):
+    """
+    View class for listing comments on recipes.
+
+    This view displays a list of comments related to the user's recipes.
+    """
     model = CommentRecipe
     template_name = 'comments_recipe_list.html'
     context_object_name = 'comments_recipe'
@@ -283,6 +390,11 @@ class CommentsRecipeListView(LoginRequiredMixin, ListView):
 
 
 def mark_comment_recipe_read(request, comment_id):
+    """
+    View function to mark a recipe comment as read.
+
+    This view marks a recipe comment as read and redirects to the recipe detail page.
+    """
     comment = get_object_or_404(CommentRecipe, id=comment_id)
     comment.new = False
     comment.save()

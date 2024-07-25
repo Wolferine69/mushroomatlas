@@ -4,6 +4,12 @@ from .models import Message, Attachment
 
 
 class MessageForm(forms.ModelForm):
+    """
+    Form for creating and updating Message instances.
+
+    This form includes fields for the receiver, subject, content, and replied_to message.
+    """
+
     class Meta:
         model = Message
         fields = ['receiver', 'subject', 'content', 'replied_to']
@@ -18,6 +24,13 @@ class MessageForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        """
+        Initialize the form with additional parameters.
+
+        Args:
+            user (User): The user sending the message.
+            receiver (User): The user receiving the message.
+        """
         user = kwargs.pop('user', None)
         receiver = kwargs.pop('receiver', None)
         super(MessageForm, self).__init__(*args, **kwargs)
@@ -29,6 +42,12 @@ class MessageForm(forms.ModelForm):
 
 
 class AttachmentForm(forms.ModelForm):
+    """
+    Form for uploading attachments.
+
+    This form includes a single field for the file to be uploaded.
+    """
+
     class Meta:
         model = Attachment
         fields = ['file']
@@ -37,10 +56,16 @@ class AttachmentForm(forms.ModelForm):
         }
 
 
+# Inline formset for attaching files to messages
 AttachmentFormSet = forms.inlineformset_factory(Message, Attachment, form=AttachmentForm, extra=1, can_delete=False)
 
 
 class SenderFilterForm(forms.Form):
+    """
+    Form for filtering messages by sender.
+
+    This form includes a field for selecting a sender from the list of users.
+    """
     sender = forms.ModelChoiceField(
         queryset=User.objects.none(),
         required=False,
@@ -48,6 +73,12 @@ class SenderFilterForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
+        """
+        Initialize the form with additional parameters.
+
+        Args:
+            user (User): The user using the filter.
+        """
         user = kwargs.pop('user', None)
         super(SenderFilterForm, self).__init__(*args, **kwargs)
         if user:
@@ -55,6 +86,11 @@ class SenderFilterForm(forms.Form):
 
 
 class ReceiverFilterForm(forms.Form):
+    """
+    Form for filtering messages by receiver.
+
+    This form includes a field for selecting a receiver from the list of users.
+    """
     receiver = forms.ModelChoiceField(
         queryset=User.objects.none(),
         required=False,
@@ -62,6 +98,12 @@ class ReceiverFilterForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
+        """
+        Initialize the form with additional parameters.
+
+        Args:
+            user (User): The user using the filter.
+        """
         user = kwargs.pop('user', None)
         super(ReceiverFilterForm, self).__init__(*args, **kwargs)
         if user:

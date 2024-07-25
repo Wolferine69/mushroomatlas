@@ -15,4 +15,15 @@
     </ul>
 </section>
 
+<h1>Tipy a triky</h1>
+<ul>
+    {% for tip in tips %}
+    <li>
+        <a href="{% url 'tip_detail' pk=tip.pk %}">{{ tip.title }}</a> - Přidal: {{ tip.user.user.username }}
+    </li>
+    {% endfor %}
+</ul>
+        {% if user.is_authenticated %}
+        <a class="btn btn-primary" href="{% url 'add_tip' %}">Přidej tip či trik</a>
+    {% endif %}
 {% endblock %}

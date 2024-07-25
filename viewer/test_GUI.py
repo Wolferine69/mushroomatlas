@@ -1,24 +1,44 @@
 import time
-
 from django.test import TestCase
 from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 
-
 class GuiTestWithSelenium(TestCase):
+    """
+    GUI tests for the Mushroomatlas project using Selenium.
+
+    This test case class contains tests for various features of the Mushroomatlas web application.
+    It uses Selenium WebDriver to automate browser actions and validate the application behavior.
+    """
 
     def test_home_page_firefox(self):
+        """
+        Test the home page using Firefox.
+
+        This test verifies that the home page is correctly displayed using Firefox.
+        """
         selenium_webdriver = webdriver.Firefox()
         selenium_webdriver.get('http://127.0.0.1:8000/')
         assert 'Vítej v našem houbovém světě!' in selenium_webdriver.page_source
 
     def test_home_page_chrome(self):
+        """
+        Test the home page using Chrome.
+
+        This test verifies that the home page is correctly displayed using Chrome.
+        """
         selenium_webdriver = webdriver.Chrome()
         selenium_webdriver.get('http://127.0.0.1:8000/')
         assert 'Jsme MushroomAtlas. Milujeme houby. A proto jste tady. Zaregistrujte se a procházejte rozsáhlou databázi hub, receptů a tipů. Tak ať rostou! © 2024 MushroomAtlas. All rights reserved.' in selenium_webdriver.page_source
 
     def test_signup(self):
+        """
+        Test the signup process.
+
+        This test automates the signup process and verifies that an error message
+        is displayed if the username already exists.
+        """
         selenium_webdriver = webdriver.Firefox()
         selenium_webdriver.get('http://127.0.0.1:8000/accounts/registration/')
         time.sleep(0.3)
@@ -44,10 +64,14 @@ class GuiTestWithSelenium(TestCase):
         submit_button.send_keys(Keys.RETURN)
         time.sleep(3)
 
-        # assert 'Welcome to our Hollymovie' in selenium_webdriver.page_source
         assert 'A user with that username already exists.' in selenium_webdriver.page_source
 
     def test_login(self):
+        """
+        Test the login process.
+
+        This test automates the login process and verifies that the user is successfully logged in.
+        """
         selenium_webdriver = webdriver.Firefox()
         selenium_webdriver.get('http://127.0.0.1:8000/accounts/login/')
         time.sleep(0.3)
@@ -63,15 +87,18 @@ class GuiTestWithSelenium(TestCase):
         assert 'Vítej v našem houbovém světě!' in selenium_webdriver.page_source
 
     def test_mushroom(self):
+        """
+        Test the mushroom detail page.
+
+        This test verifies that the mushroom detail page for mushroom with ID 1 is correctly displayed.
+        """
         selenium_webdriver = webdriver.Firefox()
         selenium_webdriver.get('http://127.0.0.1:8000/mushrooms/1/')
         time.sleep(3)
         assert 'Hřib smrkový' in selenium_webdriver.page_source
-
 
     # def test_finding(self): #TODO: findings does't response
     #     selenium_webdriver = webdriver.Firefox()
     #     selenium_webdriver.get('http://127.0.0.1:8000/findings/1/')
     #     time.sleep(3)
     #     assert 'Hřib smrkový' in selenium_webdriver.page_source
-
