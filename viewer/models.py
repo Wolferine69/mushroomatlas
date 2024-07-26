@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from accounts.models import Profile
 
+
 class Family(models.Model):
     """Model representing a mushroom family."""
     name = models.CharField(max_length=100)
@@ -16,12 +17,14 @@ class Family(models.Model):
     def __str__(self):
         return self.name
 
+
 class Habitat(models.Model):
     """Model representing a habitat of a mushroom."""
     name = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
+
 
 class Mushroom(models.Model):
     """Model representing a mushroom."""
@@ -44,6 +47,7 @@ class Mushroom(models.Model):
     def __str__(self):
         return f"{self.name_cz} ({self.name_latin}) - {self.get_edibility_display()}"
 
+
 class Finding(models.Model):
     """Model representing a finding of a mushroom."""
     user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='findings')
@@ -56,6 +60,7 @@ class Finding(models.Model):
 
     def __str__(self):
         return f"Finding of {self.mushroom.name_cz} by {self.user.user.username}"
+
 
 class Recipe(models.Model):
     """Model representing a mushroom recipe."""
@@ -89,6 +94,7 @@ class Recipe(models.Model):
         """Returns the number of ratings for the recipe."""
         return Rating.objects.filter(recipe=self).count()
 
+
 class Rating(models.Model):
     """Model representing a rating of a recipe."""
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='hodnoceni')
@@ -97,6 +103,7 @@ class Rating(models.Model):
 
     def __str__(self):
         return f"{self.recipe.title} - {self.user.username}"
+
 
 class Tip(models.Model):
     """Model representing a tip or trick."""
@@ -112,6 +119,7 @@ class Tip(models.Model):
     def __str__(self):
         return self.title
 
+
 class Comment(models.Model):
     """Model representing a comment on a finding."""
     user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='comments')
@@ -126,6 +134,7 @@ class Comment(models.Model):
     def __str__(self):
         return f"Comment by {self.user.user.username} on {self.finding}"
 
+
 class Message(models.Model):
     """Model representing a message."""
     sender = models.ForeignKey(User, related_name='sent_messages', on_delete=models.CASCADE)
@@ -135,6 +144,7 @@ class Message(models.Model):
 
     def __str__(self):
         return f"Message from {self.sender} to {self.receiver} at {self.timestamp}"
+
 
 class CommentRecipe(models.Model):
     """Model representing a comment on a recipe."""
