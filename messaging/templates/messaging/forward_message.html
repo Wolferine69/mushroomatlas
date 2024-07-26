@@ -1,49 +1,68 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{% if reply %}Odpovědět na {% else %}Přeposlat{% endif %} zprávu</h1>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <div id="attachments">
-        {{ attachment_formset.management_form }}
-        {% for form in attachment_formset %}
-            <div class="attachment-form" data-form-index="{{ forloop.counter0 }}">
-                {{ form.as_p }}
-                <button type="button" class="remove-attachment">Odebrat</button>
+<section class="flex flex-col bg-emerald-950 items-center justify-center p-12
+                md: max-h-3xl shadow-4xl rounded-lg">
+    <article class="p-4 my-2 bg-emerald-900 rounded-lg flex flex-col items-center">
+        <h1>{% if reply %}Odpovědět na {% else %}Přeposlat{% endif %} zprávu</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div id="attachments">
+                {{ attachment_formset.management_form }}
+                {% for form in attachment_formset %}
+                    <div class="attachment-form" data-form-index="{{ forloop.counter0 }}">
+                        {{ form.as_p }}
+                        <button type="button" class="remove-attachment text-white mt-2 bg-gradient-to-r from-red-400 via-red-500
+                        to-red-600 hover:bg-gradient-to-br
+                        focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-green-500/50
+                        dark:shadow-lg
+                        dark:shadow-red-800/80 font-medium rounded-lg text-sm px-3 py-2 text-center me-2">Odebrat</button>
+                    </div>
+                {% endfor %}
             </div>
-        {% endfor %}
-    </div>
-    <button type="button" id="add-attachment">Přidat přílohu</button>
-    <button type="submit" class="btn btn-primary">{% if reply %}Odpovědět{% else %}Přeposlat{% endif %}</button>
-</form>
+            <button type="button" id="add-attachment" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4
+             focus:ring-green-300 font-medium rounded-lg text-sm
+             px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700
+             dark:focus:ring-green-800 mt-2">Přidat přílohu</button>
+            <button type="submit" class='focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4
+             focus:ring-green-300 font-medium rounded-lg text-sm
+             px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700
+             dark:focus:ring-green-800 mt-2'>{% if reply %}Odpovědět{% else %}Přeposlat{% endif %}</button>
+        </form>
 
-<template id="attachment-template">
-    <div class="attachment-form">
-        {{ attachment_formset.empty_form.as_p }}
-        <button type="button" class="remove-attachment">Odebrat</button>
-    </div>
-</template>
+        <template id="attachment-template">
+            <div class="attachment-form">
+                {{ attachment_formset.empty_form.as_p }}
+                <button type="button" class="remove-attachment text-white mt-2 bg-gradient-to-r from-red-400 via-red-500
+                        to-red-600 hover:bg-gradient-to-br
+                        focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-green-500/50
+                        dark:shadow-lg
+                        dark:shadow-red-800/80 font-medium rounded-lg text-sm px-3 py-2 text-center me-2">Odebrat</button>
+            </div>
+        </template>
 
-{% if not reply %}
-<hr style="margin: 20px 0; border: 1px solid #ccc;">
+        {% if not reply %}
+            </article>
 
-<h2>Původní přílohy</h2>
-{% if original_message.attachments.exists %}
-<ul>
-    {% for attachment in original_message.attachments.all %}
-        <li><strong>Příloha:</strong> <a href="{{ attachment.file.url }}">{{ attachment.file.name }}</a></li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>Žádné přílohy.</p>
-{% endif %}
-{% endif %}
+    <article class="p-4 my-2 bg-emerald-900 rounded-lg flex flex-col items-center">
+                <h2>Původní přílohy</h2>
+        {% if original_message.attachments.exists %}
+        <ul>
+            {% for attachment in original_message.attachments.all %}
+                <li><strong>Příloha:</strong> <a href="{{ attachment.file.url }}">{{ attachment.file.name }}</a></li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>Žádné přílohy.</p>
+        {% endif %}
+        {% endif %}
 
-<hr style="margin: 20px 0; border: 1px solid #ccc;">
 
-<a href="{% url 'view_inbox' %}" class="btn btn-secondary">Zpět do přijatých zpráv</a>
+        </article>
 
+    <a href="{% url 'view_inbox' %}" class="underline">Zpět do přijatých zpráv</a>
+</section>
 <script>
     document.getElementById('add-attachment').addEventListener('click', function() {
         var attachmentTemplate = document.getElementById('attachment-template').content.cloneNode(true);

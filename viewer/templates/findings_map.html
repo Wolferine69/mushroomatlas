@@ -4,7 +4,7 @@
 {% block content %}
 
 <section class="flex flex-col items-center justify-center p-12 md:bg-emerald-950 max-h-3xl shadow-4xl rounded-lg">
-    <div id="map" style="height: 500px; width: 100%;" class="rounded-lg border-2 border-emerald-500 mb-4"></div>
+    <div id="map" style="height: 500px; width: 100%;" class="rounded-lg border-2 border-emerald-500 mb-4 z-10"></div>
     <article class="p-4 my-2 bg-emerald-900 rounded-lg flex flex-col items-center">
 
         <form id="filter-form">
@@ -16,6 +16,7 @@
                 {% endfor %}
             </select>
             <br>
+
             <label for="time-filter">Aktuálnost:</label>
             <select id="time-filter" name="time">
                 <option value="">Kdykoliv</option>
